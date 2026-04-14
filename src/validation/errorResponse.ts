@@ -1,16 +1,13 @@
-import {APIErrorResult} from "../types/errors.types";
+import { APIErrorResult } from '../types/errors.types'
 
-export const errorResponse = (
-    errorsArray: Array<{message: string, field: string}>
-) => {
+export const errorResponse = (errorsArray: Array<{ message: string; field: string }>) => {
+  let errors_: APIErrorResult = {
+    errorsMessages: [] as Array<{ message: string; field: string }>,
+  }
 
-    let errors_: APIErrorResult = {
-        errorsMessages: [] as Array<{message: string, field: string}>
-    }
+  errorsArray.forEach((error) => {
+    errors_.errorsMessages.push(error)
+  })
 
-    errorsArray.forEach((error) => {
-        errors_.errorsMessages.push(error)
-    })
-
-    return errors_
+  return errors_
 }

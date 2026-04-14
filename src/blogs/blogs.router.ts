@@ -5,6 +5,7 @@ import { HTTP_STATUSES } from '../settings';
 
 import type { BlogInput, BlogView } from './blogs.types';
 import type { APIErrorResult } from '../types/errors.types';
+import {blogFieldValidator} from "../validation/fieldValidator";
 
 export const blogsRouter = Router({});
 
@@ -15,57 +16,14 @@ export const blogsController = {
         res.status(HTTP_STATUSES.OK_200).json(blogs);
     },
 
-    getBlogById (req: Request<{ id: string }>, res: Response<BlogView>) {
-        const blog = db.blogs.find((b) => b.id === req.params.id);
-
-        if (!blog) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
-        }
-
-        res.status(HTTP_STATUSES.OK_200).json(blog);
-    },
-
     createBlog (
         req: Request<{}, {}, BlogInput>,
         res: Response<BlogView | APIErrorResult>,
     ) {
+
+        const errorsMessages = blogFieldValidator(req.body);
+
         const { name, description, websiteUrl } = req.body;
-
-        const errorsMessages: APIErrorResult['errorsMessages'] = [];
-
-        if (!name || typeof name !== 'string' || name.trim().length > 15) {
-            errorsMessages.push({
-                message: 'Invalid name',
-                field: 'name',
-            });
-        }
-
-        if (
-            !description ||
-            typeof description !== 'string' ||
-            description.trim().length > 500
-        ) {
-            errorsMessages.push({
-                message: 'Invalid description',
-                field: 'description',
-            });
-        }
-
-        const websiteUrlPattern =
-            /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
-
-        if (
-            !websiteUrl ||
-            typeof websiteUrl !== 'string' ||
-            websiteUrl.trim().length > 100 ||
-            !websiteUrlPattern.test(websiteUrl)
-        ) {
-            errorsMessages.push({
-                message: 'Invalid websiteUrl',
-                field: 'websiteUrl',
-            });
-        }
 
         if (errorsMessages.length > 0) {
             res.status(HTTP_STATUSES.BAD_REQUEST_400).json({ errorsMessages });
@@ -84,6 +42,17 @@ export const blogsController = {
         res.status(HTTP_STATUSES.CREATED_201).json(newBlog);
     },
 
+    getBlogById (req: Request<{ id: string }>, res: Response<BlogView>) {
+        const blog = db.blogs.find((b) => b.id === req.params.id);
+
+        if (!blog) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+            return;
+        }
+
+        res.status(HTTP_STATUSES.OK_200).json(blog);
+    },
+
     updateBlog (
         req: Request<{ id: string }, {}, BlogInput>,
         res: Response<APIErrorResult>,
@@ -95,47 +64,14 @@ export const blogsController = {
             return;
         }
 
-        const { name, description, websiteUrl } = req.body;
-
-        const errorsMessages: APIErrorResult['errorsMessages'] = [];
-
-        if (!name || typeof name !== 'string' || name.trim().length > 15) {
-            errorsMessages.push({
-                message: 'Invalid name',
-                field: 'name',
-            });
-        }
-
-        if (
-            !description ||
-            typeof description !== 'string' ||
-            description.trim().length > 500
-        ) {
-            errorsMessages.push({
-                message: 'Invalid description',
-                field: 'description',
-            });
-        }
-
-        const websiteUrlPattern =
-            /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
-
-        if (
-            !websiteUrl ||
-            typeof websiteUrl !== 'string' ||
-            websiteUrl.trim().length > 100 ||
-            !websiteUrlPattern.test(websiteUrl)
-        ) {
-            errorsMessages.push({
-                message: 'Invalid websiteUrl',
-                field: 'websiteUrl',
-            });
-        }
+        const errorsMessages = blogFieldValidator(req.body);
 
         if (errorsMessages.length > 0) {
             res.status(HTTP_STATUSES.BAD_REQUEST_400).json({ errorsMessages });
             return;
         }
+
+        const { name, description, websiteUrl } = req.body;
 
         blog.name = name.trim();
         blog.description = description.trim();

@@ -1,6 +1,6 @@
 import { BlogInput } from '../blogs/blogs.types'
 
-export const fieldValidator = (data: BlogInput): Array<{ message: string; field: string }> => {
+export const blogFieldValidator = (data: BlogInput): Array<{ message: string; field: string }> => {
   const errorsArray: Array<{ message: string; field: string }> = []
 
   if (!data.name || typeof data.name !== 'string' || data.name.trim().length > 15) {

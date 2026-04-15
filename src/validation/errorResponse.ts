@@ -1,6 +1,11 @@
-import { APIErrorResult } from '../types/errors.types'
+import {APIErrorResult, FieldError} from '../types/errors.types'
 
-export const errorResponse = (errorsArray: Array<{ message: string; field: string }>) => {
+export const errorResponse = (errorsMessages: FieldError[]): APIErrorResult => {
+  return { errorsMessages }
+}
+
+
+/*export const errorResponse = (errorsArray: Array<{ message: string; field: string }>) => {
   let errors_: APIErrorResult = {
     errorsMessages: [] as Array<{ message: string; field: string }>,
   }
@@ -10,4 +15,4 @@ export const errorResponse = (errorsArray: Array<{ message: string; field: strin
   })
 
   return errors_
-}
+}*/

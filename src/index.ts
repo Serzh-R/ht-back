@@ -1,12 +1,6 @@
-import express from 'express'
+import { app } from './app'
+import { SETTINGS } from './settings'
 
-// создание приложения
-const app = express()
-
-// порт приложения
-const PORT = process.env.PORT || 5001
-
-// запуск приложения
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`)
+app.listen(SETTINGS.PORT, () => {
+  console.log(`Server started on port ${SETTINGS.PORT}`)
 })

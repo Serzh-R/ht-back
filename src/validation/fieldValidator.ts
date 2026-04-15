@@ -1,20 +1,21 @@
 import { BlogInput } from '../blogs/blogs.types'
+import {FieldError} from "../types/errors.types";
 
-export const blogFieldValidator = (data: BlogInput): Array<{ message: string; field: string }> => {
-  const errorsArray: Array<{ message: string; field: string }> = []
+export const blogFieldValidator = (data: BlogInput): FieldError[] => {
+  const errorsArray: FieldError[] = []
 
-  if (!data.name || typeof data.name !== 'string' || data.name.trim().length > 15) {
+  const name = typeof data.name === 'string' ? data.name.trim() : ''
+  const description = typeof data.description === 'string' ? data.description.trim() : ''
+  const websiteUrl = typeof data.websiteUrl === 'string' ? data.websiteUrl.trim() : ''
+
+  if (name.length < 1 || name.length > 15) {
     errorsArray.push({
       message: 'Invalid name',
       field: 'name',
     })
   }
 
-  if (
-    !data.description ||
-    typeof data.description !== 'string' ||
-    data.description.trim().length > 500
-  ) {
+  if (description.length < 1 || description.length > 500) {
     errorsArray.push({
       message: 'Invalid description',
       field: 'description',
@@ -24,10 +25,9 @@ export const blogFieldValidator = (data: BlogInput): Array<{ message: string; fi
   const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
 
   if (
-    !data.websiteUrl ||
-    typeof data.websiteUrl !== 'string' ||
-    data.websiteUrl.trim().length > 100 ||
-    !websiteUrlPattern.test(data.websiteUrl)
+      websiteUrl.length < 1 ||
+      websiteUrl.length > 100 ||
+      !websiteUrlPattern.test(websiteUrl)
   ) {
     errorsArray.push({
       message: 'Invalid websiteUrl',

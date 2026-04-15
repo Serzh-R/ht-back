@@ -48,3 +48,15 @@ export const db: DBType = {
     },
   ],
 }
+
+export const setDB  = (dataset?: Partial<DBType>) => {
+  if (!dataset) { // если в функцию ничего не передано - то очищаем базу данных
+    db.blogs = []
+    db.posts = []
+    return
+  }
+
+  // если что-то передано - то заменяем старые значения новыми
+  db.blogs = dataset.blogs ?? db.blogs
+  db.posts = dataset.posts ?? db.posts
+}

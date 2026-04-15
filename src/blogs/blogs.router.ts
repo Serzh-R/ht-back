@@ -7,12 +7,13 @@ import type { BlogInput, BlogView } from './blogs.types';
 import type { APIErrorResult } from '../types/errors.types';
 import {blogFieldValidator} from "../validation/fieldValidator";
 import {errorResponse} from "../validation/errorResponse";
+import {randomUUID} from "node:crypto";
 
 export const blogsRouter = Router({});
 
 export const blogsController = {
 
-    getBlogs (req: Request, res: Response) {
+    getBlogs (req: Request, res: Response<BlogView[]>) {
         const blogs = db.blogs;
         res.status(HTTP_STATUSES.OK_200).json(blogs);
     },
@@ -32,7 +33,7 @@ export const blogsController = {
         }
 
         const newBlog: BlogView = {
-            id: String(Date.now()),
+            id: String(randomUUID()),
             name: name.trim(),
             description: description.trim(),
             websiteUrl: websiteUrl.trim(),
@@ -89,7 +90,11 @@ export const blogsController = {
             return;
         }
 
+        const deletedBlogId = db.blogs[blogIndex].id
+
         db.blogs.splice(blogIndex, 1);
+
+        db.posts = db.posts.filter((p) => p.blogId !== deletedBlogId)
 
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
     }

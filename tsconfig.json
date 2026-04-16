@@ -3,9 +3,10 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -47,6 +48,6 @@
     // "noUncheckedSideEffectImports": true,
     // "moduleDetection": "force",
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["dist", "node_modules", "__tests__"]
+  "include": ["src/**/*.ts", "__tests__/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
 }

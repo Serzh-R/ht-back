@@ -3,8 +3,8 @@ import { Request, Response } from 'express';
 import {HTTP_STATUSES} from "../settings";
 import {BlogInput, BlogView} from "./blogs.types";
 import {APIErrorResult} from "../types/errors.types";
-import {blogFieldValidator} from "../validation/fieldValidator";
-import {errorResponse} from "../validation/errorResponse";
+import {blogFieldValidator} from "../validation/custom-validator/fieldValidator";
+import {errorResponse} from "../validation/custom-validator/errorResponse";
 import {randomUUID} from "node:crypto";
 import {blogsRepository} from "./blogs.repository";
 

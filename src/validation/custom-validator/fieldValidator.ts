@@ -1,5 +1,5 @@
 import { BlogInput } from '../../blogs/blogs.types'
-import {FieldError} from "../../types/errors.types";
+import { FieldError } from '../../types/errors.types'
 
 export const blogFieldValidator = (data: BlogInput): FieldError[] => {
   const errorsArray: FieldError[] = []
@@ -24,11 +24,7 @@ export const blogFieldValidator = (data: BlogInput): FieldError[] => {
 
   const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
 
-  if (
-      websiteUrl.length < 1 ||
-      websiteUrl.length > 100 ||
-      !websiteUrlPattern.test(websiteUrl)
-  ) {
+  if (websiteUrl.length < 1 || websiteUrl.length > 100 || !websiteUrlPattern.test(websiteUrl)) {
     errorsArray.push({
       message: 'Invalid websiteUrl',
       field: 'websiteUrl',

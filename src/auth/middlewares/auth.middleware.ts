@@ -1,14 +1,42 @@
 import { NextFunction, Request, Response } from 'express'
-import { HTTP_STATUSES, SETTINGS } from '../../settings'
+import {HTTP_STATUSES, SETTINGS} from "../../settings";
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  let data = `${SETTINGS.ADMIN.LOGIN}:${SETTINGS.ADMIN.PASSWORD}`
+const ADMIN_USERNAME = SETTINGS.ADMIN.LOGIN;
+const ADMIN_PASSWORD = SETTINGS.ADMIN.PASSWORD;
 
-  let base64data = Buffer.from(data).toString('base64') // закодированная string под base64
-  const validAuthValue = `Basic ${base64data}` // вся кодировка 'Basic SDGSNstnsdgn' (admin:qwerty)
-  let authHeader = req.headers.authorization
+export const authMiddleware = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
 
-  if (authHeader && authHeader === validAuthValue) {
-    next()
-  } else res.sendStatus(HTTP_STATUSES.UNAUTORIZED_401)
-}
+  const auth = req.headers.authorization;
+
+  if (!auth) {
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+
+  const [authType, token] = auth.split(' ');
+
+  if (authType !== 'Basic') {
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+
+  if (!token) {
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+
+  const credentials = Buffer.from(token, 'base64').toString('utf-8');
+
+  const [username, password] = credentials.split(':'); // credentials: 'admin:qwerty'
+
+  if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+
+  next(); // Успешная авторизация, продолжаем
+};

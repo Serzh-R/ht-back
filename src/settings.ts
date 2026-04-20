@@ -5,8 +5,8 @@ export const SETTINGS = {
   PORT: Number(process.env.PORT) || 3003,
 
   ADMIN: {
-    LOGIN: 'admin',
-    PASSWORD: 'qwerty',
+    LOGIN: process.env.ADMIN_USERNAME || 'admin',
+    PASSWORD: process.env.ADMIN_PASSWORD || 'qwerty',
   },
 
   PATH: {
@@ -22,7 +22,7 @@ export const HTTP_STATUSES = {
   NO_CONTENT_204: 204,
 
   BAD_REQUEST_400: 400,
-  UNAUTORIZED_401: 401,
+  UNAUTHORIZED_401: 401,
   NOT_FOUND_404: 404,
 
   SERVER_ERROR_500: 500,

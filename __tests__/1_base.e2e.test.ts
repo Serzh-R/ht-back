@@ -1,4 +1,4 @@
-import { req } from './test-helpers'
+import { req } from './helpers/test-helpers'
 
 describe('/', () => {
   it('Should check base endpoint', async () => {

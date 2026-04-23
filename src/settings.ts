@@ -15,7 +15,7 @@ export const SETTINGS = {
     DELETE_ALL: '/testing/all-data',
   },
 
-  MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017',
+  MONGO_URL: process.env.MONGO_URL || '',
   DB_NAME: process.env.DB_NAME || 'blogger_platform',
 }
 

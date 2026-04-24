@@ -1,4 +1,4 @@
-import { SETTINGS } from '../../src/settings'
+import { SETTINGS } from '../../src/core/settings'
 
 export function generateBasicAuthToken() {
     const credentials = `${SETTINGS.ADMIN.LOGIN}:${SETTINGS.ADMIN.PASSWORD}`

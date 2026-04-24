@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { randomUUID } from 'node:crypto'
-import { HTTP_STATUSES } from '../settings'
+import { HTTP_STATUSES } from '../core/settings'
 import { PostInput, PostView } from './posts.types'
 import { blogsRepository } from '../blogs/blogs.repository'
-import { postsRepository } from './posts.reposirory'
+import { postsRepository } from './posts.repository'
 
 export const postsController = {
   getPosts(req: Request, res: Response<PostView[]>) {

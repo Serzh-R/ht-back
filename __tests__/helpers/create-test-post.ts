@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { Express } from 'express'
-import { SETTINGS, HTTP_STATUSES } from '../../src/settings'
+import { SETTINGS, HTTP_STATUSES } from '../../src/core/settings'
 import { correctPostData } from './test-data'
 import {generateBasicAuthToken} from "./generate-basic-auth-token";
 

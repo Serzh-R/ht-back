@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { Express } from 'express';
-import {HTTP_STATUSES, SETTINGS} from "../../src/settings";
+import {HTTP_STATUSES, SETTINGS} from "../../src/core/settings";
 
 export async function clearDb(app: Express) {
     await request(app)

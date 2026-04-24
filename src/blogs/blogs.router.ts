@@ -3,9 +3,9 @@ import { blogsController } from './blogs.controller'
 import {
   blogFieldsValidator,
   idParamValidator,
-} from '../validation/express-validator/fieldValidators'
+} from '../core/middlewares/validation/fieldValidators'
 import { authMiddleware } from '../auth/middlewares/auth.middleware'
-import { errorsResultMiddleware } from '../validation/express-validator/errorsResultMiddleware'
+import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
 
 export const blogsRouter = Router({})
 

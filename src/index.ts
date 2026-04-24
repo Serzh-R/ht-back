@@ -1,5 +1,5 @@
 import { app } from './app'
-import { SETTINGS } from './settings'
+import { SETTINGS } from './core/settings'
 import {runDb} from "./db/mongo.db";
 
 app.set('trust proxy', true) // ✅ Позволяет корректно получать `req.ip` за прокси

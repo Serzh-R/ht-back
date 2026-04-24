@@ -1,5 +1,5 @@
 import { Collection, Db, MongoClient } from 'mongodb'
-import { SETTINGS } from '../settings'
+import { SETTINGS } from '../core/settings'
 import { BlogView } from '../blogs/blogs.types'
 import { PostView } from '../posts/posts.types'
 

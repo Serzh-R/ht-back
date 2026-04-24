@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import {HTTP_STATUSES, SETTINGS} from "../../settings";
+import {HTTP_STATUSES, SETTINGS} from "../../core/settings";
 
 const ADMIN_USERNAME = SETTINGS.ADMIN.LOGIN;
 const ADMIN_PASSWORD = SETTINGS.ADMIN.PASSWORD;

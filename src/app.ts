@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 
-import { HTTP_STATUSES, SETTINGS } from './settings'
+import { HTTP_STATUSES, SETTINGS } from './core/settings'
 import { db } from './db/db'
 
 import express from 'express'

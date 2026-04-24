@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { HTTP_STATUSES } from '../settings'
+import { HTTP_STATUSES } from '../core/settings'
 import { BlogInput, BlogView } from './blogs.types'
 import { blogFieldValidator } from '../validation/custom-validator/fieldValidator'
 import { randomUUID } from 'node:crypto'

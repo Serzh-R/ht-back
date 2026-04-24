@@ -4,8 +4,8 @@ import { authMiddleware } from '../auth/middlewares/auth.middleware'
 import {
   postFieldsValidator,
   postIdParamValidator,
-} from '../validation/express-validator/fieldValidators'
-import { errorsResultMiddleware } from '../validation/express-validator/errorsResultMiddleware'
+} from '../core/middlewares/validation/fieldValidators'
+import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
 
 export const postsRouter = Router({})
 

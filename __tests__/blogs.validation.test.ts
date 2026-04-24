@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { app } from '../src/app'
-import { HTTP_STATUSES, SETTINGS } from '../src/settings'
+import { HTTP_STATUSES, SETTINGS } from '../src/core/settings'
 import { clearDb } from './helpers/clear-db'
 import { createTestBlog } from './helpers/create-test-blog'
 import { correctBlogData } from './helpers/test-data'

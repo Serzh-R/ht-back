@@ -28,3 +28,11 @@ export async function runDb(url: string): Promise<boolean> {
         return false
     }
 }
+
+// для тестов
+export async function stopDb() {
+    if (!client) {
+        throw new Error(`❌ No active client`);
+    }
+    await client.close();
+}

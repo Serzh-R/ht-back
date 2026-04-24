@@ -1,17 +1,30 @@
-
+import { Collection, Db, MongoClient } from 'mongodb'
 import { SETTINGS } from '../settings'
-import mongoose from 'mongoose'
+import { BlogView } from '../blogs/blogs.types'
+import { PostView } from '../posts/posts.types'
+
+const BLOG_COLLECTION_NAME = 'blogs'
+const POST_COLLECTION_NAME = 'posts'
+
+export let client: MongoClient
+export let blogCollection: Collection<BlogView>
+export let postCollection: Collection<PostView>
 
 export async function runDb(url: string): Promise<boolean> {
-    try {
-        await mongoose.connect(url, {
-            dbName: SETTINGS.DB_NAME,
-        })
+    client = new MongoClient(url)
+    const db: Db = client.db(SETTINGS.DB_NAME)
 
-        console.log('Connected successfully to MongoDB')
+    blogCollection = db.collection<BlogView>(BLOG_COLLECTION_NAME)
+    postCollection = db.collection<PostView>(POST_COLLECTION_NAME)
+
+    try {
+        await client.connect()
+        await db.command({ ping: 1 })
+        console.log('✅ Connected to the database')
         return true
-    } catch (err) {
-        console.error('Error connecting to MongoDB:', err)
+    } catch (e) {
+        await client.close()
+        console.error('❌ Database not connected:', e)
         return false
     }
 }

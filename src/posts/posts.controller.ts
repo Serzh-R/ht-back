@@ -23,7 +23,7 @@ export const postsController = {
   },
 
   createPost(req: Request<{}, {}, PostInput>, res: Response<PostView>) {
-    const { title, shortDescription, content, blogId } = req.body
+    const { title, shortDescription, content, blogId} = req.body
 
     const blog = blogsRepository.findById(blogId.trim())!
 

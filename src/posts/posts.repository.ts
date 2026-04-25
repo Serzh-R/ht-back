@@ -1,44 +1,82 @@
 import { db } from '../db/db'
-import { PostInput, PostView } from './posts.types'
+import {PostDb, PostInput, PostView} from './posts.types'
+import {postCollection} from "../db/mongo.db";
+import {mapperPostView} from "./mappers/mapper.post-view";
+import {ObjectId} from "mongodb";
 
 export const postsRepository = {
-  findAll(): PostView[] {
-    return db.posts
+  async findAll(): Promise<PostView[]> {
+    const posts = await postCollection.find({}).toArray()
+    return posts.map(mapperPostView)
   },
 
-  findById(id: string): PostView | null {
-    return db.posts.find((p) => p.id === id) ?? null
-  },
+  async findById(id: string): Promise<PostView | null> {
+    if (!ObjectId.isValid(id)) {
+      return null
+    }
 
-  create(newPost: PostView): PostView {
-    db.posts.push(newPost)
-    return newPost
-  },
-
-  update(id: string, dto: PostInput, blogName: string): boolean {
-    const post = db.posts.find((p) => p.id === id)
+    const post = await postCollection.findOne({ _id: new ObjectId(id) })
 
     if (!post) {
-      return false
+      return null
     }
 
-    post.title = dto.title.trim()
-    post.shortDescription = dto.shortDescription.trim()
-    post.content = dto.content.trim()
-    post.blogId = dto.blogId.trim()
-    post.blogName = blogName
-
-    return true
+    return mapperPostView(post)
   },
 
-  delete(id: string): boolean {
-    const postIndex = db.posts.findIndex((p) => p.id === id)
+  async create(input: PostInput, blogName: string): Promise<PostView> {
+    const newPost: PostDb = {
+      title: input.title,
+      shortDescription: input.shortDescription,
+      content: input.content,
+      blogId: input.blogId,
+      blogName,
+      createdAt: new Date(),
+    }
 
-    if (postIndex === -1) {
+    const result = await postCollection.insertOne(newPost)
+
+    const createdPost = await postCollection.findOne({
+      _id: result.insertedId,
+    })
+
+    if (!createdPost) {
+      throw new Error('Post was not created')
+    }
+
+    return mapperPostView(createdPost)
+  },
+
+  async update(id: string, input: PostInput, blogName: string): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
       return false
     }
 
-    db.posts.splice(postIndex, 1)
-    return true
+    const result = await postCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            title: input.title,
+            shortDescription: input.shortDescription,
+            content: input.content,
+            blogId: input.blogId,
+            blogName,
+          },
+        },
+    )
+
+    return result.matchedCount === 1
+  },
+
+  async delete(id: string): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
+      return false
+    }
+
+    const result = await postCollection.deleteOne({
+      _id: new ObjectId(id)
+    })
+
+    return result.deletedCount === 1
   },
 }

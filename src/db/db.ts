@@ -7,18 +7,24 @@ export const db: DBType = {
       name: 'Serzh',
       description: 'description',
       websiteUrl: 'https://live.com',
+      createdAt: new Date().toISOString(),
+      isMembership: false,
     },
     {
       id: '2',
       name: 'IT Blog',
       description: 'blog about backend',
       websiteUrl: 'https://itblog.com',
+      createdAt: new Date().toISOString(),
+      isMembership: false,
     },
     {
       id: '3',
       name: 'JS Notes',
       description: 'notes about javascript',
       websiteUrl: 'https://jsnotes.dev',
+      createdAt: new Date().toISOString(),
+      isMembership: false,
     },
   ],
   posts: [
@@ -29,6 +35,7 @@ export const db: DBType = {
       content: 'content 1',
       blogId: '1',
       blogName: 'Serzh',
+      createdAt: new Date().toISOString(),
     },
     {
       id: '2',
@@ -37,6 +44,7 @@ export const db: DBType = {
       content: 'content 2',
       blogId: '2',
       blogName: 'IT Blog',
+      createdAt: new Date().toISOString(),
     },
     {
       id: '3',
@@ -45,6 +53,7 @@ export const db: DBType = {
       content: 'content 3',
       blogId: '3',
       blogName: 'JS Notes',
+      createdAt: new Date().toISOString(),
     },
   ],
 }

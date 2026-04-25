@@ -6,30 +6,13 @@ import { randomUUID } from 'node:crypto'
 import { blogsRepository } from './blogs.repository'
 
 export const blogsController = {
-  getBlogs(req: Request, res: Response<BlogView[]>) {
-    const blogs = blogsRepository.findAll()
+  async getBlogs(req: Request, res: Response<BlogView[]>) {
+    const blogs = await blogsRepository.findAll()
     res.status(HTTP_STATUSES.OK_200).json(blogs)
   },
 
-  createBlog(req: Request<{}, {}, BlogInput>, res: Response<BlogView>) {
-    const errorsMessages = blogFieldValidator(req.body)
-
-    const { name, description, websiteUrl } = req.body
-
-    const newBlog: BlogView = {
-      id: String(randomUUID()),
-      name: name.trim(),
-      description: description.trim(),
-      websiteUrl: websiteUrl.trim(),
-    }
-
-    const createdBlog = blogsRepository.create(newBlog)
-
-    res.status(HTTP_STATUSES.CREATED_201).json(createdBlog)
-  },
-
-  getBlogById(req: Request<{ id: string }>, res: Response<BlogView>) {
-    const blog = blogsRepository.findById(req.params.id)
+  async getBlogById(req: Request<{ id: string }>, res: Response<BlogView>) {
+    const blog = await blogsRepository.findById(req.params.id)
 
     if (!blog) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -39,8 +22,15 @@ export const blogsController = {
     res.status(HTTP_STATUSES.OK_200).json(blog)
   },
 
-  updateBlog(req: Request<{ id: string }, {}, BlogInput>, res: Response) {
-    const isUpdated = blogsRepository.update(req.params.id, req.body)
+  async createBlog(req: Request<{}, {}, BlogInput>, res: Response<BlogView>) {
+
+    const createdBlog = await blogsRepository.create(req.body)
+
+    res.status(HTTP_STATUSES.CREATED_201).json(createdBlog)
+  },
+
+  async updateBlog(req: Request<{ id: string }, {}, BlogInput>, res: Response) {
+    const isUpdated = await blogsRepository.update(req.params.id, req.body)
 
     if (!isUpdated) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -50,8 +40,8 @@ export const blogsController = {
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
   },
 
-  deleteBlogById(req: Request<{ id: string }>, res: Response) {
-    const isDeleted = blogsRepository.delete(req.params.id)
+  async deleteBlogById(req: Request<{ id: string }>, res: Response) {
+    const isDeleted = await blogsRepository.delete(req.params.id)
 
     if (!isDeleted) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

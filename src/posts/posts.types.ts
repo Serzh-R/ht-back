@@ -1,8 +1,20 @@
+import {ObjectId} from "mongodb";
+
 export type PostInput = {
   title: string
   shortDescription: string
   content: string
   blogId: string
+}
+
+export type PostDb = {
+  _id?: ObjectId
+  title: string
+  shortDescription: string
+  content: string
+  blogId: string
+  blogName: string
+  createdAt: Date
 }
 
 export type PostView = {
@@ -12,4 +24,5 @@ export type PostView = {
   content: string
   blogId: string
   blogName: string
+  createdAt: string
 }

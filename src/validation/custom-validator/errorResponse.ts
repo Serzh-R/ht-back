@@ -1,4 +1,4 @@
-import { APIErrorResult, FieldError } from '../../types/errors.types'
+import { APIErrorResult, FieldError } from '../../core/types/errors.types'
 
 export const errorResponse = (errorsMessages: FieldError[]): APIErrorResult => {
   return { errorsMessages }

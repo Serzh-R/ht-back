@@ -1,5 +1,5 @@
 import { BlogInput } from '../../blogs/blogs.types'
-import { FieldError } from '../../types/errors.types'
+import { FieldError } from '../../core/types/errors.types'
 
 export const blogFieldValidator = (data: BlogInput): FieldError[] => {
   const errorsArray: FieldError[] = []

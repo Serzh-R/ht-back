@@ -3,10 +3,10 @@ import { blogsRepository } from '../../../blogs/blogs.repository'
 
 export const idParamValidator = param('id')
   .isString()
-  .withMessage('name should be a string')
+  .withMessage('id should be a string')
   .trim()
   .notEmpty()
-  .withMessage('name is required')
+  .withMessage('id is required')
 
 export const blogIdValidator = body('blogId')
   .isString()
@@ -16,7 +16,7 @@ export const blogIdValidator = body('blogId')
 
 /***********************************************************************/
 
-const BlogFields: string[] = ['name', 'description', 'websiteUrl']
+/*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
 
 export const specificFieldsValidator = (fields: string[]) => {
   return body().custom((_, { req }) => {
@@ -27,30 +27,29 @@ export const specificFieldsValidator = (fields: string[]) => {
     }
     return true
   })
-}
+}*/
 
 export const blogFieldsValidator = [
-  specificFieldsValidator(BlogFields),
+  //specificFieldsValidator(BlogFields),
   body('name')
-    // .optional()
     .isString()
     .withMessage('name should be a string')
     .trim()
     .notEmpty()
     .withMessage('name is required')
-    .isLength({ max: 15 })
-    .withMessage('the name length should not exceed 15 characters'),
+    .isLength({ min: 1, max: 15 })
+    .withMessage('name length should be from 1 to 15 symbols'),
+
   body('description')
-    //.optional()
     .isString()
     .withMessage('description should be a string')
     .trim()
     .notEmpty()
     .withMessage('description is required')
-    .isLength({ max: 500 })
-    .withMessage('the description length should not exceed 500 characters'),
+    .isLength({ min: 1, max: 500 })
+    .withMessage('description length should be from 1 to 500 symbols'),
+
   body('websiteUrl')
-    //.optional()
     .isURL()
     .withMessage('websiteUrl should be a valid URL')
     .isString()
@@ -58,8 +57,8 @@ export const blogFieldsValidator = [
     .trim()
     .notEmpty()
     .withMessage('websiteUrl is required')
-    .isLength({ max: 100 })
-    .withMessage('websiteUrl should not exceed 100 symbols')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('websiteUrl length should be from 1 to 100 symbols')
     .matches(/^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}\/?([a-zA-Z0-9._-]+\/?)*$/)
     .withMessage('websiteUrl must be a valid URL starting with https://'),
 ]
@@ -89,17 +88,23 @@ export const postFieldsValidator = [
     .withMessage('content length should be from 1 to 1000'),
 
   body('blogId')
-    .trim()
-    .notEmpty()
-    .withMessage('blogId is required')
-    .custom((value) => {
-      const blog = blogsRepository.findById(value)
-      if (!blog) {
-        throw new Error('Invalid blogId')
-      }
-      return true
-    }),
+      .isString()
+      .withMessage('blogId should be a string')
+      .trim()
+      .notEmpty()
+      .withMessage('blogId is required')
+      .custom(async (value) => {
+          const blog = await blogsRepository.findById(value)
+
+          if (!blog) {
+              throw new Error('Invalid blogId')
+          }
+          return true
+      })
 ]
 
-export const postIdParamValidator =
-    [param('id').trim().notEmpty().withMessage('id is required')]
+export const postIdParamValidator = [param('id')
+    .trim()
+    .notEmpty()
+    .withMessage('id is required')
+]

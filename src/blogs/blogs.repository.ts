@@ -1,45 +1,78 @@
-import { db } from '../db/db'
-import { BlogInput, BlogView } from './blogs.types'
+import {BlogDb, BlogInput, BlogView} from './blogs.types'
+import {blogCollection} from "../db/mongo.db";
+import {mapperBlogView} from "./mappers/mapper.blog-view";
+import {ObjectId} from "mongodb";
 
 export const blogsRepository = {
-  findAll(): BlogView[] {
-    return db.blogs
+  async findAll(): Promise<BlogView[]> {
+    const blogs = await blogCollection.find({}).toArray()
+    return blogs.map(mapperBlogView)
   },
 
-  findById(id: string): BlogView | null {
-    return db.blogs.find((b) => b.id === id) ?? null
-  },
+  async findById(id: string): Promise<BlogView | null> {
+    if (!ObjectId.isValid(id)) {
+      return null
+    }
 
-  create(newBlog: BlogView): BlogView {
-    db.blogs.push(newBlog)
-    return newBlog
-  },
-
-  update(id: string, dto: BlogInput): boolean {
-    const blog = db.blogs.find((b) => b.id === id)
+    const blog = await blogCollection.findOne({ _id: new ObjectId(id) })
 
     if (!blog) {
-      return false
+      return null
     }
 
-    blog.name = dto.name.trim()
-    blog.description = dto.description.trim()
-    blog.websiteUrl = dto.websiteUrl.trim()
-
-    return true
+    return mapperBlogView(blog)
   },
 
-  delete(id: string): boolean {
-    const blogIndex = db.blogs.findIndex((b) => b.id === id)
+  async create(input: BlogInput): Promise<BlogView> {
+    const newBlog: BlogDb = {
+      name: input.name,
+      description: input.description,
+      websiteUrl: input.websiteUrl,
+      createdAt: new Date(),
+      isMembership: false,
+    }
 
-    if (blogIndex === -1) {
+    const result = await blogCollection.insertOne(newBlog)
+
+    const createdBlog = await blogCollection.findOne({
+      _id: result.insertedId,
+    })
+
+    if (!createdBlog) {
+      throw new Error('Blog was not created')
+    }
+
+    return mapperBlogView(createdBlog)
+  },
+
+  async update(id: string, input: BlogInput): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
       return false
     }
 
-    db.blogs.splice(blogIndex, 1)
+    const result = await blogCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            name: input.name,
+            description: input.description,
+            websiteUrl: input.websiteUrl,
+          },
+        },
+    )
 
-    db.posts = db.posts.filter((p) => p.blogId !== id)
+    return result.matchedCount === 1
+  },
 
-    return true
+  async delete(id: string): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
+      return false
+    }
+
+    const result = await blogCollection.deleteOne({
+      _id: new ObjectId(id),
+    })
+
+    return result.deletedCount === 1
   },
 }

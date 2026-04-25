@@ -5,10 +5,20 @@ import { clearDb } from './helpers/clear-db'
 import { createTestBlog } from './helpers/create-test-blog'
 import { correctBlogData } from './helpers/test-data'
 import {generateBasicAuthToken} from "./helpers/generate-basic-auth-token";
+import {runDb, stopDb} from "../src/db/mongo.db";
 
 
 describe('Blogs API', () => {
     const adminToken = generateBasicAuthToken()
+
+    beforeAll(async () => {
+        await runDb(SETTINGS.MONGO_URL)
+        await clearDb(app)
+    })
+
+    afterAll(async () => {
+        await stopDb()
+    })
 
     beforeEach(async () => {
         await clearDb(app)
@@ -34,6 +44,8 @@ describe('Blogs API', () => {
             name: correctBlogData.name,
             description: correctBlogData.description,
             websiteUrl: correctBlogData.websiteUrl,
+            createdAt: expect.any(String),
+            isMembership: false,
         })
 
         const blogsListResponse = await request(app)
@@ -56,7 +68,7 @@ describe('Blogs API', () => {
 
     it('should return 404 for non-existing blog; GET /blogs/:id', async () => {
         await request(app)
-            .get(`${SETTINGS.PATH.BLOGS}/not-existing-id`)
+            .get(`${SETTINGS.PATH.BLOGS}/507f1f77bcf86cd799439011`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
@@ -84,12 +96,14 @@ describe('Blogs API', () => {
             name: updatedBlogData.name,
             description: updatedBlogData.description,
             websiteUrl: updatedBlogData.websiteUrl,
+            createdAt: expect.any(String),
+            isMembership: false,
         })
     })
 
     it('should return 404 when updating non-existing blog; PUT /blogs/:id', async () => {
         await request(app)
-            .put(`${SETTINGS.PATH.BLOGS}/not-existing-id`)
+            .put(`${SETTINGS.PATH.BLOGS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .send({
                 name: 'Updated blog',
@@ -114,7 +128,7 @@ describe('Blogs API', () => {
 
     it('should return 404 when deleting non-existing blog; DELETE /blogs/:id', async () => {
         await request(app)
-            .delete(`${SETTINGS.PATH.BLOGS}/not-existing-id`)
+            .delete(`${SETTINGS.PATH.BLOGS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })

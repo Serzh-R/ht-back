@@ -6,10 +6,20 @@ import { createTestBlog } from './helpers/create-test-blog'
 import { createTestPost } from './helpers/create-test-post'
 import { correctPostData } from './helpers/test-data'
 import {generateBasicAuthToken} from "./helpers/generate-basic-auth-token";
+import {runDb, stopDb} from "../src/db/mongo.db";
 
 
 describe('Posts validation', () => {
     const adminToken = generateBasicAuthToken()
+
+    beforeAll(async () => {
+        await runDb(SETTINGS.MONGO_URL)
+        await clearDb(app)
+    })
+
+    afterAll(async () => {
+        await stopDb()
+    })
 
     beforeEach(async () => {
         await clearDb(app)
@@ -64,7 +74,7 @@ describe('Posts validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet1.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet1.body.errorsMessages).toHaveLength(3)
 
         const invalidDataSet2 = await request(app)
             .post(SETTINGS.PATH.POSTS)
@@ -78,18 +88,18 @@ describe('Posts validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet2.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet2.body.errorsMessages).toHaveLength(3)
 
         const invalidDataSet3 = await request(app)
             .post(SETTINGS.PATH.POSTS)
             .set('Authorization', adminToken)
             .send({
                 ...correctPostData,
-                blogId: 'not-existing-blog-id',
+                blogId: '507f1f77bcf86cd799439011',
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet3.body.errorsMessages.length).toBe(1)
+        expect(invalidDataSet3.body.errorsMessages).toHaveLength(1)
         expect(invalidDataSet3.body.errorsMessages[0].field).toBe('blogId')
 
         const postsListResponse = await request(app)
@@ -115,7 +125,7 @@ describe('Posts validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet1.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet1.body.errorsMessages).toHaveLength(3)
 
         const invalidDataSet2 = await request(app)
             .put(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
@@ -129,18 +139,18 @@ describe('Posts validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet2.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet2.body.errorsMessages).toHaveLength(3)
 
         const invalidDataSet3 = await request(app)
             .put(`${SETTINGS.PATH.POSTS}/${createdPost.id}`)
             .set('Authorization', adminToken)
             .send({
                 ...correctPostData,
-                blogId: 'not-existing-blog-id',
+                blogId: '507f1f77bcf86cd799439011',
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet3.body.errorsMessages.length).toBe(1)
+        expect(invalidDataSet3.body.errorsMessages).toHaveLength(1)
         expect(invalidDataSet3.body.errorsMessages[0].field).toBe('blogId')
 
         const postResponse = await request(app)
@@ -150,11 +160,11 @@ describe('Posts validation', () => {
         expect(postResponse.body).toEqual(createdPost)
     })
 
-    it('should not update non-existing post with correct body; PUT /posts/:id', async () => {
+    it('should return 404 when updating non-existing post with correct body; PUT /posts/:id', async () => {
         const createdBlog = await createTestBlog(app)
 
         await request(app)
-            .put(`${SETTINGS.PATH.POSTS}/not-existing-id`)
+            .put(`${SETTINGS.PATH.POSTS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .send({
                 ...correctPostData,
@@ -165,7 +175,7 @@ describe('Posts validation', () => {
 
     it('should return 404 when deleting non-existing post with authorization; DELETE /posts/:id', async () => {
         await request(app)
-            .delete(`${SETTINGS.PATH.POSTS}/not-existing-id`)
+            .delete(`${SETTINGS.PATH.POSTS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })

@@ -6,10 +6,20 @@ import { createTestBlog } from './helpers/create-test-blog'
 import { createTestPost } from './helpers/create-test-post'
 import { correctPostData } from './helpers/test-data'
 import {generateBasicAuthToken} from "./helpers/generate-basic-auth-token";
+import {runDb, stopDb} from "../src/db/mongo.db";
 
 
 describe('Posts API', () => {
     const adminToken = generateBasicAuthToken()
+
+    beforeAll(async () => {
+        await runDb(SETTINGS.MONGO_URL)
+        await clearDb(app)
+    })
+
+    afterAll(async () => {
+        await stopDb()
+    })
 
     beforeEach(async () => {
         await clearDb(app)
@@ -42,6 +52,7 @@ describe('Posts API', () => {
             content: correctPostData.content,
             blogId: createdBlog.id,
             blogName: createdBlog.name,
+            createdAt: expect.any(String),
         })
 
         const postsListResponse = await request(app)
@@ -65,7 +76,7 @@ describe('Posts API', () => {
 
     it('should return 404 for non-existing post; GET /posts/:id', async () => {
         await request(app)
-            .get(`${SETTINGS.PATH.POSTS}/not-existing-id`)
+            .get(`${SETTINGS.PATH.POSTS}/507f1f77bcf86cd799439011`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 
@@ -108,6 +119,7 @@ describe('Posts API', () => {
             content: updatedPostData.content,
             blogId: anotherBlog.id,
             blogName: anotherBlog.name,
+            createdAt: expect.any(String),
         })
     })
 
@@ -115,7 +127,7 @@ describe('Posts API', () => {
         const createdBlog = await createTestBlog(app)
 
         await request(app)
-            .put(`${SETTINGS.PATH.POSTS}/not-existing-id`)
+            .put(`${SETTINGS.PATH.POSTS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .send({
                 ...correctPostData,
@@ -140,7 +152,7 @@ describe('Posts API', () => {
 
     it('should return 404 when deleting non-existing post; DELETE /posts/:id', async () => {
         await request(app)
-            .delete(`${SETTINGS.PATH.POSTS}/not-existing-id`)
+            .delete(`${SETTINGS.PATH.POSTS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })

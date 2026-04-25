@@ -5,10 +5,20 @@ import { clearDb } from './helpers/clear-db'
 import { createTestBlog } from './helpers/create-test-blog'
 import { correctBlogData } from './helpers/test-data'
 import {generateBasicAuthToken} from "./helpers/generate-basic-auth-token";
+import {runDb, stopDb} from "../src/db/mongo.db";
 
 
 describe('Blogs validation', () => {
     const adminToken = generateBasicAuthToken()
+
+    beforeAll(async () => {
+        await runDb(SETTINGS.MONGO_URL)
+        await clearDb(app)
+    })
+
+    afterAll(async () => {
+        await stopDb()
+    })
 
     beforeEach(async () => {
         await clearDb(app)
@@ -54,7 +64,7 @@ describe('Blogs validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet1.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet1.body.errorsMessages).toHaveLength(3)
 
         const invalidDataSet2 = await request(app)
             .post(SETTINGS.PATH.BLOGS)
@@ -67,7 +77,7 @@ describe('Blogs validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet2.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet2.body.errorsMessages).toHaveLength(3)
 
         const blogsListResponse = await request(app)
             .get(SETTINGS.PATH.BLOGS)
@@ -90,7 +100,7 @@ describe('Blogs validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet1.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet1.body.errorsMessages).toHaveLength(3)
 
         const invalidDataSet2 = await request(app)
             .put(`${SETTINGS.PATH.BLOGS}/${createdBlog.id}`)
@@ -103,7 +113,7 @@ describe('Blogs validation', () => {
             })
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
-        expect(invalidDataSet2.body.errorsMessages.length).toBe(3)
+        expect(invalidDataSet2.body.errorsMessages).toHaveLength(3)
 
         const blogResponse = await request(app)
             .get(`${SETTINGS.PATH.BLOGS}/${createdBlog.id}`)
@@ -112,9 +122,9 @@ describe('Blogs validation', () => {
         expect(blogResponse.body).toEqual(createdBlog)
     })
 
-    it('should not update non-existing blog with correct body; PUT /blogs/:id', async () => {
+    it('should return 404 when updating non-existing blog with correct body; PUT /blogs/:id', async () => {
         await request(app)
-            .put(`${SETTINGS.PATH.BLOGS}/not-existing-id`)
+            .put(`${SETTINGS.PATH.BLOGS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .send({
                 name: 'Updated blog',
@@ -126,7 +136,7 @@ describe('Blogs validation', () => {
 
     it('should return 404 when deleting non-existing blog with authorization; DELETE /blogs/:id', async () => {
         await request(app)
-            .delete(`${SETTINGS.PATH.BLOGS}/not-existing-id`)
+            .delete(`${SETTINGS.PATH.BLOGS}/507f1f77bcf86cd799439011`)
             .set('Authorization', adminToken)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })

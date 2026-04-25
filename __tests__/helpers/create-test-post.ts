@@ -3,16 +3,13 @@ import { Express } from 'express'
 import { SETTINGS, HTTP_STATUSES } from '../../src/core/settings'
 import { correctPostData } from './test-data'
 import {generateBasicAuthToken} from "./generate-basic-auth-token";
+import {PostView} from "../../src/posts/posts.types";
 
 export async function createTestPost(
     app: Express,
     blogId: string,
-    postData: {
-        title: string
-        shortDescription: string
-        content: string
-    } = correctPostData,
-) {
+    postData= correctPostData,
+): Promise<PostView> {
     const adminToken = generateBasicAuthToken()
 
     const response = await request(app)

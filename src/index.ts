@@ -5,6 +5,10 @@ import {runDb} from "./db/mongo.db";
 app.set('trust proxy', true) // ✅ Позволяет корректно получать `req.ip` за прокси
 
 const startApp = async () => {
+  if (!SETTINGS.MONGO_URL) {
+    throw new Error('MONGO_URL is not defined')
+  }
+
   const isConnected = await runDb(SETTINGS.MONGO_URL)
 
   if (!isConnected) {

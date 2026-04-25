@@ -3,6 +3,8 @@ config() // добавление переменных из файла .env в pr
 
 export const SETTINGS = {
   PORT: Number(process.env.PORT) || 3003,
+  MONGO_URL: process.env.MONGO_URL,
+  DB_NAME: process.env.DB_NAME || 'blogger_platform',
 
   ADMIN: {
     LOGIN: process.env.ADMIN_USERNAME || 'admin',
@@ -14,9 +16,6 @@ export const SETTINGS = {
     POSTS: '/posts',
     DELETE_ALL: '/testing/all-data',
   },
-
-  MONGO_URL: process.env.MONGO_URL || '',
-  DB_NAME: process.env.DB_NAME || 'blogger_platform',
 }
 
 export const HTTP_STATUSES = {

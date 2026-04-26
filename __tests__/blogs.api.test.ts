@@ -6,6 +6,7 @@ import { createTestBlog } from './helpers/create-test-blog'
 import { correctBlogData } from './helpers/test-data'
 import {generateBasicAuthToken} from "./helpers/generate-basic-auth-token";
 import {runDb, stopDb} from "../src/db/mongo.db";
+import {createTestPost} from "./helpers/create-test-post";
 
 
 describe('Blogs API', () => {
@@ -98,6 +99,56 @@ describe('Blogs API', () => {
             websiteUrl: updatedBlogData.websiteUrl,
             createdAt: expect.any(String),
             isMembership: false,
+        })
+    })
+
+    it('should update blogName in all related posts when blog is updated', async () => {
+        const createdBlog = await createTestBlog(app)
+
+        const firstPost = await createTestPost(app, createdBlog.id, {
+            title: 'Post 1',
+            shortDescription: 'Short description 1',
+            content: 'Content 1',
+            blogId: '',
+        })
+
+        const secondPost = await createTestPost(app, createdBlog.id, {
+            title: 'Post 2',
+            shortDescription: 'Short description 2',
+            content: 'Content 2',
+            blogId: '',
+        })
+
+        const updatedBlogData = {
+            name: 'Updated blog name',
+            description: 'Updated description',
+            websiteUrl: 'https://updatedblog.com',
+        }
+
+        await request(app)
+            .put(`${SETTINGS.PATH.BLOGS}/${createdBlog.id}`)
+            .set('Authorization', adminToken)
+            .send(updatedBlogData)
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+        const firstPostResponse = await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${firstPost.id}`)
+            .expect(HTTP_STATUSES.OK_200)
+
+        const secondPostResponse = await request(app)
+            .get(`${SETTINGS.PATH.POSTS}/${secondPost.id}`)
+            .expect(HTTP_STATUSES.OK_200)
+
+        expect(firstPostResponse.body).toEqual({
+            ...firstPost,
+            blogName: updatedBlogData.name,
+            createdAt: expect.any(String),
+        })
+
+        expect(secondPostResponse.body).toEqual({
+            ...secondPost,
+            blogName: updatedBlogData.name,
+            createdAt: expect.any(String),
         })
     })
 

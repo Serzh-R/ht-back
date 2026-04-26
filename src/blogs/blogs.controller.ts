@@ -4,6 +4,7 @@ import { BlogInput, BlogView } from './blogs.types'
 import { blogFieldValidator } from '../validation/custom-validator/fieldValidator'
 import { randomUUID } from 'node:crypto'
 import { blogsRepository } from './blogs.repository'
+import {blogsService} from "./blogs.service";
 
 export const blogsController = {
   async getBlogs(req: Request, res: Response<BlogView[]>) {
@@ -30,7 +31,7 @@ export const blogsController = {
   },
 
   async updateBlog(req: Request<{ id: string }, {}, BlogInput>, res: Response) {
-    const isUpdated = await blogsRepository.update(req.params.id, req.body)
+    const isUpdated = await blogsService.updateBlog(req.params.id, req.body)
 
     if (!isUpdated) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

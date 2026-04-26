@@ -38,7 +38,7 @@ export const postsController = {
   },
 
   async updatePost(req: Request<{ id: string }, {}, PostInput>, res: Response) {
-    const blog = await blogsRepository.findById(req.body.blogId.trim())
+    const blog = await blogsRepository.findById(req.body.blogId)
 
     if (!blog) {
       res.status(HTTP_STATUSES.BAD_REQUEST_400).json({

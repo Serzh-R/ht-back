@@ -68,6 +68,17 @@ export const postsRepository = {
     return result.matchedCount === 1
   },
 
+  async updateBlogNameForPosts(blogId: string, blogName: string): Promise<void> {
+    await postCollection.updateMany(
+        { blogId },
+        {
+          $set: {
+            blogName,
+          },
+        },
+    )
+  },
+
   async delete(id: string): Promise<boolean> {
     if (!ObjectId.isValid(id)) {
       return false

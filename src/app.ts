@@ -25,16 +25,3 @@ export const createApp = () => {
 }
 
 
-
-
-/*app.delete(SETTINGS.PATH.DELETE_ALL, async (req: Request, res: Response) => {
-  await blogCollection.deleteMany({})
-  await postCollection.deleteMany({})
-
-  db.blogs = []
-  db.posts = []
-
-  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-})*/
-
-

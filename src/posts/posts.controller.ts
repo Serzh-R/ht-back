@@ -22,7 +22,7 @@ export const postsController = {
     res.status(HTTP_STATUSES.OK_200).json(post)
   },
 
-  async createPost(req: Request<{}, {}, PostInput>, res: Response,) {
+  async createPost(req: Request<{}, {}, PostInput>, res: Response) {
     const blog = await blogsRepository.findById(req.body.blogId)
 
     if (!blog) {
@@ -47,11 +47,7 @@ export const postsController = {
       return
     }
 
-    const isUpdated = await postsRepository.update(
-        req.params.id,
-        req.body,
-        blog.name,
-    )
+    const isUpdated = await postsRepository.update(req.params.id, req.body, blog.name)
 
     if (!isUpdated) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

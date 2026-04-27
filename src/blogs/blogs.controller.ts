@@ -4,7 +4,7 @@ import { BlogInput, BlogView } from './blogs.types'
 import { blogFieldValidator } from '../validation/custom-validator/fieldValidator'
 import { randomUUID } from 'node:crypto'
 import { blogsRepository } from './blogs.repository'
-import {blogsService} from "./blogs.service";
+import { blogsService } from './blogs.service'
 
 export const blogsController = {
   async getBlogs(req: Request, res: Response<BlogView[]>) {
@@ -24,7 +24,6 @@ export const blogsController = {
   },
 
   async createBlog(req: Request<{}, {}, BlogInput>, res: Response<BlogView>) {
-
     const createdBlog = await blogsRepository.create(req.body)
 
     res.status(HTTP_STATUSES.CREATED_201).json(createdBlog)

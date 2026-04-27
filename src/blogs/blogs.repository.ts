@@ -1,7 +1,7 @@
-import {BlogDb, BlogInput, BlogView} from './blogs.types'
-import {blogCollection} from "../db/mongo.db";
-import {mapperBlogView} from "./mappers/mapper.blog-view";
-import {ObjectId} from "mongodb";
+import { BlogDb, BlogInput, BlogView } from './blogs.types'
+import { blogCollection } from '../db/mongo.db'
+import { mapperBlogView } from './mappers/mapper.blog-view'
+import { ObjectId } from 'mongodb'
 
 export const blogsRepository = {
   async findAll(): Promise<BlogView[]> {
@@ -51,14 +51,14 @@ export const blogsRepository = {
     }
 
     const result = await blogCollection.updateOne(
-        { _id: new ObjectId(id) },
-        {
-          $set: {
-            name: input.name,
-            description: input.description,
-            websiteUrl: input.websiteUrl,
-          },
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          name: input.name,
+          description: input.description,
+          websiteUrl: input.websiteUrl,
         },
+      },
     )
 
     return result.matchedCount === 1

@@ -1,6 +1,6 @@
-import {createApp} from './app'
+import { createApp } from './app'
 import { SETTINGS } from './core/settings'
-import {runDb} from "./db/mongo.db";
+import { runDb } from './db/mongo.db'
 
 const startApp = async () => {
   if (!SETTINGS.MONGO_URL) {

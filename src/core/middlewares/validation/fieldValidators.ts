@@ -68,19 +68,19 @@ export const postFieldsValidator = [
     .withMessage('content length should be from 1 to 1000'),
 
   body('blogId')
-      .isString()
-      .withMessage('blogId should be a string')
-      .trim()
-      .notEmpty()
-      .withMessage('blogId is required')
-      .custom(async (value) => {
-          const blog = await blogsRepository.findById(value)
+    .isString()
+    .withMessage('blogId should be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('blogId is required')
+    .custom(async (value) => {
+      const blog = await blogsRepository.findById(value)
 
-          if (!blog) {
-              throw new Error('Invalid blogId')
-          }
-          return true
-      })
+      if (!blog) {
+        throw new Error('Invalid blogId')
+      }
+      return true
+    }),
 ]
 
 /*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
@@ -95,5 +95,3 @@ export const specificFieldsValidator = (fields: string[]) => {
     return true
   })
 }*/
-
-

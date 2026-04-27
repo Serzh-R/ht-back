@@ -3,7 +3,7 @@ import { HTTP_STATUSES, SETTINGS } from './core/settings'
 import express from 'express'
 import { blogsRouter } from './blogs/blogs.router'
 import { postsRouter } from './posts/posts.router'
-import {testingRouter} from "./testing/testing.router";
+import { testingRouter } from './testing/testing.router'
 
 export const createApp = () => {
   const app = express()
@@ -23,5 +23,3 @@ export const createApp = () => {
 
   return app
 }
-
-

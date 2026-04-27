@@ -1,8 +1,8 @@
 import { db } from '../db/db'
-import {PostDb, PostInput, PostView} from './posts.types'
-import {postCollection} from "../db/mongo.db";
-import {mapperPostView} from "./mappers/mapper.post-view";
-import {ObjectId} from "mongodb";
+import { PostDb, PostInput, PostView } from './posts.types'
+import { postCollection } from '../db/mongo.db'
+import { mapperPostView } from './mappers/mapper.post-view'
+import { ObjectId } from 'mongodb'
 
 export const postsRepository = {
   async findAll(): Promise<PostView[]> {
@@ -53,16 +53,16 @@ export const postsRepository = {
     }
 
     const result = await postCollection.updateOne(
-        { _id: new ObjectId(id) },
-        {
-          $set: {
-            title: input.title,
-            shortDescription: input.shortDescription,
-            content: input.content,
-            blogId: input.blogId,
-            blogName,
-          },
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          title: input.title,
+          shortDescription: input.shortDescription,
+          content: input.content,
+          blogId: input.blogId,
+          blogName,
         },
+      },
     )
 
     return result.matchedCount === 1
@@ -70,12 +70,12 @@ export const postsRepository = {
 
   async updateBlogNameForPosts(blogId: string, blogName: string): Promise<void> {
     await postCollection.updateMany(
-        { blogId },
-        {
-          $set: {
-            blogName,
-          },
+      { blogId },
+      {
+        $set: {
+          blogName,
         },
+      },
     )
   },
 
@@ -85,7 +85,7 @@ export const postsRepository = {
     }
 
     const result = await postCollection.deleteOne({
-      _id: new ObjectId(id)
+      _id: new ObjectId(id),
     })
 
     return result.deletedCount === 1

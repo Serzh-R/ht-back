@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { app } from '../src/app'
+import {createApp} from '../src/app'
 import { HTTP_STATUSES, SETTINGS } from '../src/core/settings'
 import { clearDb } from './helpers/clear-db'
 import { createTestBlog } from './helpers/create-test-blog'
@@ -7,6 +7,7 @@ import { correctBlogData } from './helpers/test-data'
 import {generateBasicAuthToken} from "./helpers/generate-basic-auth-token";
 import {runDb, stopDb} from "../src/db/mongo.db";
 
+const app = createApp()
 
 describe('Blogs validation', () => {
     const adminToken = generateBasicAuthToken()

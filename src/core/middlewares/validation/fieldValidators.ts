@@ -8,29 +8,9 @@ export const idParamValidator = param('id')
   .notEmpty()
   .withMessage('id is required')
 
-export const blogIdValidator = body('blogId')
-  .isString()
-  .withMessage('blogId should be a string')
-  .trim()
-  .notEmpty()
-
 /***********************************************************************/
 
-/*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
-
-export const specificFieldsValidator = (fields: string[]) => {
-  return body().custom((_, { req }) => {
-    const bodyKeys = Object.keys(req.body)
-
-    const invalidFields = bodyKeys.filter((key) => !fields.includes(key))
-    if (invalidFields.length > 0) {
-    }
-    return true
-  })
-}*/
-
 export const blogFieldsValidator = [
-  //specificFieldsValidator(BlogFields),
   body('name')
     .isString()
     .withMessage('name should be a string')
@@ -103,8 +83,17 @@ export const postFieldsValidator = [
       })
 ]
 
-export const postIdParamValidator = [param('id')
-    .trim()
-    .notEmpty()
-    .withMessage('id is required')
-]
+/*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
+
+export const specificFieldsValidator = (fields: string[]) => {
+  return body().custom((_, { req }) => {
+    const bodyKeys = Object.keys(req.body)
+
+    const invalidFields = bodyKeys.filter((key) => !fields.includes(key))
+    if (invalidFields.length > 0) {
+    }
+    return true
+  })
+}*/
+
+

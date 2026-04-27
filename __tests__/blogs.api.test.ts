@@ -120,7 +120,7 @@ describe('Blogs API', () => {
         })
 
         const updatedBlogData = {
-            name: 'Updated blog name',
+            name: 'Updated blog',
             description: 'Updated description',
             websiteUrl: 'https://updatedblog.com',
         }

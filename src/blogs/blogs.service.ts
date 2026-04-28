@@ -14,4 +14,16 @@ export const blogsService = {
 
     return true
   },
+
+  async deleteBlogById(id: string): Promise<boolean> {
+    const isDeleted = await blogsRepository.delete(id)
+
+    if (!isDeleted) {
+      return false
+    }
+
+    await postsRepository.deletePostsByBlogId(id)
+
+    return true
+  },
 }

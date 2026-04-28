@@ -79,6 +79,10 @@ export const postsRepository = {
     )
   },
 
+  async deletePostsByBlogId(blogId: string): Promise<void> {
+    await postCollection.deleteMany({ blogId })
+  },
+
   async delete(id: string): Promise<boolean> {
     if (!ObjectId.isValid(id)) {
       return false

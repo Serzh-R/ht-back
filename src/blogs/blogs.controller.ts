@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import { BlogInput, BlogView } from './blogs.types'
-import { blogFieldValidator } from '../validation/custom-validator/fieldValidator'
-import { randomUUID } from 'node:crypto'
 import { blogsRepository } from './blogs.repository'
 import { blogsService } from './blogs.service'
 
@@ -41,7 +39,7 @@ export const blogsController = {
   },
 
   async deleteBlogById(req: Request<{ id: string }>, res: Response) {
-    const isDeleted = await blogsRepository.delete(req.params.id)
+    const isDeleted = await blogsService.deleteBlogById(req.params.id)
 
     if (!isDeleted) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

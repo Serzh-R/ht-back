@@ -1,4 +1,3 @@
-import { db } from '../db/db'
 import { PostDb, PostInput, PostView } from './posts.types'
 import { postCollection } from '../db/mongo.db'
 import { mapperPostView } from './mappers/mapper.post-view'

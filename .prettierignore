@@ -3,3 +3,11 @@ node_modules/
 dist/
 
 build/
+
+.idea/
+
+!.vscode/
+
+!.git/
+
+.env

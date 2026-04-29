@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { randomUUID } from 'node:crypto'
 import { HTTP_STATUSES } from '../core/settings'
 import { PostInput, PostView } from './posts.types'
 import { blogsRepository } from '../blogs/blogs.repository'

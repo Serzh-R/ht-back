@@ -23,3 +23,7 @@ export type BlogView = {
   createdAt: string
   isMembership: boolean
 }
+
+export type BlogPostsParams = {
+  blogId: string
+}

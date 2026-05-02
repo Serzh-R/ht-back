@@ -7,6 +7,12 @@ export type PostInput = {
   blogId: string
 }
 
+export type BlogPostInput = {
+  title: string
+  shortDescription: string
+  content: string
+}
+
 export type PostDb = {
   _id?: ObjectId
   title: string

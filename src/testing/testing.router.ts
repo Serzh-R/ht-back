@@ -6,11 +6,11 @@ import { db } from '../db/db'
 export const testingRouter = Router({})
 
 testingRouter.delete('/', async (req: Request, res: Response) => {
-  await blogCollection.deleteMany({})
-  await postCollection.deleteMany({})
+   await blogCollection.deleteMany({})
+   await postCollection.deleteMany({})
 
-  db.blogs = []
-  db.posts = []
+   db.blogs = []
+   db.posts = []
 
-  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+   res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

@@ -6,20 +6,20 @@ import { postsRouter } from './posts/posts.router'
 import { testingRouter } from './testing/testing.router'
 
 export const createApp = () => {
-  const app = express()
+   const app = express()
 
-  app.set('trust proxy', true) // ✅ Позволяет корректно получать `req.ip` за прокси
+   app.set('trust proxy', true) // ✅ Позволяет корректно получать `req.ip` за прокси
 
-  app.use(express.json())
+   app.use(express.json())
 
-  app.use(SETTINGS.PATH.BLOGS, blogsRouter)
-  app.use(SETTINGS.PATH.POSTS, postsRouter)
+   app.use(SETTINGS.PATH.BLOGS, blogsRouter)
+   app.use(SETTINGS.PATH.POSTS, postsRouter)
 
-  app.use(SETTINGS.PATH.DELETE_ALL, testingRouter)
+   app.use(SETTINGS.PATH.DELETE_ALL, testingRouter)
 
-  app.get('/', (req: Request, res: Response) => {
-    res.status(HTTP_STATUSES.OK_200).json('Ciao Back-end!')
-  })
+   app.get('/', (req: Request, res: Response) => {
+      res.status(HTTP_STATUSES.OK_200).json('Ciao Back-end!')
+   })
 
-  return app
+   return app
 }

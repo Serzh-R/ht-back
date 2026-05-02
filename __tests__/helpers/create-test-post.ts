@@ -6,20 +6,20 @@ import { generateBasicAuthToken } from './generate-basic-auth-token'
 import { PostView } from '../../src/posts/posts.types'
 
 export async function createTestPost(
-  app: Express,
-  blogId: string,
-  postData = correctPostData,
+   app: Express,
+   blogId: string,
+   postData = correctPostData,
 ): Promise<PostView> {
-  const adminToken = generateBasicAuthToken()
+   const adminToken = generateBasicAuthToken()
 
-  const response = await request(app)
-    .post(SETTINGS.PATH.POSTS)
-    .set('Authorization', adminToken)
-    .send({
-      ...postData,
-      blogId,
-    })
-    .expect(HTTP_STATUSES.CREATED_201)
+   const response = await request(app)
+      .post(SETTINGS.PATH.POSTS)
+      .set('Authorization', adminToken)
+      .send({
+         ...postData,
+         blogId,
+      })
+      .expect(HTTP_STATUSES.CREATED_201)
 
-  return response.body
+   return response.body
 }

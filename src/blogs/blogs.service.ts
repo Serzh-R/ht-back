@@ -3,27 +3,27 @@ import { blogsRepository } from './blogs.repository'
 import { postsRepository } from '../posts/posts.repository'
 
 export const blogsService = {
-  async updateBlog(id: string, input: BlogInput): Promise<boolean> {
-    const isUpdated = await blogsRepository.update(id, input)
+   async updateBlog(id: string, input: BlogInput): Promise<boolean> {
+      const isUpdated = await blogsRepository.update(id, input)
 
-    if (!isUpdated) {
-      return false
-    }
+      if (!isUpdated) {
+         return false
+      }
 
-    await postsRepository.updateBlogNameForPosts(id, input.name)
+      await postsRepository.updateBlogNameForPosts(id, input.name)
 
-    return true
-  },
+      return true
+   },
 
-  async deleteBlogById(id: string): Promise<boolean> {
-    const isDeleted = await blogsRepository.delete(id)
+   async deleteBlogById(id: string): Promise<boolean> {
+      const isDeleted = await blogsRepository.delete(id)
 
-    if (!isDeleted) {
-      return false
-    }
+      if (!isDeleted) {
+         return false
+      }
 
-    await postsRepository.deletePostsByBlogId(id)
+      await postsRepository.deletePostsByBlogId(id)
 
-    return true
-  },
+      return true
+   },
 }

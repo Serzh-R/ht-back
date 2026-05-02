@@ -8,6 +8,13 @@ export const idParamValidator = param('id')
   .notEmpty()
   .withMessage('id is required')
 
+export const blogIdParamValidator = param('blogId')
+  .isString()
+  .withMessage('blogId should be a string')
+  .trim()
+  .notEmpty()
+  .withMessage('blogId is required')
+
 /***********************************************************************/
 
 export const blogFieldsValidator = [
@@ -81,6 +88,31 @@ export const postFieldsValidator = [
       }
       return true
     }),
+]
+
+/*************************************************************************/
+
+export const blogPostFieldsValidator = [
+  body('title')
+    .trim()
+    .isString()
+    .withMessage('title should be a string')
+    .isLength({ min: 1, max: 30 })
+    .withMessage('title length should be from 1 to 30'),
+
+  body('shortDescription')
+    .trim()
+    .isString()
+    .withMessage('shortDescription should be a string')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('shortDescription length should be from 1 to 100'),
+
+  body('content')
+    .trim()
+    .isString()
+    .withMessage('content should be a string')
+    .isLength({ min: 1, max: 1000 })
+    .withMessage('content length should be from 1 to 1000'),
 ]
 
 /*const BlogFields: string[] = ['name', 'description', 'websiteUrl']

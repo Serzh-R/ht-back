@@ -3,11 +3,20 @@ import { HTTP_STATUSES } from '../core/settings'
 import { PostInput, PostView } from './posts.types'
 import { blogsRepository } from '../blogs/blogs.repository'
 import { postsRepository } from './posts.repository'
+import { Paginator } from '../core/types/paginator.types'
+import { PostsQueryInput } from '../core/types/query.types'
+import { normalizePostsQuery } from '../core/helpers/query-normalizers'
 
 export const postsController = {
-   async getPosts(req: Request, res: Response<PostView[]>) {
-      const posts = await postsRepository.findAll()
-      res.status(HTTP_STATUSES.OK_200).json(posts)
+   async getPosts(
+      req: Request<{}, Paginator<PostView>, {}, PostsQueryInput>,
+      res: Response<Paginator<PostView>>,
+   ) {
+      const query = normalizePostsQuery(req.query)
+
+      const posts = await postsRepository.findAll(query)
+
+      res.status(HTTP_STATUSES.OK_200).send(posts)
    },
 
    async getPostById(req: Request<{ id: string }>, res: Response<PostView>) {

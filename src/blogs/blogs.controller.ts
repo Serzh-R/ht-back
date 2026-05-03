@@ -3,11 +3,20 @@ import { HTTP_STATUSES } from '../core/settings'
 import { BlogInput, BlogView } from './blogs.types'
 import { blogsRepository } from './blogs.repository'
 import { blogsService } from './blogs.service'
+import { BlogsQueryInput } from '../core/types/query.types'
+import { Paginator } from '../core/types/paginator.types'
+import { normalizeBlogsQuery } from '../core/helpers/query-normalizers'
 
 export const blogsController = {
-   async getBlogs(req: Request, res: Response<BlogView[]>) {
-      const blogs = await blogsRepository.findAll()
-      res.status(HTTP_STATUSES.OK_200).json(blogs)
+   async getBlogs(
+      req: Request<{}, Paginator<BlogView>, {}, BlogsQueryInput>,
+      res: Response<Paginator<BlogView>>,
+   ) {
+      const query = normalizeBlogsQuery(req.query)
+
+      const blogs = await blogsRepository.findAll(query)
+
+      res.status(HTTP_STATUSES.OK_200).send(blogs)
    },
 
    async getBlogById(req: Request<{ id: string }>, res: Response<BlogView>) {

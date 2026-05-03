@@ -16,7 +16,7 @@ export const postsController = {
 
       const posts = await postsRepository.findAll(query)
 
-      res.status(HTTP_STATUSES.OK_200).send(posts)
+      res.status(HTTP_STATUSES.OK_200).json(posts)
    },
 
    async getPostById(req: Request<{ id: string }>, res: Response<PostView>) {

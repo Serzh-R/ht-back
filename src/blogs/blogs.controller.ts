@@ -16,7 +16,7 @@ export const blogsController = {
 
       const blogs = await blogsRepository.findAll(query)
 
-      res.status(HTTP_STATUSES.OK_200).send(blogs)
+      res.status(HTTP_STATUSES.OK_200).json(blogs)
    },
 
    async getBlogById(req: Request<{ id: string }>, res: Response<BlogView>) {

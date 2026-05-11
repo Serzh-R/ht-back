@@ -19,6 +19,8 @@ blogsRouter.post(
    blogsController.createBlog,
 )
 
+blogsRouter.get('/:blogId/posts', blogsController.getPostsByBlogId)
+
 blogsRouter.get('/:id', idParamValidator, errorsResultMiddleware, blogsController.getBlogById)
 
 blogsRouter.put(

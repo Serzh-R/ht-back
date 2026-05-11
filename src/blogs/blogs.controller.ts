@@ -1,11 +1,13 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
-import { BlogInput, BlogView } from './blogs.types'
+import { BlogInput, BlogPostsParams, BlogView } from './blogs.types'
 import { blogsRepository } from './blogs.repository'
 import { blogsService } from './blogs.service'
-import { BlogsQueryInput } from '../core/types/query.types'
+import { BlogsQueryInput, PostsByBlogQueryInput } from '../core/types/query.types'
 import { Paginator } from '../core/types/paginator.types'
-import { normalizeBlogsQuery } from '../core/helpers/query-normalizers'
+import { normalizeBlogsQuery, normalizePostsQuery } from '../core/helpers/query-normalizers'
+import { PostView } from '../posts/posts.types'
+import { postsRepository } from '../posts/posts.repository'
 
 export const blogsController = {
    async getBlogs(
@@ -28,6 +30,26 @@ export const blogsController = {
       }
 
       res.status(HTTP_STATUSES.OK_200).json(blog)
+   },
+
+   async getPostsByBlogId(
+      req: Request<BlogPostsParams, Paginator<PostView>, {}, PostsByBlogQueryInput>,
+      res: Response<Paginator<PostView>>,
+   ) {
+      const blogId = req.params.blogId
+
+      const blog = await blogsRepository.findById(blogId)
+
+      if (!blog) {
+         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+         return
+      }
+
+      const query = normalizePostsQuery(req.query)
+
+      const posts = await postsRepository.findPostsByBlogId(blogId, query)
+
+      res.status(HTTP_STATUSES.OK_200).send(posts)
    },
 
    async createBlog(req: Request<{}, {}, BlogInput>, res: Response<BlogView>) {

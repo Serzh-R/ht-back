@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { blogsController } from './blogs.controller'
 import {
    blogFieldsValidator,
+   blogPostFieldsValidator,
    idParamValidator,
 } from '../core/middlewares/validation/fieldValidators'
 import { authMiddleware } from '../auth/middlewares/auth.middleware'
@@ -20,6 +21,14 @@ blogsRouter.post(
 )
 
 blogsRouter.get('/:blogId/posts', blogsController.getPostsByBlogId)
+
+blogsRouter.post(
+   '/:blogId/posts',
+   authMiddleware,
+   blogPostFieldsValidator,
+   errorsResultMiddleware,
+   blogsController.createPostByBlogId,
+)
 
 blogsRouter.get('/:id', idParamValidator, errorsResultMiddleware, blogsController.getBlogById)
 

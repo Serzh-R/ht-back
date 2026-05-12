@@ -8,6 +8,7 @@ import { Paginator } from '../core/types/paginator.types'
 import { normalizeBlogsQuery, normalizePostsQuery } from '../core/helpers/query-normalizers'
 import { BlogPostInput, PostView } from '../posts/posts.types'
 import { postsRepository } from '../posts/posts.repository'
+import { blogsQueryRepository } from './blogs.query-repository'
 
 export const blogsController = {
    async getBlogs(
@@ -16,7 +17,7 @@ export const blogsController = {
    ) {
       const query = normalizeBlogsQuery(req.query)
 
-      const blogs = await blogsRepository.findAll(query)
+      const blogs = await blogsQueryRepository.findAll(query)
 
       res.status(HTTP_STATUSES.OK_200).json(blogs)
    },

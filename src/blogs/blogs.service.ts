@@ -1,6 +1,7 @@
 import { BlogInput } from './blogs.types'
 import { blogsRepository } from './blogs.repository'
 import { postsRepository } from '../posts/posts.repository'
+import { BlogPostInput, PostView } from '../posts/posts.types'
 
 export const blogsService = {
    async updateBlog(id: string, input: BlogInput): Promise<boolean> {
@@ -15,7 +16,23 @@ export const blogsService = {
       return true
    },
 
-   /*async createBlog(input: BlogInput): Promise<void> {},*/
+   async createPostByBlogId(blogId: string, input: BlogPostInput): Promise<PostView | null> {
+      const blog = await blogsRepository.findById(blogId)
+
+      if (!blog) {
+         return null
+      }
+
+      return postsRepository.create(
+         {
+            title: input.title,
+            shortDescription: input.shortDescription,
+            content: input.content,
+            blogId: blog.id,
+         },
+         blog.name,
+      )
+   },
 
    async deleteBlogById(id: string): Promise<boolean> {
       const isDeleted = await blogsRepository.delete(id)

@@ -8,7 +8,6 @@ import { Paginator } from '../core/types/paginator.types'
 import { normalizeBlogsQuery, normalizePostsQuery } from '../core/helpers/query-normalizers'
 import { BlogPostInput, PostView } from '../posts/posts.types'
 import { postsRepository } from '../posts/posts.repository'
-import { correctBlogData } from '../../__tests__/helpers/test-data'
 
 export const blogsController = {
    async getBlogs(
@@ -63,26 +62,14 @@ export const blogsController = {
       req: Request<BlogPostsParams, PostView, BlogPostInput>,
       res: Response<PostView>,
    ) {
-      const blogId = req.params.blogId
+      const createdPost = await blogsService.createPostByBlogId(req.params.blogId, req.body)
 
-      const blog = await blogsRepository.findById(blogId)
-
-      if (!blog) {
+      if (!createdPost) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
          return
       }
 
-      const createdPost = await postsRepository.create(
-         {
-            title: req.body.title,
-            shortDescription: req.body.shortDescription,
-            content: req.body.content,
-            blogId: blog.id,
-         },
-         blog.name,
-      )
-
-      res.status(HTTP_STATUSES.CREATED_201).send(createdPost)
+      res.status(HTTP_STATUSES.CREATED_201).json(createdPost)
    },
 
    async updateBlog(req: Request<{ id: string }, {}, BlogInput>, res: Response) {

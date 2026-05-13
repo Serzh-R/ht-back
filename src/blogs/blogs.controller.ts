@@ -7,7 +7,6 @@ import { BlogsQueryInput, PostsByBlogQueryInput } from '../core/types/query.type
 import { Paginator } from '../core/types/paginator.types'
 import { normalizeBlogsQuery, normalizePostsQuery } from '../core/helpers/query-normalizers'
 import { BlogPostInput, PostView } from '../posts/posts.types'
-import { postsRepository } from '../posts/posts.repository'
 import { blogsQueryRepository } from './blogs.query-repository'
 import { postsQueryRepository } from '../posts/posts.query-repository'
 

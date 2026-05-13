@@ -12,4 +12,18 @@ export const postsService = {
 
       return postsRepository.create(input, blog.name)
    },
+
+   async updatePost(id: string, input: PostInput): Promise<boolean> {
+      const blog = await blogsRepository.findById(input.blogId)
+
+      if (!blog) {
+         return false
+      }
+
+      return postsRepository.update(id, input, blog.name)
+   },
+
+   async deletePost(id: string): Promise<boolean> {
+      return postsRepository.delete(id)
+   },
 }

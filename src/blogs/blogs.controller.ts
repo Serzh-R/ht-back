@@ -54,7 +54,7 @@ export const blogsController = {
    },
 
    async createBlog(req: Request<{}, {}, BlogInput>, res: Response<BlogView>) {
-      const createdBlog = await blogsRepository.create(req.body)
+      const createdBlog = await blogsService.createBlog(req.body)
 
       res.status(HTTP_STATUSES.CREATED_201).json(createdBlog)
    },

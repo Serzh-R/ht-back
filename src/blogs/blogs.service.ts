@@ -1,9 +1,13 @@
-import { BlogInput } from './blogs.types'
+import { BlogInput, BlogView } from './blogs.types'
 import { blogsRepository } from './blogs.repository'
 import { postsRepository } from '../posts/posts.repository'
 import { BlogPostInput, PostView } from '../posts/posts.types'
 
 export const blogsService = {
+   async createBlog(input: BlogInput): Promise<BlogView> {
+      return blogsRepository.create(input)
+   },
+
    async updateBlog(id: string, input: BlogInput): Promise<boolean> {
       const isUpdated = await blogsRepository.update(id, input)
 

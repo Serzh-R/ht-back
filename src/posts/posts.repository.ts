@@ -27,7 +27,7 @@ export const postsRepository = {
       }
    },*/
 
-   async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<Paginator<PostView>> {
+   /*async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<Paginator<PostView>> {
       const filter: Filter<PostDb> = { blogId }
 
       const skip = (query.pageNumber - 1) * query.pageSize
@@ -48,7 +48,7 @@ export const postsRepository = {
          totalCount,
          items: posts.map(mapperPostView),
       }
-   },
+   },*/
 
    /*async findById(id: string): Promise<PostView | null> {
       if (!ObjectId.isValid(id)) {

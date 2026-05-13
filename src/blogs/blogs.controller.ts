@@ -9,6 +9,7 @@ import { normalizeBlogsQuery, normalizePostsQuery } from '../core/helpers/query-
 import { BlogPostInput, PostView } from '../posts/posts.types'
 import { postsRepository } from '../posts/posts.repository'
 import { blogsQueryRepository } from './blogs.query-repository'
+import { postsQueryRepository } from '../posts/posts.query-repository'
 
 export const blogsController = {
    async getBlogs(
@@ -39,7 +40,7 @@ export const blogsController = {
    ) {
       const blogId = req.params.blogId
 
-      const blog = await blogsRepository.findById(blogId)
+      const blog = await blogsQueryRepository.findById(blogId)
 
       if (!blog) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -48,7 +49,7 @@ export const blogsController = {
 
       const query = normalizePostsQuery(req.query)
 
-      const posts = await postsRepository.findPostsByBlogId(blogId, query)
+      const posts = await postsQueryRepository.findPostsByBlogId(blogId, query)
 
       res.status(HTTP_STATUSES.OK_200).send(posts)
    },

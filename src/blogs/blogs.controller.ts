@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import { BlogInput, BlogPostsParams, BlogView } from './blogs.types'
-import { blogsRepository } from './blogs.repository'
 import { blogsService } from './blogs.service'
 import { BlogsQueryInput, PostsByBlogQueryInput } from '../core/types/query.types'
 import { Paginator } from '../core/types/paginator.types'

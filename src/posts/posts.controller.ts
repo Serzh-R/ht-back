@@ -7,6 +7,7 @@ import { Paginator } from '../core/types/paginator.types'
 import { PostsQueryInput } from '../core/types/query.types'
 import { normalizePostsQuery } from '../core/helpers/query-normalizers'
 import { postsQueryRepository } from './posts.query-repository'
+import { postsService } from './posts.service'
 
 export const postsController = {
    async getPosts(
@@ -32,16 +33,14 @@ export const postsController = {
    },
 
    async createPost(req: Request<{}, {}, PostInput>, res: Response) {
-      const blog = await blogsRepository.findById(req.body.blogId)
+      const createdPost = await postsService.createPost(req.body)
 
-      if (!blog) {
+      if (!createdPost) {
          res.status(HTTP_STATUSES.BAD_REQUEST_400).json({
             errorsMessages: [{ message: 'Invalid blogId', field: 'blogId' }],
          })
          return
       }
-
-      const createdPost = await postsRepository.create(req.body, blog.name)
 
       res.status(HTTP_STATUSES.CREATED_201).json(createdPost)
    },

@@ -6,6 +6,7 @@ import { postsRepository } from './posts.repository'
 import { Paginator } from '../core/types/paginator.types'
 import { PostsQueryInput } from '../core/types/query.types'
 import { normalizePostsQuery } from '../core/helpers/query-normalizers'
+import { postsQueryRepository } from './posts.query-repository'
 
 export const postsController = {
    async getPosts(
@@ -14,13 +15,13 @@ export const postsController = {
    ) {
       const query = normalizePostsQuery(req.query)
 
-      const posts = await postsRepository.findAll(query)
+      const posts = await postsQueryRepository.findAll(query)
 
       res.status(HTTP_STATUSES.OK_200).json(posts)
    },
 
    async getPostById(req: Request<{ id: string }>, res: Response<PostView>) {
-      const post = await postsRepository.findById(req.params.id)
+      const post = await postsQueryRepository.findById(req.params.id)
 
       if (!post) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

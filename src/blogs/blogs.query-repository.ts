@@ -1,4 +1,4 @@
-import { Filter } from 'mongodb'
+import { Filter, ObjectId } from 'mongodb'
 import { BlogDb, BlogView } from './blogs.types'
 import { blogCollection } from '../db/mongo.db'
 import { BlogsQuery } from '../core/types/query.types'
@@ -31,5 +31,19 @@ export const blogsQueryRepository = {
          totalCount,
          items: blogs.map(mapperBlogView),
       }
+   },
+
+   async findById(id: string): Promise<BlogView | null> {
+      if (!ObjectId.isValid(id)) {
+         return null
+      }
+
+      const blog = await blogCollection.findOne({ _id: new ObjectId(id) })
+
+      if (!blog) {
+         return null
+      }
+
+      return mapperBlogView(blog)
    },
 }

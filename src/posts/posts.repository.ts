@@ -6,7 +6,7 @@ import { PostsQuery } from '../core/types/query.types'
 import { Paginator } from '../core/types/paginator.types'
 
 export const postsRepository = {
-   async findAll(query: PostsQuery): Promise<Paginator<PostView>> {
+   /*async findAll(query: PostsQuery): Promise<Paginator<PostView>> {
       const skip = (query.pageNumber - 1) * query.pageSize
 
       const totalCount = await postCollection.countDocuments({})
@@ -25,7 +25,7 @@ export const postsRepository = {
          totalCount,
          items: posts.map(mapperPostView),
       }
-   },
+   },*/
 
    async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<Paginator<PostView>> {
       const filter: Filter<PostDb> = { blogId }
@@ -50,7 +50,7 @@ export const postsRepository = {
       }
    },
 
-   async findById(id: string): Promise<PostView | null> {
+   /*async findById(id: string): Promise<PostView | null> {
       if (!ObjectId.isValid(id)) {
          return null
       }
@@ -62,7 +62,7 @@ export const postsRepository = {
       }
 
       return mapperPostView(post)
-   },
+   },*/
 
    async create(input: PostInput, blogName: string): Promise<PostView> {
       const newPost: PostDb = {

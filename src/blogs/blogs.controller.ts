@@ -23,7 +23,7 @@ export const blogsController = {
    },
 
    async getBlogById(req: Request<{ id: string }>, res: Response<BlogView>) {
-      const blog = await blogsRepository.findById(req.params.id)
+      const blog = await blogsQueryRepository.findById(req.params.id)
 
       if (!blog) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

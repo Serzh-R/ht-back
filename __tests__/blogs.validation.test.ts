@@ -84,7 +84,13 @@ describe('Blogs validation', () => {
          .get(SETTINGS.PATH.BLOGS)
          .expect(HTTP_STATUSES.OK_200)
 
-      expect(blogsListResponse.body).toEqual([])
+      expect(blogsListResponse.body).toEqual({
+         pagesCount: 0,
+         page: 1,
+         pageSize: 10,
+         totalCount: 0,
+         items: [],
+      })
    })
 
    it('should not update blog when incorrect body passed; PUT /blogs/:id', async () => {

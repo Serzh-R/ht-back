@@ -29,7 +29,13 @@ describe('Blogs API', () => {
    it('should return empty blogs array; GET /blogs', async () => {
       const response = await request(app).get(SETTINGS.PATH.BLOGS).expect(HTTP_STATUSES.OK_200)
 
-      expect(response.body).toEqual([])
+      expect(response.body).toEqual({
+         pagesCount: 0,
+         page: 1,
+         pageSize: 10,
+         totalCount: 0,
+         items: [],
+      })
    })
 
    it('should create blog; POST /blogs', async () => {
@@ -52,8 +58,8 @@ describe('Blogs API', () => {
          .get(SETTINGS.PATH.BLOGS)
          .expect(HTTP_STATUSES.OK_200)
 
-      expect(blogsListResponse.body).toHaveLength(1)
-      expect(blogsListResponse.body[0]).toEqual(response.body)
+      expect(blogsListResponse.body.items).toHaveLength(1)
+      expect(blogsListResponse.body.items[0]).toEqual(response.body)
    })
 
    it('should return blog by id; GET /blogs/:id', async () => {

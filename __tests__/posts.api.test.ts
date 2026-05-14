@@ -29,7 +29,13 @@ describe('Posts API', () => {
    it('should return empty posts array; GET /posts', async () => {
       const response = await request(app).get(SETTINGS.PATH.POSTS).expect(HTTP_STATUSES.OK_200)
 
-      expect(response.body).toEqual([])
+      expect(response.body).toEqual({
+         pagesCount: 0,
+         page: 1,
+         pageSize: 10,
+         totalCount: 0,
+         items: [],
+      })
    })
 
    it('should create post; POST /posts', async () => {
@@ -58,8 +64,8 @@ describe('Posts API', () => {
          .get(SETTINGS.PATH.POSTS)
          .expect(HTTP_STATUSES.OK_200)
 
-      expect(postsListResponse.body).toHaveLength(1)
-      expect(postsListResponse.body[0]).toEqual(response.body)
+      expect(postsListResponse.body.items).toHaveLength(1)
+      expect(postsListResponse.body.items[0]).toEqual(response.body)
    })
 
    it('should return post by id; GET /posts/:id', async () => {

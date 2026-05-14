@@ -107,7 +107,13 @@ describe('Posts validation', () => {
          .get(SETTINGS.PATH.POSTS)
          .expect(HTTP_STATUSES.OK_200)
 
-      expect(postsListResponse.body).toEqual([])
+      expect(postsListResponse.body).toEqual({
+         pagesCount: 0,
+         page: 1,
+         pageSize: 10,
+         totalCount: 0,
+         items: [],
+      })
    })
 
    it('should not update post when incorrect body passed; PUT /posts/:id', async () => {

@@ -19,3 +19,9 @@ coverage/
 .DS_Store
 
 "Unversioned Files"/
+
+# Случайно скомпилированные JS-файлы рядом с TS-файлами
+src/**/*.js
+src/**/*.js.map
+__tests__/**/*.js
+__tests__/**/*.js.map

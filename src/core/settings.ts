@@ -32,3 +32,5 @@ export const HTTP_STATUSES = {
 
    SERVER_ERROR_500: 500,
 }
+
+export const BCRYPT_SALT_ROUNDS = 12

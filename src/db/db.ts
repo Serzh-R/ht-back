@@ -56,6 +56,26 @@ export const db: DBType = {
          createdAt: new Date().toISOString(),
       },
    ],
+   users: [
+      {
+         id: '1',
+         login: 'user1',
+         email: 'example1@example.dev',
+         createdAt: new Date().toISOString(),
+      },
+      {
+         id: '2',
+         login: 'user2',
+         email: 'example2@example.dev',
+         createdAt: new Date().toISOString(),
+      },
+      {
+         id: '3',
+         login: 'user3',
+         email: 'example3@example.dev',
+         createdAt: new Date().toISOString(),
+      },
+   ],
 }
 
 export const setDB = (dataset?: Partial<DBType>) => {
@@ -63,10 +83,12 @@ export const setDB = (dataset?: Partial<DBType>) => {
       // если в функцию ничего не передано - то очищаем базу данных
       db.blogs = []
       db.posts = []
+      db.users = []
       return
    }
 
    // если что-то передано - то заменяем старые значения новыми
    db.blogs = dataset.blogs ?? db.blogs
    db.posts = dataset.posts ?? db.posts
+   db.users = dataset.users ?? db.users
 }

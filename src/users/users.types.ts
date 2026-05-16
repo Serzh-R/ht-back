@@ -1,4 +1,5 @@
 import { Paginator } from '../core/types/paginator.types'
+import { ObjectId } from 'mongodb'
 
 export type UserInput = {
    login: string
@@ -14,7 +15,7 @@ export type UserView = {
 }
 
 export type UserDb = {
-   _id?: string
+   _id?: ObjectId
    login: string
    email: string
    passwordHash: string

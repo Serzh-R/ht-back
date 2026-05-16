@@ -1,6 +1,6 @@
 import { BlogDb, BlogInput, BlogView } from './blogs.types'
 import { blogCollection } from '../db/mongo.db'
-import { mapperBlogView } from './mappers/mapper.blog-view'
+import { mapBlogView } from './mappers/map-blog.view'
 import { ObjectId } from 'mongodb'
 
 export const blogsRepository = {
@@ -15,7 +15,7 @@ export const blogsRepository = {
          return null
       }
 
-      return mapperBlogView(blog)
+      return mapBlogView(blog)
    },
 
    async create(input: BlogInput): Promise<BlogView> {
@@ -37,7 +37,7 @@ export const blogsRepository = {
          throw new Error('Blog was not created')
       }
 
-      return mapperBlogView(createdBlog)
+      return mapBlogView(createdBlog)
    },
 
    async update(id: string, input: BlogInput): Promise<boolean> {

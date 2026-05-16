@@ -1,6 +1,6 @@
 import { PostDb, PostInput, PostView } from './posts.types'
 import { postCollection } from '../db/mongo.db'
-import { mapperPostView } from './mappers/mapper.post-view'
+import { mapPostView } from './mappers/map-post.view'
 import { ObjectId } from 'mongodb'
 
 export const postsRepository = {
@@ -24,7 +24,7 @@ export const postsRepository = {
          throw new Error('Post was not created')
       }
 
-      return mapperPostView(createdPost)
+      return mapPostView(createdPost)
    },
 
    async update(id: string, input: PostInput, blogName: string): Promise<boolean> {

@@ -2,7 +2,7 @@ import { PostsQuery } from '../core/types/query.types'
 import { Paginator } from '../core/types/paginator.types'
 import { PostDb, PostView } from './posts.types'
 import { postCollection } from '../db/mongo.db'
-import { mapperPostView } from './mappers/mapper.post-view'
+import { mapPostView } from './mappers/map-post.view'
 import { Filter, ObjectId } from 'mongodb'
 
 export const postsQueryRepository = {
@@ -23,7 +23,7 @@ export const postsQueryRepository = {
          page: query.pageNumber,
          pageSize: query.pageSize,
          totalCount,
-         items: posts.map(mapperPostView),
+         items: posts.map(mapPostView),
       }
    },
 
@@ -38,7 +38,7 @@ export const postsQueryRepository = {
          return null
       }
 
-      return mapperPostView(post)
+      return mapPostView(post)
    },
 
    async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<Paginator<PostView>> {
@@ -60,7 +60,7 @@ export const postsQueryRepository = {
          page: query.pageNumber,
          pageSize: query.pageSize,
          totalCount,
-         items: posts.map(mapperPostView),
+         items: posts.map(mapPostView),
       }
    },
 }

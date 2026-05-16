@@ -3,7 +3,7 @@ import { BlogDb, BlogView } from './blogs.types'
 import { blogCollection } from '../db/mongo.db'
 import { BlogsQuery } from '../core/types/query.types'
 import { Paginator } from '../core/types/paginator.types'
-import { mapperBlogView } from './mappers/mapper.blog-view'
+import { mapBlogView } from './mappers/map-blog.view'
 
 export const blogsQueryRepository = {
    async findAll(query: BlogsQuery): Promise<Paginator<BlogView>> {
@@ -29,7 +29,7 @@ export const blogsQueryRepository = {
          page: query.pageNumber,
          pageSize: query.pageSize,
          totalCount,
-         items: blogs.map(mapperBlogView),
+         items: blogs.map(mapBlogView),
       }
    },
 
@@ -44,6 +44,6 @@ export const blogsQueryRepository = {
          return null
       }
 
-      return mapperBlogView(blog)
+      return mapBlogView(blog)
    },
 }

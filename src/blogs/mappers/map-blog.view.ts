@@ -1,7 +1,7 @@
 import { WithId } from 'mongodb'
 import { BlogDb, BlogView } from '../blogs.types'
 
-export function mapperBlogView(blog: WithId<BlogDb>): BlogView {
+export function mapBlogView(blog: WithId<BlogDb>): BlogView {
    return {
       id: blog._id.toString(),
       name: blog.name,

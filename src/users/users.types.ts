@@ -1,4 +1,3 @@
-import { Paginator } from '../core/types/paginator.types'
 import { ObjectId } from 'mongodb'
 
 export type UserInput = {

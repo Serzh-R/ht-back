@@ -1,12 +1,11 @@
 import { Filter, ObjectId } from 'mongodb'
 import { BlogDb, BlogView } from './blogs.types'
 import { blogCollection } from '../db/mongo.db'
-import { BlogsQuery } from '../core/types/query.types'
-import { Paginator } from '../core/types/paginator.types'
-import { mapBlogView } from './mappers/map-blog.view'
+import { BlogsQuery, BlogsQueryOutput } from '../core/types/query.types'
+import { mapperBlogView } from './mappers/mapper-blog.view'
 
 export const blogsQueryRepository = {
-   async findAll(query: BlogsQuery): Promise<Paginator<BlogView>> {
+   async findAll(query: BlogsQuery): Promise<BlogsQueryOutput> {
       const filter: Filter<BlogDb> = {}
 
       if (query.searchNameTerm) {
@@ -29,7 +28,7 @@ export const blogsQueryRepository = {
          page: query.pageNumber,
          pageSize: query.pageSize,
          totalCount,
-         items: blogs.map(mapBlogView),
+         items: blogs.map(mapperBlogView),
       }
    },
 
@@ -44,6 +43,6 @@ export const blogsQueryRepository = {
          return null
       }
 
-      return mapBlogView(blog)
+      return mapperBlogView(blog)
    },
 }

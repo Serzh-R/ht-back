@@ -1,12 +1,11 @@
-import { PostsQuery } from '../core/types/query.types'
-import { Paginator } from '../core/types/paginator.types'
+import { PostsQuery, PostsQueryOutput } from '../core/types/query.types'
 import { PostDb, PostView } from './posts.types'
 import { postCollection } from '../db/mongo.db'
-import { mapPostView } from './mappers/map-post.view'
+import { mapperPostView } from './mappers/mapper-post.view'
 import { Filter, ObjectId } from 'mongodb'
 
 export const postsQueryRepository = {
-   async findAll(query: PostsQuery): Promise<Paginator<PostView>> {
+   async findAll(query: PostsQuery): Promise<PostsQueryOutput> {
       const skip = (query.pageNumber - 1) * query.pageSize
 
       const totalCount = await postCollection.countDocuments({})
@@ -23,7 +22,7 @@ export const postsQueryRepository = {
          page: query.pageNumber,
          pageSize: query.pageSize,
          totalCount,
-         items: posts.map(mapPostView),
+         items: posts.map(mapperPostView),
       }
    },
 
@@ -38,10 +37,10 @@ export const postsQueryRepository = {
          return null
       }
 
-      return mapPostView(post)
+      return mapperPostView(post)
    },
 
-   async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<Paginator<PostView>> {
+   async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<PostsQueryOutput> {
       const filter: Filter<PostDb> = { blogId }
 
       const skip = (query.pageNumber - 1) * query.pageSize
@@ -60,7 +59,7 @@ export const postsQueryRepository = {
          page: query.pageNumber,
          pageSize: query.pageSize,
          totalCount,
-         items: posts.map(mapPostView),
+         items: posts.map(mapperPostView),
       }
    },
 }

@@ -4,6 +4,8 @@ import {
    PostsQuery,
    PostsQueryInput,
    SortDirections,
+   UsersQuery,
+   UsersQueryInput,
 } from '../types/query.types'
 
 const DEFAULT_PAGE_NUMBER = 1
@@ -45,5 +47,16 @@ export function normalizePostsQuery(query: PostsQueryInput): PostsQuery {
       sortDirection: normalizeSortDirection(query.sortDirection),
       pageNumber: normalizePositiveInteger(query.pageNumber, DEFAULT_PAGE_NUMBER),
       pageSize: normalizePositiveInteger(query.pageSize, DEFAULT_PAGE_SIZE),
+   }
+}
+
+export function normalizeUsersQuery(query: UsersQueryInput): UsersQuery {
+   return {
+      sortBy: normalizeSortBy(query.sortBy),
+      sortDirection: normalizeSortDirection(query.sortDirection),
+      pageNumber: normalizePositiveInteger(query.pageNumber, DEFAULT_PAGE_NUMBER),
+      pageSize: normalizePositiveInteger(query.pageSize, DEFAULT_PAGE_SIZE),
+      searchLoginTerm: query.searchLoginTerm ?? null,
+      searchEmailTerm: query.searchEmailTerm ?? null,
    }
 }

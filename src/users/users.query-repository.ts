@@ -1,39 +1,28 @@
+import { Filter } from 'mongodb'
 import { userCollection } from '../db/mongo.db'
-import { Filter, WithId } from 'mongodb'
-import { GetUsersQueryParams } from './types/users.query.types'
-import { UserDb, UsersQueryOutput } from './types/users.types'
-import { mapUserView } from './mappers/map-user.view'
+import { UserDb } from './users.types'
+import { UsersQuery, UsersQueryOutput } from '../core/types/query.types'
+import { mapperUserView } from './mappers/mapper-user.view'
 
 export const usersQueryRepository = {
-   async getAll(query: GetUsersQueryParams): Promise<UsersQueryOutput> {
-      const searchLoginTerm = query.searchLoginTerm ?? null
-      const searchEmailTerm = query.searchEmailTerm ?? null
+   async findAll(query: UsersQuery): Promise<UsersQueryOutput> {
+      const filter: Filter<UserDb> = {}
 
-      const sortBy = query.sortBy ?? 'createdAt'
-      const sortDirection = query.sortDirection === 'asc' ? 'asc' : 'desc'
+      const searchConditions: Filter<UserDb>[] = []
 
-      const pageNumber = query.pageNumber ? Number(query.pageNumber) : 1
-      const pageSize = query.pageSize ? Number(query.pageSize) : 10
-
-      const skip = (pageNumber - 1) * pageSize
-
-      const filter: Filter<WithId<UserDb>> = {}
-
-      const searchConditions: Filter<WithId<UserDb>>[] = []
-
-      if (searchLoginTerm) {
+      if (query.searchLoginTerm) {
          searchConditions.push({
             login: {
-               $regex: searchLoginTerm,
+               $regex: query.searchLoginTerm,
                $options: 'i',
             },
          })
       }
 
-      if (searchEmailTerm) {
+      if (query.searchEmailTerm) {
          searchConditions.push({
             email: {
-               $regex: searchEmailTerm,
+               $regex: query.searchEmailTerm,
                $options: 'i',
             },
          })
@@ -43,21 +32,23 @@ export const usersQueryRepository = {
          filter.$or = searchConditions
       }
 
+      const skip = (query.pageNumber - 1) * query.pageSize
+
       const totalCount = await userCollection.countDocuments(filter)
 
       const users = await userCollection
          .find(filter)
-         .sort({ [sortBy]: sortDirection })
+         .sort({ [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1 })
          .skip(skip)
-         .limit(pageSize)
+         .limit(query.pageSize)
          .toArray()
 
       return {
-         pagesCount: Math.ceil(totalCount / pageSize),
-         page: pageNumber,
-         pageSize,
+         pagesCount: Math.ceil(totalCount / query.pageSize),
+         page: query.pageNumber,
+         pageSize: query.pageSize,
          totalCount,
-         items: users.map(mapUserView),
+         items: users.map(mapperUserView),
       }
    },
 }

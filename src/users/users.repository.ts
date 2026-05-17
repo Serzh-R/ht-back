@@ -1,7 +1,7 @@
 import { userCollection } from '../db/mongo.db'
 import { ObjectId } from 'mongodb'
-import { UserDb, UserView } from './types/users.types'
-import { mapUserView } from './mappers/map-user.view'
+import { UserDb, UserView } from './users.types'
+import { mapperUserView } from './mappers/mapper-user.view'
 
 export const usersRepository = {
    async findById(id: string): Promise<UserView | null> {
@@ -13,7 +13,7 @@ export const usersRepository = {
          return null
       }
 
-      return mapUserView(user)
+      return mapperUserView(user)
    },
 
    async findByLogin(login: string): Promise<UserDb | null> {
@@ -40,7 +40,7 @@ export const usersRepository = {
          throw new Error('User was not created')
       }
 
-      return mapUserView(createdUser)
+      return mapperUserView(createdUser)
    },
    async deleteById(id: string): Promise<boolean> {
       const result = await userCollection.deleteOne({

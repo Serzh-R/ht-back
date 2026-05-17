@@ -1,7 +1,7 @@
 import { WithId } from 'mongodb'
 import { PostDb, PostView } from '../posts.types'
 
-export function mapPostView(post: WithId<PostDb>): PostView {
+export function mapperPostView(post: WithId<PostDb>): PostView {
    return {
       id: post._id.toString(),
       title: post.title,

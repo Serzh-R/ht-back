@@ -1,4 +1,4 @@
-import { UserDb, UserInput, UserView } from './types/users.types'
+import { UserDb, UserInput, UserView } from './users.types'
 import { usersRepository } from './users.repository'
 import { bcryptService } from '../auth/adapters/bcrypt.service'
 import { Result, ResultStatus } from '../core/types/result.types'

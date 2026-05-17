@@ -1,4 +1,4 @@
-import { Paginator } from '../../core/types/paginator.types'
+import { Paginator } from '../core/types/paginator.types'
 import { ObjectId } from 'mongodb'
 
 export type UserInput = {
@@ -21,5 +21,3 @@ export type UserDb = {
    passwordHash: string
    createdAt: Date
 }
-
-export type UsersQueryOutput = Paginator<UserView>

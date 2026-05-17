@@ -1,4 +1,4 @@
-import { UserDb, UserView } from '../users.types'
+import { UserDb, UserView } from '../types/users.types'
 import { WithId } from 'mongodb'
 
 export function mapUserView(user: WithId<UserDb>): UserView {

@@ -1,7 +1,7 @@
 import { userCollection } from '../db/mongo.db'
 import { ObjectId } from 'mongodb'
-import { UserDb, UserView } from './users.types'
-import { mapUserView } from './mappers/mapper.user-view'
+import { UserDb, UserView } from './types/users.types'
+import { mapUserView } from './mappers/map-user.view'
 
 export const usersRepository = {
    async findById(id: string): Promise<UserView | null> {

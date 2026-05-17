@@ -115,6 +115,33 @@ export const blogPostFieldsValidator = [
       .withMessage('content length should be from 1 to 1000'),
 ]
 
+/*************************************************************************/
+
+export const userFieldsValidator = [
+   body('login')
+      .trim()
+      .isString()
+      .withMessage('login must be a string')
+      .isLength({ min: 3, max: 10 })
+      .withMessage('login length must be from 3 to 10')
+      .matches(/^[a-zA-Z0-9_-]*$/)
+      .withMessage('login has invalid format'),
+
+   body('password')
+      .trim()
+      .isString()
+      .withMessage('password must be a string')
+      .isLength({ min: 6, max: 20 })
+      .withMessage('password length must be from 6 to 20'),
+
+   body('email')
+      .trim()
+      .isString()
+      .withMessage('email must be a string')
+      .matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
+      .withMessage('email has invalid format'),
+]
+
 /*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
 
 export const specificFieldsValidator = (fields: string[]) => {

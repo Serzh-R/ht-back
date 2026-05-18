@@ -10,3 +10,9 @@ export const correctPostData = {
    content: 'Some content for post',
    blogId: '',
 }
+
+export const correctUserData = {
+   login: 'test',
+   email: '',
+   password: '',
+}

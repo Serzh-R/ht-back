@@ -12,7 +12,7 @@ export const correctPostData = {
 }
 
 export const correctUserData = {
-   login: 'test',
-   email: '',
-   password: '',
+   login: 'testUser',
+   email: 'test-user@mail.com',
+   password: 'qwerty123',
 }

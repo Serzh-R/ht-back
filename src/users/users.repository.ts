@@ -4,18 +4,6 @@ import { UserDb, UserView } from './users.types'
 import { mapperUserView } from './mappers/mapper-user.view'
 
 export const usersRepository = {
-   async findById(id: string): Promise<UserView | null> {
-      const user = await userCollection.findOne({
-         _id: new ObjectId(id),
-      })
-
-      if (!user) {
-         return null
-      }
-
-      return mapperUserView(user)
-   },
-
    async findByLogin(login: string): Promise<UserDb | null> {
       return userCollection.findOne({ login })
    },
@@ -43,6 +31,10 @@ export const usersRepository = {
       return mapperUserView(createdUser)
    },
    async deleteById(id: string): Promise<boolean> {
+      if (!ObjectId.isValid(id)) {
+         return false
+      }
+
       const result = await userCollection.deleteOne({
          _id: new ObjectId(id),
       })

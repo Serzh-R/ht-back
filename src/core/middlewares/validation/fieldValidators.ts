@@ -160,7 +160,7 @@ export const loginFieldsValidator = [
       .withMessage('password is required'),
 ]
 
-/**************************************************************************/
+/***************************************************************************/
 
 /*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
 

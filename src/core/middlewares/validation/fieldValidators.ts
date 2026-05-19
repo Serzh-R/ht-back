@@ -142,6 +142,26 @@ export const userFieldsValidator = [
       .withMessage('email has invalid format'),
 ]
 
+/***********************************************************************/
+
+export const loginFieldsValidator = [
+   body('loginOrEmail')
+      .trim()
+      .isString()
+      .withMessage('loginOrEmail must be a string')
+      .notEmpty()
+      .withMessage('loginOrEmail is required'),
+
+   body('password')
+      .trim()
+      .isString()
+      .withMessage('password must be a string')
+      .notEmpty()
+      .withMessage('password is required'),
+]
+
+/**************************************************************************/
+
 /*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
 
 export const specificFieldsValidator = (fields: string[]) => {

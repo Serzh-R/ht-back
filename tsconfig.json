@@ -49,5 +49,6 @@
       // "moduleDetection": "force",
    },
    "include": ["src/**/*.ts", "__tests__/**/*.ts"],
-   "exclude": ["dist", "node_modules"]
+   "exclude": ["dist", "node_modules"],
+   "files": ["src/types/index.d.ts"]
 }

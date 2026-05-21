@@ -1,6 +1,6 @@
 export type FieldError = {
    message: string
-   field: string
+   field: string | null
 }
 
 export type APIErrorResult = {

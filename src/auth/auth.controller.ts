@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
-import { ResultStatus } from '../core/types/result.types'
-import { LoginInputModel } from './auth.types'
+import { ResultStatus } from '../core/result/result.types'
+import { LoginInputModel, LoginSuccessViewModel } from './auth.types'
 import { authService } from './auth.service'
 import { jwtService } from './adapters/jwt.service'
 
 export const authController = {
-   async login(req: Request<{}, {}, LoginInputModel>, res: Response) {
+   async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
       const result = await authService.checkCredentials(req.body)
 
       if (result.status === ResultStatus.Unauthorized || !result.data || !result.data._id) {

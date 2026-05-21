@@ -28,7 +28,7 @@ export const authService = {
       return {
          status: ResultStatus.Success,
          extensions: [],
-         data: null,
+         data: user,
       }
    },
 }

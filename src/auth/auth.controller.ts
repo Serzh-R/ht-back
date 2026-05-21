@@ -3,16 +3,21 @@ import { HTTP_STATUSES } from '../core/settings'
 import { ResultStatus } from '../core/types/result.types'
 import { LoginInputModel } from './auth.types'
 import { authService } from './auth.service'
+import { jwtService } from './adapters/jwt.service'
 
 export const authController = {
    async login(req: Request<{}, {}, LoginInputModel>, res: Response) {
       const result = await authService.checkCredentials(req.body)
 
-      if (result.status === ResultStatus.Unauthorized) {
+      if (result.status === ResultStatus.Unauthorized || !result.data || !result.data._id) {
          res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
          return
       }
 
-      res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+      const accessToken = await jwtService.createAccessToken(result.data._id.toString())
+
+      res.status(HTTP_STATUSES.OK_200).send({
+         accessToken,
+      })
    },
 }

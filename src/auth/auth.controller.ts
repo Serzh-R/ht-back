@@ -1,9 +1,11 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import { ResultStatus } from '../core/result/result.types'
-import { LoginInputModel, LoginSuccessViewModel } from './auth.types'
+import { LoginInputModel, LoginSuccessViewModel, MeViewModel } from './auth.types'
 import { authService } from './auth.service'
 import { jwtService } from './adapters/jwt.service'
+import { usersRepository } from '../users/users.repository'
+import { mapperMeView } from './mappers/mapper-me.view'
 
 export const authController = {
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
@@ -19,5 +21,21 @@ export const authController = {
       res.status(HTTP_STATUSES.OK_200).send({
          accessToken,
       })
+   },
+
+   async me(req: Request, res: Response<MeViewModel>) {
+      if (!req.userId) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const user = await usersRepository.findById(req.userId)
+
+      if (!user) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      res.status(HTTP_STATUSES.OK_200).send(mapperMeView(user))
    },
 }

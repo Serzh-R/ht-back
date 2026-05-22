@@ -17,6 +17,15 @@ export const usersRepository = {
          $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
       })
    },
+
+   async findById(id: string) {
+      if (!ObjectId.isValid(id)) {
+         return null
+      }
+
+      return userCollection.findOne({ _id: new ObjectId(id) })
+   },
+
    async create(newUser: UserDb): Promise<UserView> {
       const result = await userCollection.insertOne(newUser)
 

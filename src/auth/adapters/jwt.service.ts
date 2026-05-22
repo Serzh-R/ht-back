@@ -3,9 +3,10 @@ import { ACCESS_SECRET, ACCESS_TIME } from '../../core/settings'
 
 export const jwtService = {
    async createAccessToken(userId: string): Promise<string> {
-      return jwt.sign({ userId }, ACCESS_SECRET, {
+      const token = jwt.sign({ userId }, ACCESS_SECRET, {
          expiresIn: Number(ACCESS_TIME),
       })
+      return token
    },
 
    async decodeToken(token: string): Promise<any> {

@@ -2,8 +2,11 @@ import { UserView } from '../../users/users.types'
 import { Paginator } from './paginator.types'
 import { BlogView } from '../../blogs/blogs.types'
 import { PostView } from '../../posts/posts.types'
+import { CommentView } from '../../comments/comments.types'
 
 export type SortDirections = 'asc' | 'desc'
+
+/************ blogs query ******************************/
 
 export type BlogsQueryInput = {
    searchNameTerm?: string
@@ -22,6 +25,8 @@ export type BlogsQuery = {
 }
 
 export type BlogsQueryOutput = Paginator<BlogView>
+
+/***************** posts query *********************************/
 
 export type PostsQueryInput = {
    sortBy?: string
@@ -42,6 +47,16 @@ export type PostsQueryOutput = Paginator<PostView>
 export type PostsByBlogQueryInput = PostsQueryInput
 
 export type PostsByBlogQuery = PostsQuery
+
+/******************* comments query ***********************************/
+
+export type CommentsQueryInput = PostsQueryInput
+
+export type CommentsQuery = PostsQuery
+
+export type CommentsQueryOutput = Paginator<CommentView>
+
+/****************** users query ************************************/
 
 export type UsersQueryInput = {
    searchLoginTerm?: string

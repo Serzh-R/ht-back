@@ -16,6 +16,7 @@ export const SETTINGS = {
       POSTS: '/posts',
       AUTH: '/auth',
       USERS: '/users',
+      COMMENTS: '/comments',
       DELETE_ALL: '/testing/all-data',
    },
 }

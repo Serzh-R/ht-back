@@ -162,6 +162,17 @@ export const loginFieldsValidator = [
 
 /***************************************************************************/
 
+export const commentFieldsValidator = [
+   body('content')
+      .trim()
+      .isString()
+      .withMessage('content should be a string')
+      .isLength({ min: 20, max: 300 })
+      .withMessage('content length should be from 20 to 300'),
+]
+
+/**************************************************************************/
+
 /*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
 
 export const specificFieldsValidator = (fields: string[]) => {

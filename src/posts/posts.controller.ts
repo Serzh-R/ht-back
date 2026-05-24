@@ -3,7 +3,7 @@ import { HTTP_STATUSES } from '../core/settings'
 import { PostInput, PostView } from './posts.types'
 import { Paginator } from '../core/types/paginator.types'
 import { CommentsQueryInput, PostsQueryInput } from '../core/types/query.types'
-import { normalizePostsQuery } from '../core/helpers/query-normalizers'
+import { normalizeCommentsQuery, normalizePostsQuery } from '../core/helpers/query-normalizers'
 import { postsQueryRepository } from './posts.query-repository'
 import { postsService } from './posts.service'
 import { CommentInput, CommentView } from '../comments/comments.types'
@@ -89,7 +89,7 @@ export const postsController = {
          return
       }
 
-      const query = normalizePostsQuery(req.query)
+      const query = normalizeCommentsQuery(req.query)
 
       const comments = await commentsQueryRepository.findCommentsByPostId(req.params.postId, query)
 

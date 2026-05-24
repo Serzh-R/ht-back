@@ -1,6 +1,8 @@
 import {
    BlogsQuery,
    BlogsQueryInput,
+   CommentsQuery,
+   CommentsQueryInput,
    PostsQuery,
    PostsQueryInput,
    SortDirections,
@@ -59,4 +61,8 @@ export function normalizeUsersQuery(query: UsersQueryInput): UsersQuery {
       searchLoginTerm: query.searchLoginTerm ?? null,
       searchEmailTerm: query.searchEmailTerm ?? null,
    }
+}
+
+export const normalizeCommentsQuery = (query: CommentsQueryInput): CommentsQuery => {
+   return normalizePostsQuery(query)
 }

@@ -9,23 +9,23 @@ export const jwtService = {
       return token
    },
 
-   async decodeToken(token: string): Promise<any> {
+   /*async decodeToken(token: string): Promise<any> {
       try {
          return jwt.decode(token)
       } catch (e: unknown) {
          console.error("Can't decode token", e)
          return null
       }
-   },
+   },*/
 
-   async verifyAccessToken(accessToken: string): Promise<{ userId: string } | null> {
+   /*async verifyAccessToken(accessToken: string): Promise<{ userId: string } | null> {
       try {
          return jwt.verify(accessToken, ACCESS_SECRET) as { userId: string }
       } catch (error) {
          console.error('AccessToken verify some error')
          return null
       }
-   },
+   },*/
 
    async getUserIdByAccessToken(accessToken: string): Promise<string | null> {
       try {

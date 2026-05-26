@@ -4,6 +4,7 @@ import { HTTP_STATUSES, SETTINGS } from '../../src/core/settings'
 import { clearDb } from '../helpers/clear-db'
 import { runDb, stopDb } from '../../src/db/mongo.db'
 import { createTestUser } from '../helpers/create-test-user'
+import { loginTestUser } from '../helpers/login-test-user'
 
 const app = createApp()
 
@@ -28,13 +29,16 @@ describe('Auth API', () => {
          password: 'qwerty123',
       })
 
-      await request(app)
+      const response = await request(app)
          .post(`${SETTINGS.PATH.AUTH}/login`)
          .send({
             loginOrEmail: 'testUser',
             password: 'qwerty123',
          })
-         .expect(HTTP_STATUSES.NO_CONTENT_204)
+         .expect(HTTP_STATUSES.OK_200)
+      expect(response.body).toEqual({
+         accessToken: expect.any(String),
+      })
    })
 
    it('should login user by email; POST /auth/login', async () => {
@@ -44,13 +48,16 @@ describe('Auth API', () => {
          password: 'qwerty123',
       })
 
-      await request(app)
+      const response = await request(app)
          .post(`${SETTINGS.PATH.AUTH}/login`)
          .send({
             loginOrEmail: 'test-user@mail.com',
             password: 'qwerty123',
          })
-         .expect(HTTP_STATUSES.NO_CONTENT_204)
+         .expect(HTTP_STATUSES.OK_200)
+      expect(response.body).toEqual({
+         accessToken: expect.any(String),
+      })
    })
 
    it('should not login user with incorrect login or email; POST /auth/login', async () => {
@@ -83,5 +90,26 @@ describe('Auth API', () => {
             password: 'wrongPassword',
          })
          .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should return current user info; GET /auth/me', async () => {
+      const user = await createTestUser(app, {
+         login: 'testUser',
+         email: 'test-user@mail.com',
+         password: 'qwerty123',
+      })
+
+      const bearerToken = await loginTestUser(app, 'testUser', 'qwerty123')
+
+      const response = await request(app)
+         .get(`${SETTINGS.PATH.AUTH}/me`)
+         .set('Authorization', bearerToken)
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(response.body).toEqual({
+         email: user.email,
+         login: user.login,
+         userId: user.id,
+      })
    })
 })

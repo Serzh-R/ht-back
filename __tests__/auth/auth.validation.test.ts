@@ -70,4 +70,15 @@ describe('Auth validation', () => {
          })
          .expect(HTTP_STATUSES.UNAUTHORIZED_401)
    })
+
+   it('should return 401 without Bearer token; GET /auth/me', async () => {
+      await request(app).get(`${SETTINGS.PATH.AUTH}/me`).expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should return 401 with incorrect Bearer token; GET /auth/me', async () => {
+      await request(app)
+         .get(`${SETTINGS.PATH.AUTH}/me`)
+         .set('Authorization', 'Bearer incorrect-token')
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
 })

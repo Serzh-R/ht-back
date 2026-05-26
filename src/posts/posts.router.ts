@@ -8,7 +8,6 @@ import {
 } from '../core/middlewares/validation/fieldValidators'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
 import { jwtAccessAuthMiddleware } from '../auth/middlewares/jwt-access-auth.middleware'
-import { NextFunction, Request, Response } from 'express'
 
 export const postsRouter = Router({})
 
@@ -16,11 +15,6 @@ postsRouter.get('/', postsController.getPosts)
 
 postsRouter.post(
    '/:postId/comments',
-   (req: Request, res: Response, next: NextFunction) => {
-      console.log('POST /posts/:postId/comments ROUTE WAS CALLED')
-      console.log('POST_ID:', req.params.postId)
-      next()
-   },
    jwtAccessAuthMiddleware,
    commentFieldsValidator,
    errorsResultMiddleware,

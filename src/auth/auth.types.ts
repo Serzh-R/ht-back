@@ -12,3 +12,11 @@ export type MeViewModel = {
    login: string
    userId: string
 }
+
+export type RegConfirmCode = {
+   code: string
+}
+
+export type RegEmailResending = {
+   email: string
+}

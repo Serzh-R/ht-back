@@ -173,6 +173,17 @@ export const commentFieldsValidator = [
 
 /**************************************************************************/
 
+export const regEmailResendingFieldsValidator = [
+   body('email')
+      .trim()
+      .isString()
+      .withMessage('email must be a string')
+      .matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
+      .withMessage('email has invalid format'),
+]
+
+/*************************************************************************/
+
 /*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
 
 export const specificFieldsValidator = (fields: string[]) => {

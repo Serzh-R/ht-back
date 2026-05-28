@@ -13,10 +13,19 @@ export type UserView = {
    createdAt: string
 }
 
+export type EmailConfirmationInfo = {
+   confirmationCode: string
+   expirationDate: Date
+   isConfirmed: boolean
+}
+
 export type UserDb = {
    _id?: ObjectId
+
    login: string
    email: string
    passwordHash: string
    createdAt: Date
+
+   emailConfirmation: EmailConfirmationInfo
 }

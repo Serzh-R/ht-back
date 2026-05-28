@@ -19,6 +19,11 @@ export const SETTINGS = {
       COMMENTS: '/comments',
       DELETE_ALL: '/testing/all-data',
    },
+
+   EMAIL: {
+      USER: process.env.EMAIL_USER || '',
+      PASS: process.env.EMAIL_PASS || '',
+   },
 }
 
 export const HTTP_STATUSES = {

@@ -41,8 +41,7 @@ export const jwtService = {
          }
 
          return null
-      } catch (error) {
-         console.error('AccessToken verify some error')
+      } catch {
          return null
       }
    },

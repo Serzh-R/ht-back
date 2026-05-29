@@ -8,4 +8,10 @@ export const authRouter = Router({})
 
 authRouter.post('/login', loginFieldsValidator, errorsResultMiddleware, authController.login)
 
+authRouter.post('/registration', authController.registration)
+
+authRouter.post('/registration-confirmation', authController.registrationConfirmation)
+
+authRouter.post('/registration-email-resending', authController.registrationEmailResending)
+
 authRouter.get('/me', jwtAccessAuthMiddleware, authController.me)

@@ -7,6 +7,7 @@ import { jwtService } from './adapters/jwt.service'
 import { usersRepository } from '../users/users.repository'
 import { mapperMeView } from './mappers/mapper-me.view'
 import { RegConfirmCode, RegEmailResending } from './auth.types'
+import { UserInput } from '../users/users.types'
 
 export const authController = {
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
@@ -24,7 +25,17 @@ export const authController = {
       })
    },
 
-   async registration(req: Request, res: Response) {
+   async registration(req: Request<{}, {}, UserInput>, res: Response) {
+      const result = await authService.registration(req.body)
+
+      if (result.status === ResultStatus.BadRequest) {
+         res.status(HTTP_STATUSES.BAD_REQUEST_400).send({
+            errorsMessages: result.extensions,
+         })
+
+         return
+      }
+
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
    },
 

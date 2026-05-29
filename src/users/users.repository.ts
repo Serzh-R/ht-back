@@ -39,6 +39,7 @@ export const usersRepository = {
 
       return mapperUserView(createdUser)
    },
+
    async deleteById(id: string): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
          return false

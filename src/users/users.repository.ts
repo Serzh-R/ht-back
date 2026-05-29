@@ -26,6 +26,43 @@ export const usersRepository = {
       return userCollection.findOne({ _id: new ObjectId(id) })
    },
 
+   async findByConfirmationCode(code: string): Promise<UserDb | null> {
+      return userCollection.findOne({
+         'emailConfirmation.confirmationCode': code,
+      })
+   },
+
+   async confirmEmail(userId: string): Promise<boolean> {
+      const result = await userCollection.updateOne(
+         { _id: new ObjectId(userId) },
+         {
+            $set: {
+               'emailConfirmation.isConfirmed': true,
+            },
+         },
+      )
+
+      return result.matchedCount === 1
+   },
+
+   async updateConfirmationInfo(
+      userId: string,
+      confirmationCode: string,
+      expirationDate: Date,
+   ): Promise<boolean> {
+      const result = await userCollection.updateOne(
+         { _id: new ObjectId(userId) },
+         {
+            $set: {
+               'emailConfirmation.confirmationCode': confirmationCode,
+               'emailConfirmation.expirationDate': expirationDate,
+            },
+         },
+      )
+
+      return result.matchedCount === 1
+   },
+
    async create(newUser: UserDb): Promise<UserView> {
       const result = await userCollection.insertOne(newUser)
 

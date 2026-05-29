@@ -173,7 +173,18 @@ export const commentFieldsValidator = [
 
 /**************************************************************************/
 
-export const regEmailResendingFieldsValidator = [
+export const regConfirmationValidator = [
+   body('code')
+      .trim()
+      .isString()
+      .withMessage('code must be a string')
+      .notEmpty()
+      .withMessage('code is required'),
+]
+
+/**************************************************************************/
+
+export const regEmailResendingValidator = [
    body('email')
       .trim()
       .isString()
@@ -183,16 +194,3 @@ export const regEmailResendingFieldsValidator = [
 ]
 
 /*************************************************************************/
-
-/*const BlogFields: string[] = ['name', 'description', 'websiteUrl']
-
-export const specificFieldsValidator = (fields: string[]) => {
-  return body().custom((_, { req }) => {
-    const bodyKeys = Object.keys(req.body)
-
-    const invalidFields = bodyKeys.filter((key) => !fields.includes(key))
-    if (invalidFields.length > 0) {
-    }
-    return true
-  })
-}*/

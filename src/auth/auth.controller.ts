@@ -40,10 +40,30 @@ export const authController = {
    },
 
    async registrationConfirmation(req: Request<{}, {}, RegConfirmCode>, res: Response) {
+      const result = await authService.registrationConfirmation(req.body)
+
+      if (result.status === ResultStatus.BadRequest) {
+         res.status(HTTP_STATUSES.BAD_REQUEST_400).send({
+            errorsMessages: result.extensions,
+         })
+
+         return
+      }
+
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
    },
 
    async registrationEmailResending(req: Request<{}, {}, RegEmailResending>, res: Response) {
+      const result = await authService.registrationEmailResending(req.body)
+
+      if (result.status === ResultStatus.BadRequest) {
+         res.status(HTTP_STATUSES.BAD_REQUEST_400).send({
+            errorsMessages: result.extensions,
+         })
+
+         return
+      }
+
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
    },
 

@@ -2,6 +2,7 @@ import { UserDb, UserInput, UserView } from './users.types'
 import { usersRepository } from './users.repository'
 import { bcryptService } from '../auth/adapters/bcrypt.service'
 import { Result, ResultStatus } from '../core/result/result.types'
+import { createEmailConfirmation } from '../auth/helpers/create-email-confirmation'
 
 export const usersService = {
    async createUser(input: UserInput): Promise<Result<UserView>> {
@@ -42,6 +43,7 @@ export const usersService = {
          email: input.email,
          passwordHash,
          createdAt: new Date(),
+         emailConfirmation: createEmailConfirmation(),
       }
 
       const createdUser = await usersRepository.create(newUser)

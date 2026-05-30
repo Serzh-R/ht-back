@@ -43,7 +43,11 @@ export const usersService = {
          email: input.email,
          passwordHash,
          createdAt: new Date(),
-         emailConfirmation: createEmailConfirmation(),
+         emailConfirmation: {
+            confirmationCode: '',
+            expirationDate: new Date(),
+            isConfirmed: true,
+         },
       }
 
       const createdUser = await usersRepository.create(newUser)

@@ -29,7 +29,7 @@ export const usersRepository = {
    async findByConfirmationCode(code: string): Promise<UserDb | null> {
       return userCollection.findOne({
          'emailConfirmation.confirmationCode': code,
-      })
+      } as any)
    },
 
    async confirmEmail(userId: string): Promise<boolean> {
@@ -38,7 +38,7 @@ export const usersRepository = {
          {
             $set: {
                'emailConfirmation.isConfirmed': true,
-            },
+            } as any,
          },
       )
 
@@ -56,7 +56,7 @@ export const usersRepository = {
             $set: {
                'emailConfirmation.confirmationCode': confirmationCode,
                'emailConfirmation.expirationDate': expirationDate,
-            },
+            } as any,
          },
       )
 

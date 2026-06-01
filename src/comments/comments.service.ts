@@ -3,6 +3,43 @@ import { commentsRepository } from './comments.repository'
 import { Result, ResultStatus } from '../core/result/result.types'
 
 export const commentsService = {
+   /*async createComment(
+      input: CommentInput,
+      postId: string,
+      userId: string,
+   ): Promise<Result<CommentView>> {
+      const post = await postsQueryRepository.findById(postId)
+
+      if (!post) {
+         return {
+            status: ResultStatus.NotFound,
+            extensions: [],
+            data: null,
+         }
+      }
+
+      const user = await usersRepository.findById(userId)
+
+      if (!user) {
+         return {
+            status: ResultStatus.Unauthorized,
+            extensions: [],
+            data: null,
+         }
+      }
+
+      const createdComment = await commentsRepository.create(input, postId, {
+         userId,
+         userLogin: user.login,
+      })
+
+      return {
+         status: ResultStatus.Created,
+         extensions: [],
+         data: createdComment,
+      }
+   },*/
+
    async createComment(
       input: CommentInput,
       postId: string,

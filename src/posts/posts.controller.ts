@@ -47,6 +47,25 @@ export const postsController = {
       res.status(HTTP_STATUSES.CREATED_201).json(createdPost)
    },
 
+   /*async createCommentByPostId(
+      req: Request<{ postId: string }, {}, CommentInput>,
+      res: Response<CommentView>,
+   ) {
+      if (!req.userId) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const result = await commentsService.createComment(req.body, req.params.postId, req.userId)
+
+      if (result.status !== ResultStatus.Created) {
+         res.sendStatus(resultCodeToHttpException(result.status))
+         return
+      }
+
+      res.status(HTTP_STATUSES.CREATED_201).json(result.data!)
+   },*/
+
    async createCommentByPostId(
       req: Request<{ postId: string }, {}, CommentInput>,
       res: Response<CommentView>,

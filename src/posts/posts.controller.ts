@@ -7,9 +7,10 @@ import { normalizeCommentsQuery, normalizePostsQuery } from '../core/helpers/que
 import { postsQueryRepository } from './posts.query-repository'
 import { postsService } from './posts.service'
 import { CommentInput, CommentView } from '../comments/comments.types'
-import { usersRepository } from '../users/users.repository'
 import { commentsService } from '../comments/comments.service'
 import { commentsQueryRepository } from '../comments/comments.query-repository'
+import { ResultStatus } from '../core/result/result.types'
+import { resultCodeToHttpException } from '../core/result/result-code-to-http-exception'
 
 export const postsController = {
    async getPosts(
@@ -47,7 +48,7 @@ export const postsController = {
       res.status(HTTP_STATUSES.CREATED_201).json(createdPost)
    },
 
-   /*async createCommentByPostId(
+   async createCommentByPostId(
       req: Request<{ postId: string }, {}, CommentInput>,
       res: Response<CommentView>,
    ) {
@@ -64,9 +65,9 @@ export const postsController = {
       }
 
       res.status(HTTP_STATUSES.CREATED_201).json(result.data!)
-   },*/
+   },
 
-   async createCommentByPostId(
+   /*async createCommentByPostId(
       req: Request<{ postId: string }, {}, CommentInput>,
       res: Response<CommentView>,
    ) {
@@ -95,7 +96,7 @@ export const postsController = {
       })
 
       res.status(HTTP_STATUSES.CREATED_201).json(result.data!)
-   },
+   },*/
 
    async getCommentsByPostId(
       req: Request<{ postId: string }, Paginator<CommentView>, {}, CommentsQueryInput>,

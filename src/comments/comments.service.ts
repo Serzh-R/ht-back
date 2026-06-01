@@ -1,9 +1,11 @@
-import { CommentInput, CommentatorInfo, CommentView } from './comments.types'
+import { CommentInput, CommentView } from './comments.types'
 import { commentsRepository } from './comments.repository'
 import { Result, ResultStatus } from '../core/result/result.types'
+import { usersRepository } from '../users/users.repository'
+import { postsQueryRepository } from '../posts/posts.query-repository'
 
 export const commentsService = {
-   /*async createComment(
+   async createComment(
       input: CommentInput,
       postId: string,
       userId: string,
@@ -38,9 +40,9 @@ export const commentsService = {
          extensions: [],
          data: createdComment,
       }
-   },*/
+   },
 
-   async createComment(
+   /*async createComment(
       input: CommentInput,
       postId: string,
       commentatorInfo: CommentatorInfo,
@@ -52,7 +54,7 @@ export const commentsService = {
          extensions: [],
          data: createdComment,
       }
-   },
+   },*/
 
    async updateComment(commentId: string, input: CommentInput, userId: string): Promise<Result> {
       const comment = await commentsRepository.findById(commentId)

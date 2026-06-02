@@ -8,6 +8,7 @@ import { usersRepository } from '../users/users.repository'
 import { mapperMeView } from './mappers/mapper-me.view'
 import { RegConfirmCode, RegEmailResending } from './auth.types'
 import { UserInput } from '../users/users.types'
+import { resultCodeToHttpException } from '../core/result/result-code-to-http-exception'
 
 export const authController = {
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
@@ -29,14 +30,14 @@ export const authController = {
       const result = await authService.registration(req.body)
 
       if (result.status === ResultStatus.BadRequest) {
-         res.status(HTTP_STATUSES.BAD_REQUEST_400).send({
+         res.status(resultCodeToHttpException(result.status)).send({
             errorsMessages: result.extensions,
          })
 
          return
       }
 
-      res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+      res.sendStatus(resultCodeToHttpException(result.status))
    },
 
    async registrationConfirmation(req: Request<{}, {}, RegConfirmCode>, res: Response) {

@@ -15,13 +15,13 @@ export const authController = {
       const result = await authService.checkCredentials(req.body)
 
       if (result.status === ResultStatus.Unauthorized || !result.data || !result.data._id) {
-         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         res.sendStatus(resultCodeToHttpException(result.status))
          return
       }
 
       const accessToken = await jwtService.createAccessToken(result.data._id.toString())
 
-      res.status(HTTP_STATUSES.OK_200).send({
+      res.status(resultCodeToHttpException(result.status)).send({
          accessToken,
       })
    },
@@ -44,28 +44,28 @@ export const authController = {
       const result = await authService.registrationConfirmation(req.body)
 
       if (result.status === ResultStatus.BadRequest) {
-         res.status(HTTP_STATUSES.BAD_REQUEST_400).send({
+         res.status(resultCodeToHttpException(result.status)).send({
             errorsMessages: result.extensions,
          })
 
          return
       }
 
-      res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+      res.sendStatus(resultCodeToHttpException(result.status))
    },
 
    async registrationEmailResending(req: Request<{}, {}, RegEmailResending>, res: Response) {
       const result = await authService.registrationEmailResending(req.body)
 
       if (result.status === ResultStatus.BadRequest) {
-         res.status(HTTP_STATUSES.BAD_REQUEST_400).send({
+         res.status(resultCodeToHttpException(result.status)).send({
             errorsMessages: result.extensions,
          })
 
          return
       }
 
-      res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+      res.sendStatus(resultCodeToHttpException(result.status))
    },
 
    async me(req: Request, res: Response<MeViewModel>) {

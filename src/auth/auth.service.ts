@@ -88,7 +88,9 @@ export const authService = {
 
       await usersRepository.create(newUser)
 
-      await emailManager.sendEmailConfirmationMessage(newUser)
+      emailManager.sendEmailConfirmationMessage(newUser).catch((e) => {
+         console.error(`Failed to send confirmation email to ${newUser.email}`, e)
+      })
 
       return {
          status: ResultStatus.NoContent,

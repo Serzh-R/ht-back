@@ -7,6 +7,9 @@ import { createTestUser } from '../helpers/create-test-user'
 import { loginTestUser } from '../helpers/login-test-user'
 import { usersRepository } from '../../src/users/users.repository'
 import { emailManager } from '../../src/email/email.manager'
+import { registerTestUser } from '../helpers/register-test-user'
+import { correctUserData } from '../helpers/test-data'
+import { confirmTestUserEmail } from '../helpers/confirm-test-user-email'
 
 const app = createApp()
 
@@ -33,32 +36,22 @@ describe('Auth API', () => {
          .spyOn(emailManager, 'sendEmailConfirmationMessage')
          .mockResolvedValue(undefined)
 
-      const userData = {
-         login: 'newUser',
-         email: 'new-user@mail.com',
-         password: 'qwerty123',
-      }
+      const registrationResponse = await registerTestUser(app, correctUserData)
 
-      await request(app)
-         .post(`${SETTINGS.PATH.AUTH}/registration`)
-         .send(userData)
-         .expect(HTTP_STATUSES.NO_CONTENT_204)
+      expect(registrationResponse.status).toBe(HTTP_STATUSES.NO_CONTENT_204)
 
       expect(sendEmailMock).toHaveBeenCalledTimes(1)
 
-      const createdUser = await usersRepository.findByEmail(userData.email)
+      const createdUser = await usersRepository.findByEmail(correctUserData.email)
 
       expect(createdUser).not.toBeNull()
       expect(createdUser!.emailConfirmation.isConfirmed).toBe(false)
 
-      await request(app)
-         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
-         .send({
-            code: createdUser!.emailConfirmation.confirmationCode,
-         })
-         .expect(HTTP_STATUSES.NO_CONTENT_204)
+      const confirmationResponse = await confirmTestUserEmail(app, correctUserData.email)
 
-      const confirmedUser = await usersRepository.findByEmail(userData.email)
+      expect(confirmationResponse.status).toBe(HTTP_STATUSES.NO_CONTENT_204)
+
+      const confirmedUser = await usersRepository.findByEmail(correctUserData.email)
 
       expect(confirmedUser).not.toBeNull()
       expect(confirmedUser!.emailConfirmation.isConfirmed).toBe(true)

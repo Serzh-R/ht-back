@@ -3,7 +3,7 @@ import request from 'supertest'
 import { Express } from 'express'
 import { SETTINGS } from '../../src/core/settings'
 
-export const confirmTestUserEmail = async (app: Express, email: string) => {
+export async function confirmTestUserEmail(app: Express, email: string) {
    const user = await usersRepository.findByEmail(email)
 
    if (!user) {

@@ -5,6 +5,8 @@ import { clearDb } from '../helpers/clear-db'
 import { runDb, stopDb } from '../../src/db/mongo.db'
 import { createTestUser } from '../helpers/create-test-user'
 import { loginTestUser } from '../helpers/login-test-user'
+import { usersRepository } from '../../src/users/users.repository'
+import { emailManager } from '../../src/email/email.manager'
 
 const app = createApp()
 
@@ -20,6 +22,46 @@ describe('Auth API', () => {
 
    beforeEach(async () => {
       await clearDb(app)
+   })
+
+   afterEach(() => {
+      jest.restoreAllMocks()
+   })
+
+   it('should register user and confirm email; POST /auth/registration and POST /auth/registration-confirmation', async () => {
+      const sendEmailMock = jest
+         .spyOn(emailManager, 'sendEmailConfirmationMessage')
+         .mockResolvedValue(undefined)
+
+      const userData = {
+         login: 'newUser',
+         email: 'new-user@mail.com',
+         password: 'qwerty123',
+      }
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration`)
+         .send(userData)
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      expect(sendEmailMock).toHaveBeenCalledTimes(1)
+
+      const createdUser = await usersRepository.findByEmail(userData.email)
+
+      expect(createdUser).not.toBeNull()
+      expect(createdUser!.emailConfirmation.isConfirmed).toBe(false)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+         .send({
+            code: createdUser!.emailConfirmation.confirmationCode,
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const confirmedUser = await usersRepository.findByEmail(userData.email)
+
+      expect(confirmedUser).not.toBeNull()
+      expect(confirmedUser!.emailConfirmation.isConfirmed).toBe(true)
    })
 
    it('should login user by login; POST /auth/login', async () => {

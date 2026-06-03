@@ -1,0 +1,16 @@
+import { usersRepository } from '../../src/users/users.repository'
+import request from 'supertest'
+import { Express } from 'express'
+import { SETTINGS } from '../../src/core/settings'
+
+export const confirmTestUserEmail = async (app: Express, email: string) => {
+   const user = await usersRepository.findByEmail(email)
+
+   if (!user) {
+      throw new Error(`User with email ${email} was not found`)
+   }
+
+   return request(app).post(`${SETTINGS.PATH.AUTH}/registration-confirmation`).send({
+      code: user.emailConfirmation.confirmationCode,
+   })
+}

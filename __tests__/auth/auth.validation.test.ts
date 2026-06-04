@@ -21,6 +21,193 @@ describe('Auth validation', () => {
       await clearDb(app)
    })
 
+   it('should not register user with empty login, email and password; POST /auth/registration', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/registration`).send({
+         login: '',
+         email: '',
+         password: '',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: expect.arrayContaining([
+            {
+               message: expect.any(String),
+               field: 'login',
+            },
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+            {
+               message: expect.any(String),
+               field: 'password',
+            },
+         ]),
+      })
+   })
+
+   it('should not register user with too short login and password; POST /auth/registration', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/registration`).send({
+         login: 'ab',
+         email: 'test@mail.com',
+         password: '12345',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: expect.arrayContaining([
+            {
+               message: expect.any(String),
+               field: 'login',
+            },
+            {
+               message: expect.any(String),
+               field: 'password',
+            },
+         ]),
+      })
+   })
+
+   it('should not register user with too long login and password; POST /auth/registration', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/registration`).send({
+         login: '12345678901',
+         email: 'test@mail.com',
+         password: '123456789012345678901',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: expect.arrayContaining([
+            {
+               message: expect.any(String),
+               field: 'login',
+            },
+            {
+               message: expect.any(String),
+               field: 'password',
+            },
+         ]),
+      })
+   })
+
+   it('should not register user with invalid login pattern; POST /auth/registration', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/registration`).send({
+         login: 'user@',
+         email: 'test@mail.com',
+         password: 'qwerty123',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'login',
+            },
+         ],
+      })
+   })
+
+   it('should not register user with invalid email; POST /auth/registration', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/registration`).send({
+         login: 'validUser',
+         email: 'invalid-email',
+         password: 'qwerty123',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+         ],
+      })
+   })
+
+   it('should not confirm email with empty code; POST /auth/registration-confirmation', async () => {
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+         .send({
+            code: '',
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'code',
+            },
+         ],
+      })
+   })
+
+   it('should not confirm email with code containing only spaces; POST /auth/registration-confirmation', async () => {
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+         .send({
+            code: '   ',
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'code',
+            },
+         ],
+      })
+   })
+
+   it('should not resend confirmation email with empty email; POST /auth/registration-email-resending', async () => {
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
+         .send({
+            email: '',
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+         ],
+      })
+   })
+
+   it('should not resend confirmation email with invalid email; POST /auth/registration-email-resending', async () => {
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
+         .send({
+            email: 'invalid-email',
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+         ],
+      })
+   })
+
    it('should not login user when incorrect body passed; POST /auth/login', async () => {
       const invalidDataSet1 = await request(app)
          .post(`${SETTINGS.PATH.AUTH}/login`)

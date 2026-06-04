@@ -164,6 +164,38 @@ describe('Auth API', () => {
       })
    })
 
+   it('should resend confirmation email for registered but not confirmed user; POST /auth/registration-email-resending', async () => {
+      const sendEmailMock = jest
+         .spyOn(emailManager, 'sendEmailConfirmationMessage')
+         .mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      expect(sendEmailMock).toHaveBeenCalledTimes(1)
+
+      const userBeforeResending = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(userBeforeResending).not.toBeNull()
+
+      const oldConfirmationCode = userBeforeResending!.emailConfirmation.confirmationCode
+
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
+         .send({
+            email: correctUserData.email,
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.NO_CONTENT_204)
+
+      expect(sendEmailMock).toHaveBeenCalledTimes(2)
+
+      const userAfterResending = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(userAfterResending).not.toBeNull()
+
+      expect(userAfterResending!.emailConfirmation.confirmationCode).not.toBe(oldConfirmationCode)
+   })
+
    it('should login user by login; POST /auth/login', async () => {
       await createTestUser(app, {
          login: 'testUser',

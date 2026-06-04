@@ -80,6 +80,30 @@ describe('Auth API', () => {
       })
    })
 
+   it('should not register user with already existing login; POST /auth/registration', async () => {
+      jest.spyOn(emailManager, 'sendEmailConfirmationMessage').mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      const secondUserData = {
+         ...correctUserData,
+         email: 'another-email@mail.com',
+      }
+
+      const response = await registerTestUser(app, secondUserData)
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'login',
+            },
+         ],
+      })
+   })
+
    it('should login user by login; POST /auth/login', async () => {
       await createTestUser(app, {
          login: 'testUser',

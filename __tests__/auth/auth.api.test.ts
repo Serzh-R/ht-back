@@ -104,6 +104,29 @@ describe('Auth API', () => {
       })
    })
 
+   it('should not confirm email with incorrect confirmation code; POST /auth/registration-confirmation', async () => {
+      jest.spyOn(emailManager, 'sendEmailConfirmationMessage').mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+         .send({
+            code: 'incorrect-confirmation-code',
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'code',
+            },
+         ],
+      })
+   })
+
    it('should login user by login; POST /auth/login', async () => {
       await createTestUser(app, {
          login: 'testUser',

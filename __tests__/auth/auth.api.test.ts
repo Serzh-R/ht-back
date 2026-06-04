@@ -127,6 +127,43 @@ describe('Auth API', () => {
       })
    })
 
+   it('should not confirm email twice with the same confirmation code; POST /auth/registration-confirmation', async () => {
+      jest.spyOn(emailManager, 'sendEmailConfirmationMessage').mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      const user = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(user).not.toBeNull()
+
+      const confirmationCode = user!.emailConfirmation.confirmationCode
+
+      const firstResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+         .send({
+            code: confirmationCode,
+         })
+
+      expect(firstResponse.status).toBe(HTTP_STATUSES.NO_CONTENT_204)
+
+      const secondResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-confirmation`)
+         .send({
+            code: confirmationCode,
+         })
+
+      expect(secondResponse.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(secondResponse.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'code',
+            },
+         ],
+      })
+   })
+
    it('should login user by login; POST /auth/login', async () => {
       await createTestUser(app, {
          login: 'testUser',

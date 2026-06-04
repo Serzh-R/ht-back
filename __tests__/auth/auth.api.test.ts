@@ -252,6 +252,57 @@ describe('Auth API', () => {
       expect(sendEmailMock).not.toHaveBeenCalled()
    })
 
+   it('should not login user if email is not confirmed; POST /auth/login', async () => {
+      jest.spyOn(emailManager, 'sendEmailConfirmationMessage').mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/login`).send({
+         loginOrEmail: correctUserData.login,
+         password: correctUserData.password,
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should login user after email confirmation; POST /auth/login', async () => {
+      jest.spyOn(emailManager, 'sendEmailConfirmationMessage').mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      await confirmTestUserEmail(app, correctUserData.email)
+
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/login`).send({
+         loginOrEmail: correctUserData.login,
+         password: correctUserData.password,
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.OK_200)
+
+      expect(response.body).toEqual({
+         accessToken: expect.any(String),
+      })
+   })
+
+   it('should login confirmed user by email; POST /auth/login', async () => {
+      jest.spyOn(emailManager, 'sendEmailConfirmationMessage').mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      await confirmTestUserEmail(app, correctUserData.email)
+
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/login`).send({
+         loginOrEmail: correctUserData.email,
+         password: correctUserData.password,
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.OK_200)
+
+      expect(response.body).toEqual({
+         accessToken: expect.any(String),
+      })
+   })
+
    it('should login user by login; POST /auth/login', async () => {
       await createTestUser(app, {
          login: 'testUser',

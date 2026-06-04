@@ -196,6 +196,62 @@ describe('Auth API', () => {
       expect(userAfterResending!.emailConfirmation.confirmationCode).not.toBe(oldConfirmationCode)
    })
 
+   it('should not resend confirmation email if user is already confirmed; POST /auth/registration-email-resending', async () => {
+      const sendEmailMock = jest
+         .spyOn(emailManager, 'sendEmailConfirmationMessage')
+         .mockResolvedValue(undefined)
+
+      await registerTestUser(app, correctUserData)
+
+      await confirmTestUserEmail(app, correctUserData.email)
+
+      expect(sendEmailMock).toHaveBeenCalledTimes(1)
+
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
+         .send({
+            email: correctUserData.email,
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+         ],
+      })
+
+      expect(sendEmailMock).toHaveBeenCalledTimes(1)
+   })
+
+   it('should not resend confirmation email for non-existing user; POST /auth/registration-email-resending', async () => {
+      const sendEmailMock = jest
+         .spyOn(emailManager, 'sendEmailConfirmationMessage')
+         .mockResolvedValue(undefined)
+
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)
+         .send({
+            email: 'not-exists@mail.com',
+         })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+         ],
+      })
+
+      expect(sendEmailMock).not.toHaveBeenCalled()
+   })
+
    it('should login user by login; POST /auth/login', async () => {
       await createTestUser(app, {
          login: 'testUser',

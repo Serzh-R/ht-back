@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES, SETTINGS } from './core/settings'
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import { blogsRouter } from './blogs/blogs.router'
 import { postsRouter } from './posts/posts.router'
 import { testingRouter } from './testing/testing.router'
@@ -14,6 +15,7 @@ export const createApp = () => {
    app.set('trust proxy', true) // ✅ Позволяет корректно получать `req.ip` за прокси
 
    app.use(express.json())
+   app.use(cookieParser())
 
    app.use(SETTINGS.PATH.BLOGS, blogsRouter)
    app.use(SETTINGS.PATH.POSTS, postsRouter)

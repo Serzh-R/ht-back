@@ -1,6 +1,12 @@
 import { Request, Response, Router } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
-import { blogCollection, commentCollection, postCollection, userCollection } from '../db/mongo.db'
+import {
+   blacklistRefreshTokenCollection,
+   blogCollection,
+   commentCollection,
+   postCollection,
+   userCollection,
+} from '../db/mongo.db'
 
 export const testingRouter = Router({})
 
@@ -9,6 +15,7 @@ testingRouter.delete('/', async (req: Request, res: Response) => {
    await postCollection.deleteMany({})
    await userCollection.deleteMany({})
    await commentCollection.deleteMany({})
+   await blacklistRefreshTokenCollection.deleteMany({})
 
    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

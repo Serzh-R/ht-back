@@ -4,17 +4,20 @@ import { BlogDb } from '../blogs/blogs.types'
 import { PostDb } from '../posts/posts.types'
 import { UserDb } from '../users/users.types'
 import { CommentDb } from '../comments/comments.types'
+import { BlacklistRefreshTokenDb } from '../auth/auth.types'
 
 const BLOG_COLLECTION_NAME = 'blogs'
 const POST_COLLECTION_NAME = 'posts'
 const USER_COLLECTION_NAME = 'users'
 const COMMENT_COLLECTION_NAME = 'comments'
+const BLACKLIST_REFRESH_TOKEN_COLLECTION_NAME = 'blacklist-refresh-tokens'
 
 export let client: MongoClient
 export let blogCollection: Collection<BlogDb>
 export let postCollection: Collection<PostDb>
 export let userCollection: Collection<UserDb>
 export let commentCollection: Collection<CommentDb>
+export let blacklistRefreshTokenCollection: Collection<BlacklistRefreshTokenDb>
 
 export async function runDb(url: string): Promise<boolean> {
    client = new MongoClient(url)
@@ -24,6 +27,11 @@ export async function runDb(url: string): Promise<boolean> {
    postCollection = db.collection<PostDb>(POST_COLLECTION_NAME)
    userCollection = db.collection<UserDb>(USER_COLLECTION_NAME)
    commentCollection = db.collection<CommentDb>(COMMENT_COLLECTION_NAME)
+   blacklistRefreshTokenCollection = db.collection<BlacklistRefreshTokenDb>(
+      BLACKLIST_REFRESH_TOKEN_COLLECTION_NAME,
+   )
+
+   await blacklistRefreshTokenCollection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 20 })
 
    try {
       await client.connect()

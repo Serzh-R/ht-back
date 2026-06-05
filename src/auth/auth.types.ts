@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb'
+
 export type LoginInputModel = {
    loginOrEmail: string
    password: string
@@ -19,4 +21,10 @@ export type RegConfirmCode = {
 
 export type RegEmailResending = {
    email: string
+}
+
+export type BlacklistRefreshTokenDb = {
+   _id?: ObjectId
+   token: string
+   createdAt: Date
 }

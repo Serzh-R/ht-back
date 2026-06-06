@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { HTTP_STATUSES } from '../core/settings'
+import { HTTP_STATUSES, REFRESH_TIME } from '../core/settings'
 import { ResultStatus } from '../core/result/result.types'
 import { LoginInputModel, LoginSuccessViewModel, MeViewModel } from './auth.types'
 import { authService } from './auth.service'
@@ -19,7 +19,16 @@ export const authController = {
          return
       }
 
-      const accessToken = await jwtService.createAccessToken(result.data._id.toString())
+      const userId = result.data._id.toString()
+
+      const accessToken = await jwtService.createAccessToken(userId)
+      const refreshToken = await jwtService.createRefreshToken(userId)
+
+      res.cookie('refreshToken', refreshToken, {
+         httpOnly: true,
+         secure: true,
+         maxAge: Number(REFRESH_TIME) * 1000,
+      })
 
       res.status(resultCodeToHttpException(result.status)).send({
          accessToken,

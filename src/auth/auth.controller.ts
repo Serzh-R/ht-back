@@ -37,38 +37,12 @@ export const authController = {
    },
 
    async refreshToken(req: Request, res: Response<LoginSuccessViewModel>) {
-      const refreshToken = req.cookies.refreshToken
+      const oldRefreshToken = req.cookies.refreshToken
 
-      if (!refreshToken) {
-         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
-         return
-      }
+      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)
 
-      const isTokenBlacklist = await refreshTokenBlacklistRepository.isTokenBlacklist(refreshToken)
-
-      if (isTokenBlacklist) {
-         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
-         return
-      }
-
-      const userId = await jwtService.getUserIdByRefreshToken(refreshToken)
-
-      if (!userId) {
-         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
-         return
-      }
-
-      const user = await usersRepository.findById(userId)
-
-      if (!user) {
-         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
-         return
-      }
-
-      await refreshTokenBlacklistRepository.addToBlacklist(refreshToken)
-
-      const newAccessToken = await jwtService.createAccessToken(userId)
-      const newRefreshToken = await jwtService.createRefreshToken(userId)
+      const newAccessToken = await jwtService.createAccessToken(req.userId!)
+      const newRefreshToken = await jwtService.createRefreshToken(req.userId!)
 
       res.cookie('refreshToken', newRefreshToken, {
          httpOnly: true,

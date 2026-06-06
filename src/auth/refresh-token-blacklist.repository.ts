@@ -8,11 +8,11 @@ export const refreshTokenBlacklistRepository = {
       })
    },
 
-   async isTokenBlacklisted(token: string): Promise<boolean> {
-      const blacklistedToken = await blacklistRefreshTokenCollection.findOne({
+   async isTokenBlacklist(token: string): Promise<boolean> {
+      const blacklistToken = await blacklistRefreshTokenCollection.findOne({
          token,
       })
 
-      return !!blacklistedToken
+      return !!blacklistToken
    },
 }

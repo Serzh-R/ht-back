@@ -9,6 +9,7 @@ import { mapperMeView } from './mappers/mapper-me.view'
 import { RegConfirmCode, RegEmailResending } from './auth.types'
 import { UserInput } from '../users/users.types'
 import { resultCodeToHttpException } from '../core/result/result-code-to-http-exception'
+import { refreshTokenBlacklistRepository } from './refresh-token-blacklist.repository'
 
 export const authController = {
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
@@ -32,6 +33,51 @@ export const authController = {
 
       res.status(resultCodeToHttpException(result.status)).send({
          accessToken,
+      })
+   },
+
+   async refreshToken(req: Request, res: Response<LoginSuccessViewModel>) {
+      const refreshToken = req.cookies.refreshToken
+
+      if (!refreshToken) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const isTokenBlacklist = await refreshTokenBlacklistRepository.isTokenBlacklist(refreshToken)
+
+      if (isTokenBlacklist) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const userId = await jwtService.getUserIdByRefreshToken(refreshToken)
+
+      if (!userId) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const user = await usersRepository.findById(userId)
+
+      if (!user) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      await refreshTokenBlacklistRepository.addToBlacklist(refreshToken)
+
+      const newAccessToken = await jwtService.createAccessToken(userId)
+      const newRefreshToken = await jwtService.createRefreshToken(userId)
+
+      res.cookie('refreshToken', newRefreshToken, {
+         httpOnly: true,
+         secure: true,
+         maxAge: Number(REFRESH_TIME) * 1000,
+      })
+
+      res.status(HTTP_STATUSES.OK_200).send({
+         accessToken: newAccessToken,
       })
    },
 

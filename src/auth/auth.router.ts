@@ -16,6 +16,8 @@ authRouter.post('/login', loginFieldsValidator, errorsResultMiddleware, authCont
 
 authRouter.post('/refresh-token', jwtRefreshAuthMiddleware, authController.refreshToken)
 
+authRouter.post('/logout', jwtRefreshAuthMiddleware, authController.logout)
+
 authRouter.post(
    '/registration',
    userFieldsValidator,

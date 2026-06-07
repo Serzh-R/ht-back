@@ -226,6 +226,89 @@ describe('Auth API', () => {
          .expect(HTTP_STATUSES.OK_200)
    })
 
+   it('should return 401 if refreshToken is invalid', async () => {
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', ['refreshToken=invalid-refresh-token'])
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should return 401 for logout if refreshToken is invalid', async () => {
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/logout`)
+         .set('Cookie', ['refreshToken=invalid-refresh-token'])
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should return 401 if refreshToken was already revoked by logout', async () => {
+      const userData = {
+         login: 'login11',
+         password: 'password11',
+         email: 'login11@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const loginResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      const refreshCookie = loginResponse.headers['set-cookie']
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/logout`)
+         .set('Cookie', refreshCookie)
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/logout`)
+         .set('Cookie', refreshCookie)
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should not refresh tokens after logout with rotated refreshToken', async () => {
+      const userData = {
+         login: 'login12',
+         password: 'password12',
+         email: 'login12@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const loginResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      const firstRefreshCookie = loginResponse.headers['set-cookie']
+
+      const refreshResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', firstRefreshCookie)
+         .expect(HTTP_STATUSES.OK_200)
+
+      const secondRefreshCookie = refreshResponse.headers['set-cookie']
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/logout`)
+         .set('Cookie', secondRefreshCookie)
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', secondRefreshCookie)
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
    it('should register user and confirm email; POST /auth/registration and POST /auth/registration-confirmation', async () => {
       const sendEmailMock = jest
          .spyOn(emailManager, 'sendEmailConfirmationMessage')

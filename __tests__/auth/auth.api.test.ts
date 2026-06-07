@@ -31,6 +31,201 @@ describe('Auth API', () => {
       jest.restoreAllMocks()
    })
 
+   it('should login user and return accessToken in body and refreshToken in cookie', async () => {
+      const userData = {
+         login: 'login01',
+         password: 'password01',
+         email: 'login01@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const response = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(response.body).toEqual({
+         accessToken: expect.any(String),
+      })
+
+      const cookies = response.headers['set-cookie']
+
+      expect(cookies).toBeDefined()
+      expect(cookies[0]).toContain('refreshToken=')
+      expect(cookies[0]).toContain('HttpOnly')
+   })
+
+   it('should refresh tokens and return new accessToken and refreshToken cookie', async () => {
+      const userData = {
+         login: 'login02',
+         password: 'password02',
+         email: 'login02@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const loginResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      const refreshCookie = loginResponse.headers['set-cookie']
+
+      const refreshResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', refreshCookie)
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(refreshResponse.body).toEqual({
+         accessToken: expect.any(String),
+      })
+
+      const newCookies = refreshResponse.headers['set-cookie']
+
+      expect(newCookies).toBeDefined()
+      expect(newCookies[0]).toContain('refreshToken=')
+   })
+
+   it('should not refresh tokens twice with the same refreshToken', async () => {
+      const userData = {
+         login: 'login03',
+         password: 'password03',
+         email: 'login03@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const loginResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      const oldRefreshCookie = loginResponse.headers['set-cookie']
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', oldRefreshCookie)
+         .expect(HTTP_STATUSES.OK_200)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', oldRefreshCookie)
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should logout user by refreshToken in cookie', async () => {
+      const userData = {
+         login: 'login04',
+         password: 'password04',
+         email: 'login04@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const loginResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      const refreshCookie = loginResponse.headers['set-cookie']
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/logout`)
+         .set('Cookie', refreshCookie)
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+   })
+
+   it('should not refresh tokens after logout', async () => {
+      const userData = {
+         login: 'login05',
+         password: 'password05',
+         email: 'login05@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const loginResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      const refreshCookie = loginResponse.headers['set-cookie']
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/logout`)
+         .set('Cookie', refreshCookie)
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', refreshCookie)
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should return 401 if refreshToken cookie is missing', async () => {
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should return 401 for logout if refreshToken cookie is missing', async () => {
+      await request(app).post(`${SETTINGS.PATH.AUTH}/logout`).expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should allow refresh tokens with new refreshToken cookie after rotation', async () => {
+      const userData = {
+         login: 'login08',
+         password: 'password08',
+         email: 'login08@gmail.com',
+      }
+
+      await registerTestUser(app, userData)
+      await confirmTestUserEmail(app, userData.email)
+
+      const loginResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: userData.login,
+            password: userData.password,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+
+      const firstRefreshCookie = loginResponse.headers['set-cookie']
+
+      const firstRefreshResponse = await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', firstRefreshCookie)
+         .expect(HTTP_STATUSES.OK_200)
+
+      const secondRefreshCookie = firstRefreshResponse.headers['set-cookie']
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/refresh-token`)
+         .set('Cookie', secondRefreshCookie)
+         .expect(HTTP_STATUSES.OK_200)
+   })
+
    it('should register user and confirm email; POST /auth/registration and POST /auth/registration-confirmation', async () => {
       const sendEmailMock = jest
          .spyOn(emailManager, 'sendEmailConfirmationMessage')

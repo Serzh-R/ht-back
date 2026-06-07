@@ -55,6 +55,14 @@ export const authController = {
       })
    },
 
+   async logout(req: Request, res: Response) {
+      const refreshToken = req.cookies.refreshToken
+
+      await refreshTokenBlacklistRepository.addToBlacklist(refreshToken)
+
+      res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+   },
+
    async registration(req: Request<{}, {}, UserInput>, res: Response) {
       const result = await authService.registration(req.body)
 

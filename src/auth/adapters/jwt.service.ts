@@ -1,5 +1,12 @@
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { ACCESS_SECRET, ACCESS_TIME, REFRESH_SECRET, REFRESH_TIME } from '../../core/settings'
+
+type RefreshTokenPayload = JwtPayload & {
+   userId: string
+   deviceId: string
+   iat: number
+   exp: number
+}
 
 export const jwtService = {
    async createAccessToken(userId: string): Promise<string> {
@@ -36,7 +43,7 @@ export const jwtService = {
       }
    },
 
-   async getUserIdByRefreshToken(refreshToken: string): Promise<string | null> {
+   async getRefreshTokenPayload(refreshToken: string): Promise<RefreshTokenPayload | null> {
       try {
          const result = jwt.verify(refreshToken, REFRESH_SECRET)
 
@@ -44,9 +51,13 @@ export const jwtService = {
             typeof result === 'object' &&
             result !== null &&
             'userId' in result &&
-            typeof result.userId === 'string'
+            typeof result.userId === 'string' &&
+            'deviceId' in result &&
+            typeof result.deviceId === 'string' &&
+            typeof result.iat === 'number' &&
+            typeof result.exp === 'number'
          ) {
-            return result.userId
+            return result as RefreshTokenPayload
          }
 
          return null

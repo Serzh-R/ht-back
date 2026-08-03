@@ -10,6 +10,7 @@ import { RegConfirmCode, RegEmailResending } from './auth.types'
 import { UserInput } from '../users/users.types'
 import { resultCodeToHttpException } from '../core/result/result-code-to-http-exception'
 import { refreshTokenBlacklistRepository } from './refresh-token-blacklist.repository'
+import { randomUUID } from 'crypto'
 
 export const authController = {
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
@@ -21,9 +22,12 @@ export const authController = {
       }
 
       const userId = result.data._id.toString()
+      const deviceId = randomUUID()
+      const ip = req.ip
+      const title = req.get('user-agent') ?? 'Unknown device'
 
       const accessToken = await jwtService.createAccessToken(userId)
-      const refreshToken = await jwtService.createRefreshToken(userId)
+      const refreshToken = await jwtService.createRefreshToken(userId, deviceId)
 
       res.cookie('refreshToken', refreshToken, {
          httpOnly: true,

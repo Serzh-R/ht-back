@@ -9,6 +9,8 @@ const startApp = async () => {
 
    const app = createApp()
 
+   app.set('trust proxy', true)
+
    const isConnected = await runDb(SETTINGS.MONGO_URL)
 
    if (!isConnected) {

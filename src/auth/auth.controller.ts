@@ -63,7 +63,7 @@ export const authController = {
       await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)
 
       const newAccessToken = await jwtService.createAccessToken(req.userId!)
-      const newRefreshToken = await jwtService.createRefreshToken(req.userId!)
+      const newRefreshToken = await jwtService.createRefreshToken(req.userId!, req.deviceId!)
 
       res.cookie('refreshToken', newRefreshToken, {
          httpOnly: true,

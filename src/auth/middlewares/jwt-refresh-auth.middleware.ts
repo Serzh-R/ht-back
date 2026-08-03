@@ -19,21 +19,22 @@ export const jwtRefreshAuthMiddleware = async (req: Request, res: Response, next
       return
    }
 
-   const userId = await jwtService.getUserIdByRefreshToken(refreshToken)
+   const refreshTokenPayload = await jwtService.getRefreshTokenPayload(refreshToken)
 
-   if (!userId) {
+   if (!refreshTokenPayload) {
       res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
       return
    }
 
-   const user = await usersRepository.findById(userId)
+   const user = await usersRepository.findById(refreshTokenPayload.userId)
 
    if (!user) {
       res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
       return
    }
 
-   req.userId = userId
+   req.userId = refreshTokenPayload.userId
+   req.deviceId = refreshTokenPayload.deviceId
 
    next()
 }

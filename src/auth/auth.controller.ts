@@ -11,6 +11,7 @@ import { UserInput } from '../users/users.types'
 import { resultCodeToHttpException } from '../core/result/result-code-to-http-exception'
 import { refreshTokenBlacklistRepository } from './refresh-token-blacklist.repository'
 import { randomUUID } from 'crypto'
+import { securityRepository } from '../security/security.repository'
 
 export const authController = {
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
@@ -28,6 +29,22 @@ export const authController = {
 
       const accessToken = await jwtService.createAccessToken(userId)
       const refreshToken = await jwtService.createRefreshToken(userId, deviceId)
+
+      const refreshTokenPayload = await jwtService.getRefreshTokenPayload(refreshToken)
+
+      if (!refreshTokenPayload) {
+         res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
+         return
+      }
+
+      await securityRepository.createSession({
+         userId,
+         deviceId,
+         ip,
+         title,
+         lastActiveDate: new Date(refreshTokenPayload.iat * 1000),
+         expirationDate: new Date(refreshTokenPayload.exp * 1000),
+      })
 
       res.cookie('refreshToken', refreshToken, {
          httpOnly: true,

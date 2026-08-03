@@ -24,7 +24,7 @@ export const authController = {
 
       const userId = result.data._id.toString()
       const deviceId = randomUUID()
-      const ip = req.ip
+      const ip = req.ip ?? 'Unknown IP'
       const title = req.get('user-agent') ?? 'Unknown device'
 
       const accessToken = await jwtService.createAccessToken(userId)

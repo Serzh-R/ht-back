@@ -19,7 +19,5 @@ testingRouter.delete('/', async (req: Request, res: Response) => {
    await deviceSessionCollection.deleteMany({})
    await apiRequestCollection.deleteMany({})
 
-   //await blacklistRefreshTokenCollection.deleteMany({})
-
    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

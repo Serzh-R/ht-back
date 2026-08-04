@@ -22,8 +22,6 @@ export let commentCollection: Collection<CommentDb>
 export let deviceSessionCollection: Collection<DeviceSessionDb>
 export let apiRequestCollection: Collection<ApiRequestDb>
 
-/*export let blacklistRefreshTokenCollection: Collection<BlacklistRefreshTokenDb>*/
-
 export async function runDb(url: string): Promise<boolean> {
    client = new MongoClient(url)
    const db: Db = client.db(SETTINGS.DB_NAME)
@@ -43,11 +41,6 @@ export async function runDb(url: string): Promise<boolean> {
          expireAfterSeconds: 10,
       },
    )
-
-   /*blacklistRefreshTokenCollection = db.collection<BlacklistRefreshTokenDb>(
-      BLACKLIST_REFRESH_TOKEN_COLLECTION_NAME,
-   )
-   await blacklistRefreshTokenCollection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 20 })*/
 
    try {
       await client.connect()

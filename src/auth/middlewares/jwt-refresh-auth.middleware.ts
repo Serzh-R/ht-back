@@ -48,10 +48,3 @@ export const jwtRefreshAuthMiddleware = async (req: Request, res: Response, next
 
    next()
 }
-
-/*const isTokenBlacklist = await refreshTokenBlacklistRepository.isTokenBlacklist(refreshToken)
-
-   if (isTokenBlacklist) {
-      res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
-      return
-   }*/

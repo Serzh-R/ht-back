@@ -92,10 +92,6 @@ export const authController = {
       res.status(HTTP_STATUSES.OK_200).send({
          accessToken: newAccessToken,
       })
-
-      /*const oldRefreshToken = req.cookies.refreshToken
-
-      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)*/
    },
 
    async logout(req: Request, res: Response) {
@@ -117,10 +113,6 @@ export const authController = {
       })
 
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-
-      /*const refreshToken = req.cookies.refreshToken
-
-      await refreshTokenBlacklistRepository.addToBlacklist(refreshToken)*/
    },
 
    async registration(req: Request<{}, {}, UserInput>, res: Response) {

@@ -3,6 +3,7 @@ import { HTTP_STATUSES } from '../../core/settings'
 import { refreshTokenBlacklistRepository } from '../refresh-token-blacklist.repository'
 import { jwtService } from '../adapters/jwt.service'
 import { usersRepository } from '../../users/users.repository'
+import { securityRepository } from '../../security/security.repository'
 
 export const jwtRefreshAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
    const refreshToken = req.cookies.refreshToken
@@ -12,16 +13,26 @@ export const jwtRefreshAuthMiddleware = async (req: Request, res: Response, next
       return
    }
 
-   const isTokenBlacklist = await refreshTokenBlacklistRepository.isTokenBlacklist(refreshToken)
+   const refreshTokenPayload = await jwtService.getRefreshTokenPayload(refreshToken)
 
-   if (isTokenBlacklist) {
+   if (!refreshTokenPayload) {
       res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
       return
    }
 
-   const refreshTokenPayload = await jwtService.getRefreshTokenPayload(refreshToken)
+   const session = await securityRepository.findSessionByDeviceId(refreshTokenPayload.deviceId)
 
-   if (!refreshTokenPayload) {
+   if (!session) {
+      res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+      return
+   }
+
+   if (session.userId !== refreshTokenPayload.userId) {
+      res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+      return
+   }
+
+   if (session.lastActiveDate.getTime() !== refreshTokenPayload.iat * 1000) {
       res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
       return
    }
@@ -38,3 +49,10 @@ export const jwtRefreshAuthMiddleware = async (req: Request, res: Response, next
 
    next()
 }
+
+/*const isTokenBlacklist = await refreshTokenBlacklistRepository.isTokenBlacklist(refreshToken)
+
+   if (isTokenBlacklist) {
+      res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+      return
+   }*/

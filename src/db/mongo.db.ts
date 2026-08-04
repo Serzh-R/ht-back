@@ -33,18 +33,28 @@ export async function runDb(url: string): Promise<boolean> {
    deviceSessionCollection = db.collection<DeviceSessionDb>(DEVICE_SESSION_COLLECTION_NAME)
    apiRequestCollection = db.collection<ApiRequestDb>(API_REQUEST_COLLECTION_NAME)
 
-   await apiRequestCollection.createIndex(
-      {
-         date: 1,
-      },
-      {
-         expireAfterSeconds: 10,
-      },
-   )
-
    try {
       await client.connect()
       await db.command({ ping: 1 })
+
+      await deviceSessionCollection.createIndex(
+         {
+            expirationDate: 1,
+         },
+         {
+            expireAfterSeconds: 0,
+         },
+      )
+
+      await apiRequestCollection.createIndex(
+         {
+            date: 1,
+         },
+         {
+            expireAfterSeconds: 10,
+         },
+      )
+
       console.log('✅ Connected to the database')
       return true
    } catch (e) {

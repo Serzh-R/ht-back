@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import { HTTP_STATUSES } from '../../core/settings'
-import { refreshTokenBlacklistRepository } from '../refresh-token-blacklist.repository'
 import { jwtService } from '../adapters/jwt.service'
 import { usersRepository } from '../../users/users.repository'
 import { securityRepository } from '../../security/security.repository'

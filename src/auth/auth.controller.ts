@@ -58,12 +58,35 @@ export const authController = {
    },
 
    async refreshToken(req: Request, res: Response<LoginSuccessViewModel>) {
-      const oldRefreshToken = req.cookies.refreshToken
+      /*const oldRefreshToken = req.cookies.refreshToken
 
-      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)
+      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)*/
 
-      const newAccessToken = await jwtService.createAccessToken(req.userId!)
-      const newRefreshToken = await jwtService.createRefreshToken(req.userId!, req.deviceId!)
+      if (!req.userId || !req.deviceId) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const newAccessToken = await jwtService.createAccessToken(req.userId)
+      const newRefreshToken = await jwtService.createRefreshToken(req.userId, req.deviceId)
+
+      const newRefreshTokenPayload = await jwtService.getRefreshTokenPayload(newRefreshToken)
+
+      if (!newRefreshTokenPayload) {
+         res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
+         return
+      }
+
+      const isSessionUpdated = await securityRepository.updateSession(
+         req.deviceId,
+         new Date(newRefreshTokenPayload.iat * 1000),
+         new Date(newRefreshTokenPayload.exp * 1000),
+      )
+
+      if (!isSessionUpdated) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
 
       res.cookie('refreshToken', newRefreshToken, {
          httpOnly: true,

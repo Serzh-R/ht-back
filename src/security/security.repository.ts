@@ -39,4 +39,13 @@ export const securityRepository = {
 
       return result.deletedCount === 1
    },
+
+   async deleteOtherSessions(userId: string, currentDeviceId: string): Promise<void> {
+      await deviceSessionCollection.deleteMany({
+         userId,
+         deviceId: {
+            $ne: currentDeviceId,
+         },
+      })
+   },
 }

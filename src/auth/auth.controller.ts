@@ -9,7 +9,6 @@ import { mapperMeView } from './mappers/mapper-me.view'
 import { RegConfirmCode, RegEmailResending } from './auth.types'
 import { UserInput } from '../users/users.types'
 import { resultCodeToHttpException } from '../core/result/result-code-to-http-exception'
-import { refreshTokenBlacklistRepository } from './refresh-token-blacklist.repository'
 import { randomUUID } from 'crypto'
 import { securityRepository } from '../security/security.repository'
 

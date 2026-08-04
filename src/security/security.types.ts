@@ -9,3 +9,10 @@ export type DeviceSessionDb = {
    lastActiveDate: Date
    expirationDate: Date
 }
+
+export type DeviceViewModel = {
+   ip: string
+   title: string
+   lastActiveDate: string
+   deviceId: string
+}

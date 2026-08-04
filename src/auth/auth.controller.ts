@@ -58,10 +58,6 @@ export const authController = {
    },
 
    async refreshToken(req: Request, res: Response<LoginSuccessViewModel>) {
-      /*const oldRefreshToken = req.cookies.refreshToken
-
-      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)*/
-
       if (!req.userId || !req.deviceId) {
          res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
          return
@@ -165,3 +161,7 @@ export const authController = {
       res.status(HTTP_STATUSES.OK_200).send(mapperMeView(user))
    },
 }
+
+/*const oldRefreshToken = req.cookies.refreshToken
+
+      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)*/

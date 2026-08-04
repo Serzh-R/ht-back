@@ -31,4 +31,12 @@ export const securityRepository = {
 
       return result.matchedCount === 1
    },
+
+   async deleteSession(deviceId: string): Promise<boolean> {
+      const result = await deviceSessionCollection.deleteOne({
+         deviceId,
+      })
+
+      return result.deletedCount === 1
+   },
 }

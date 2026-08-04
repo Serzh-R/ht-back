@@ -4,6 +4,7 @@ import {
    blacklistRefreshTokenCollection,
    blogCollection,
    commentCollection,
+   deviceSessionCollection,
    postCollection,
    userCollection,
 } from '../db/mongo.db'
@@ -15,6 +16,7 @@ testingRouter.delete('/', async (req: Request, res: Response) => {
    await postCollection.deleteMany({})
    await userCollection.deleteMany({})
    await commentCollection.deleteMany({})
+   await deviceSessionCollection.deleteMany({})
    await blacklistRefreshTokenCollection.deleteMany({})
 
    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)

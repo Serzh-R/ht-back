@@ -93,14 +93,35 @@ export const authController = {
       res.status(HTTP_STATUSES.OK_200).send({
          accessToken: newAccessToken,
       })
+
+      /*const oldRefreshToken = req.cookies.refreshToken
+
+      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)*/
    },
 
    async logout(req: Request, res: Response) {
-      const refreshToken = req.cookies.refreshToken
+      if (!req.deviceId) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
 
-      await refreshTokenBlacklistRepository.addToBlacklist(refreshToken)
+      const isSessionDeleted = await securityRepository.deleteSession(req.deviceId)
+
+      if (!isSessionDeleted) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      res.clearCookie('refreshToken', {
+         httpOnly: true,
+         secure: true,
+      })
 
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+
+      /*const refreshToken = req.cookies.refreshToken
+
+      await refreshTokenBlacklistRepository.addToBlacklist(refreshToken)*/
    },
 
    async registration(req: Request<{}, {}, UserInput>, res: Response) {
@@ -161,7 +182,3 @@ export const authController = {
       res.status(HTTP_STATUSES.OK_200).send(mapperMeView(user))
    },
 }
-
-/*const oldRefreshToken = req.cookies.refreshToken
-
-      await refreshTokenBlacklistRepository.addToBlacklist(oldRefreshToken)*/

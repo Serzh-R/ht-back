@@ -87,7 +87,7 @@ describe('Security devices API', () => {
 
    it('should manage active device sessions', async () => {
       const userData: TestUserData = {
-         login: 'securityUser',
+         login: 'secureUser',
          email: 'security-user@mail.com',
          password: 'qwerty123',
       }
@@ -96,11 +96,11 @@ describe('Security devices API', () => {
 
       const device1 = await loginDevice(app, userData, 'Chrome 105')
 
-      const device2 = await loginDevice(app, userData, 'Firefox 104')
+      await loginDevice(app, userData, 'Firefox 104')
 
       const device3 = await loginDevice(app, userData, 'Safari 16')
 
-      const device4 = await loginDevice(app, userData, 'Edge 105')
+      await loginDevice(app, userData, 'Edge 105')
 
       const devicesBeforeRefresh = await getDevices(app, device1.refreshCookie)
 
@@ -204,10 +204,7 @@ describe('Security devices API', () => {
       expect(finalDevices[0].deviceId).toBe(firstDeviceBeforeRefresh.deviceId)
 
       expect(finalDevices[0].title).toBe('Chrome 105')
-
-      void device2
-      void device4
-   })
+   }, 30000)
 
    it('should return 401 if refresh token cookie is missing', async () => {
       await request(app)
@@ -225,7 +222,7 @@ describe('Security devices API', () => {
 
    it('should return 404 if device session does not exist', async () => {
       const userData: TestUserData = {
-         login: 'notFoundUser',
+         login: 'notFound',
          email: 'not-found-user@mail.com',
          password: 'qwerty123',
       }
@@ -281,7 +278,7 @@ describe('Security devices API', () => {
 
    it('should invalidate refresh token after device deletion', async () => {
       const userData: TestUserData = {
-         login: 'deletedDeviceUser',
+         login: 'delDevice',
          email: 'deleted-device-user@mail.com',
          password: 'qwerty123',
       }
@@ -313,7 +310,7 @@ describe('Security devices API', () => {
 
    it('should keep current device when deleting all other sessions', async () => {
       const userData: TestUserData = {
-         login: 'keepDeviceUser',
+         login: 'keepDevice',
          email: 'keep-device-user@mail.com',
          password: 'qwerty123',
       }

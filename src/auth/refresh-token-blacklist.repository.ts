@@ -1,4 +1,4 @@
-import { blacklistRefreshTokenCollection } from '../db/mongo.db'
+/*import { blacklistRefreshTokenCollection } from '../db/mongo.db'
 
 export const refreshTokenBlacklistRepository = {
    async addToBlacklist(token: string): Promise<void> {
@@ -15,4 +15,4 @@ export const refreshTokenBlacklistRepository = {
 
       return !!blacklistToken
    },
-}
+}*/

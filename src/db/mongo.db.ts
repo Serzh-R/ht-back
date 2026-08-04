@@ -4,15 +4,15 @@ import { BlogDb } from '../blogs/blogs.types'
 import { PostDb } from '../posts/posts.types'
 import { UserDb } from '../users/users.types'
 import { CommentDb } from '../comments/comments.types'
-import { BlacklistRefreshTokenDb } from '../auth/auth.types'
 import { DeviceSessionDb } from '../security/security.types'
+import { ApiRequestDb } from '../rate-limit/rate-limit.types'
 
 const BLOG_COLLECTION_NAME = 'blogs'
 const POST_COLLECTION_NAME = 'posts'
 const USER_COLLECTION_NAME = 'users'
 const COMMENT_COLLECTION_NAME = 'comments'
 const DEVICE_SESSION_COLLECTION_NAME = 'device-sessions'
-const BLACKLIST_REFRESH_TOKEN_COLLECTION_NAME = 'blacklist-refresh-tokens'
+const API_REQUEST_COLLECTION_NAME = 'api-requests'
 
 export let client: MongoClient
 export let blogCollection: Collection<BlogDb>
@@ -20,7 +20,9 @@ export let postCollection: Collection<PostDb>
 export let userCollection: Collection<UserDb>
 export let commentCollection: Collection<CommentDb>
 export let deviceSessionCollection: Collection<DeviceSessionDb>
-export let blacklistRefreshTokenCollection: Collection<BlacklistRefreshTokenDb>
+export let apiRequestCollection: Collection<ApiRequestDb>
+
+/*export let blacklistRefreshTokenCollection: Collection<BlacklistRefreshTokenDb>*/
 
 export async function runDb(url: string): Promise<boolean> {
    client = new MongoClient(url)
@@ -31,11 +33,21 @@ export async function runDb(url: string): Promise<boolean> {
    userCollection = db.collection<UserDb>(USER_COLLECTION_NAME)
    commentCollection = db.collection<CommentDb>(COMMENT_COLLECTION_NAME)
    deviceSessionCollection = db.collection<DeviceSessionDb>(DEVICE_SESSION_COLLECTION_NAME)
-   blacklistRefreshTokenCollection = db.collection<BlacklistRefreshTokenDb>(
-      BLACKLIST_REFRESH_TOKEN_COLLECTION_NAME,
+   apiRequestCollection = db.collection<ApiRequestDb>(API_REQUEST_COLLECTION_NAME)
+
+   await apiRequestCollection.createIndex(
+      {
+         date: 1,
+      },
+      {
+         expireAfterSeconds: 10,
+      },
    )
 
-   await blacklistRefreshTokenCollection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 20 })
+   /*blacklistRefreshTokenCollection = db.collection<BlacklistRefreshTokenDb>(
+      BLACKLIST_REFRESH_TOKEN_COLLECTION_NAME,
+   )
+   await blacklistRefreshTokenCollection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 20 })*/
 
    try {
       await client.connect()

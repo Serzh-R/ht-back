@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import {
-   blacklistRefreshTokenCollection,
+   apiRequestCollection,
    blogCollection,
    commentCollection,
    deviceSessionCollection,
@@ -17,7 +17,9 @@ testingRouter.delete('/', async (req: Request, res: Response) => {
    await userCollection.deleteMany({})
    await commentCollection.deleteMany({})
    await deviceSessionCollection.deleteMany({})
-   await blacklistRefreshTokenCollection.deleteMany({})
+   await apiRequestCollection.deleteMany({})
+
+   //await blacklistRefreshTokenCollection.deleteMany({})
 
    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

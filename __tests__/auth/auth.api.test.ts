@@ -5,11 +5,11 @@ import { clearDb } from '../helpers/clear-db'
 import { runDb, stopDb } from '../../src/db/mongo.db'
 import { createTestUser } from '../helpers/create-test-user'
 import { loginTestUser } from '../helpers/login-test-user'
-import { usersRepository } from '../../src/users/users.repository'
 import { emailManager } from '../../src/email/email.manager'
 import { registerTestUser } from '../helpers/register-test-user'
 import { correctUserData } from '../helpers/test-data'
 import { confirmTestUserEmail } from '../helpers/confirm-test-user-email'
+import { usersRepository } from '../../src/composition-root'
 
 const app = createApp()
 
@@ -345,7 +345,7 @@ describe('Auth API', () => {
          login: 'user2',
       }
 
-      const response = await registerTestUser(app, secondUserData)
+      const response = await registerTestUser(app, secondUserData, HTTP_STATUSES.BAD_REQUEST_400)
 
       expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
       expect(response.body).toEqual({
@@ -368,7 +368,7 @@ describe('Auth API', () => {
          email: 'another-email@mail.com',
       }
 
-      const response = await registerTestUser(app, secondUserData)
+      const response = await registerTestUser(app, secondUserData, HTTP_STATUSES.BAD_REQUEST_400)
 
       expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
 

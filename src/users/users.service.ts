@@ -1,11 +1,13 @@
 import { UserDb, UserInput, UserView } from './users.types'
-import { usersRepository } from './users.repository'
+import { UsersRepository } from './users.repository'
 import { bcryptService } from '../auth/adapters/bcrypt.service'
 import { Result, ResultStatus } from '../core/result/result.types'
 
-export const usersService = {
+export class UsersService {
+   constructor(protected usersRepository: UsersRepository) {}
+
    async createUser(input: UserInput): Promise<Result<UserView>> {
-      const userByLogin = await usersRepository.findByLogin(input.login)
+      const userByLogin = await this.usersRepository.findByLogin(input.login)
 
       if (userByLogin) {
          return {
@@ -20,7 +22,7 @@ export const usersService = {
          }
       }
 
-      const userByEmail = await usersRepository.findByEmail(input.email)
+      const userByEmail = await this.usersRepository.findByEmail(input.email)
 
       if (userByEmail) {
          return {
@@ -49,17 +51,17 @@ export const usersService = {
          },
       }
 
-      const createdUser = await usersRepository.create(newUser)
+      const createdUser = await this.usersRepository.create(newUser)
 
       return {
          status: ResultStatus.Created,
          extensions: [],
          data: createdUser,
       }
-   },
+   }
 
    async deleteUserById(id: string): Promise<Result> {
-      const isDeleted = await usersRepository.deleteById(id)
+      const isDeleted = await this.usersRepository.deleteById(id)
 
       if (!isDeleted) {
          return {
@@ -74,5 +76,5 @@ export const usersService = {
          extensions: [],
          data: null,
       }
-   },
+   }
 }

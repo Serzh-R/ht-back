@@ -1,22 +1,22 @@
 import { Router } from 'express'
-import { usersController } from './users.controller'
 import { authMiddleware } from '../auth/middlewares/auth.middleware'
 import {
    idParamValidator,
    userFieldsValidator,
 } from '../core/middlewares/validation/fieldValidators'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
+import { usersController } from '../composition-root'
 
 export const usersRouter = Router({})
 
-usersRouter.get('/', authMiddleware, usersController.getUsers)
+usersRouter.get('/', authMiddleware, usersController.getUsers.bind(usersController))
 
 usersRouter.post(
    '/',
    authMiddleware,
    userFieldsValidator,
    errorsResultMiddleware,
-   usersController.createUser,
+   usersController.createUser.bind(usersController),
 )
 
 usersRouter.delete(
@@ -24,5 +24,5 @@ usersRouter.delete(
    authMiddleware,
    idParamValidator,
    errorsResultMiddleware,
-   usersController.deleteUser,
+   usersController.deleteUser.bind(usersController),
 )

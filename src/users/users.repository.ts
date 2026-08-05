@@ -3,20 +3,20 @@ import { ObjectId } from 'mongodb'
 import { UserDb, UserView } from './users.types'
 import { mapperUserView } from './mappers/mapper-user.view'
 
-export const usersRepository = {
+export class UsersRepository {
    async findByLogin(login: string): Promise<UserDb | null> {
       return userCollection.findOne({ login })
-   },
+   }
 
    async findByEmail(email: string): Promise<UserDb | null> {
       return userCollection.findOne({ email })
-   },
+   }
 
    async findByLoginOrEmail(loginOrEmail: string): Promise<UserDb | null> {
       return userCollection.findOne({
          $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
       })
-   },
+   }
 
    async findById(id: string) {
       if (!ObjectId.isValid(id)) {
@@ -24,13 +24,13 @@ export const usersRepository = {
       }
 
       return userCollection.findOne({ _id: new ObjectId(id) })
-   },
+   }
 
    async findByConfirmationCode(code: string): Promise<UserDb | null> {
       return userCollection.findOne({
          'emailConfirmation.confirmationCode': code,
       } as any)
-   },
+   }
 
    async confirmEmail(userId: string): Promise<boolean> {
       const result = await userCollection.updateOne(
@@ -43,7 +43,7 @@ export const usersRepository = {
       )
 
       return result.matchedCount === 1
-   },
+   }
 
    async updateConfirmationInfo(
       userId: string,
@@ -61,7 +61,7 @@ export const usersRepository = {
       )
 
       return result.matchedCount === 1
-   },
+   }
 
    async create(newUser: UserDb): Promise<UserView> {
       const result = await userCollection.insertOne(newUser)
@@ -75,7 +75,7 @@ export const usersRepository = {
       }
 
       return mapperUserView(createdUser)
-   },
+   }
 
    async deleteById(id: string): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
@@ -87,5 +87,5 @@ export const usersRepository = {
       })
 
       return result.deletedCount === 1
-   },
+   }
 }

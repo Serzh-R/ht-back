@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { authController } from './auth.controller'
 import {
    loginFieldsValidator,
    regConfirmationValidator,
@@ -10,6 +9,7 @@ import { errorsResultMiddleware } from '../core/middlewares/validation/errorsRes
 import { jwtAccessAuthMiddleware } from './middlewares/jwt-access-auth.middleware'
 import { jwtRefreshAuthMiddleware } from './middlewares/jwt-refresh-auth.middleware'
 import { rateLimitMiddleware } from '../rate-limit/rate-limit.middleware'
+import { authController } from '../composition-root'
 
 export const authRouter = Router({})
 
@@ -18,19 +18,23 @@ authRouter.post(
    rateLimitMiddleware,
    loginFieldsValidator,
    errorsResultMiddleware,
-   authController.login,
+   authController.login.bind(authController),
 )
 
-authRouter.post('/refresh-token', jwtRefreshAuthMiddleware, authController.refreshToken)
+authRouter.post(
+   '/refresh-token',
+   jwtRefreshAuthMiddleware,
+   authController.refreshToken.bind(authController),
+)
 
-authRouter.post('/logout', jwtRefreshAuthMiddleware, authController.logout)
+authRouter.post('/logout', jwtRefreshAuthMiddleware, authController.logout.bind(authController))
 
 authRouter.post(
    '/registration',
    rateLimitMiddleware,
    userFieldsValidator,
    errorsResultMiddleware,
-   authController.registration,
+   authController.registration.bind(authController),
 )
 
 authRouter.post(
@@ -38,7 +42,7 @@ authRouter.post(
    rateLimitMiddleware,
    regConfirmationValidator,
    errorsResultMiddleware,
-   authController.registrationConfirmation,
+   authController.registrationConfirmation.bind(authController),
 )
 
 authRouter.post(
@@ -46,7 +50,7 @@ authRouter.post(
    rateLimitMiddleware,
    regEmailResendingValidator,
    errorsResultMiddleware,
-   authController.registrationEmailResending,
+   authController.registrationEmailResending.bind(authController),
 )
 
-authRouter.get('/me', jwtAccessAuthMiddleware, authController.me)
+authRouter.get('/me', jwtAccessAuthMiddleware, authController.me.bind(authController))

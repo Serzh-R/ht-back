@@ -1,5 +1,5 @@
 import { Result, ResultStatus } from '../core/result/result.types'
-import { usersRepository } from '../users/users.repository'
+import { UsersRepository } from '../users/users.repository'
 import { LoginInputModel } from './auth.types'
 import { bcryptService } from './adapters/bcrypt.service'
 import { UserInput, UserDb } from '../users/users.types'
@@ -8,9 +8,11 @@ import { createEmailConfirmation } from './helpers/create-email-confirmation'
 import { RegConfirmCode } from './auth.types'
 import { RegEmailResending } from './auth.types'
 
-export const authService = {
+export class AuthService {
+   constructor(protected usersRepository: UsersRepository) {}
+
    async checkCredentials(input: LoginInputModel): Promise<Result<UserDb>> {
-      const user = await usersRepository.findByLoginOrEmail(input.loginOrEmail)
+      const user = await this.usersRepository.findByLoginOrEmail(input.loginOrEmail)
 
       if (!user) {
          return {
@@ -43,10 +45,10 @@ export const authService = {
          extensions: [],
          data: user,
       }
-   },
+   }
 
    async registration(input: UserInput): Promise<Result> {
-      const userByLogin = await usersRepository.findByLogin(input.login)
+      const userByLogin = await this.usersRepository.findByLogin(input.login)
 
       if (userByLogin) {
          return {
@@ -61,7 +63,7 @@ export const authService = {
          }
       }
 
-      const userByEmail = await usersRepository.findByEmail(input.email)
+      const userByEmail = await this.usersRepository.findByEmail(input.email)
 
       if (userByEmail) {
          return {
@@ -86,7 +88,7 @@ export const authService = {
          emailConfirmation: createEmailConfirmation(),
       }
 
-      await usersRepository.create(newUser)
+      await this.usersRepository.create(newUser)
 
       emailManager.sendEmailConfirmationMessage(newUser).catch((e) => {
          console.error(`Failed to send confirmation email to ${newUser.email}`, e)
@@ -97,10 +99,10 @@ export const authService = {
          extensions: [],
          data: null,
       }
-   },
+   }
 
    async registrationConfirmation(input: RegConfirmCode): Promise<Result> {
-      const user = await usersRepository.findByConfirmationCode(input.code)
+      const user = await this.usersRepository.findByConfirmationCode(input.code)
 
       if (!user) {
          return {
@@ -141,17 +143,17 @@ export const authService = {
          }
       }
 
-      await usersRepository.confirmEmail(user._id!.toString())
+      await this.usersRepository.confirmEmail(user._id!.toString())
 
       return {
          status: ResultStatus.NoContent,
          extensions: [],
          data: null,
       }
-   },
+   }
 
    async registrationEmailResending(input: RegEmailResending): Promise<Result> {
-      const user = await usersRepository.findByEmail(input.email)
+      const user = await this.usersRepository.findByEmail(input.email)
 
       if (!user) {
          return {
@@ -181,7 +183,7 @@ export const authService = {
 
       const newConfirmation = createEmailConfirmation()
 
-      await usersRepository.updateConfirmationInfo(
+      await this.usersRepository.updateConfirmationInfo(
          user._id!.toString(),
          newConfirmation.confirmationCode,
          newConfirmation.expirationDate,
@@ -196,5 +198,5 @@ export const authService = {
          extensions: [],
          data: null,
       }
-   },
+   }
 }

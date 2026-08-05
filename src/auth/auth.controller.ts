@@ -2,9 +2,9 @@ import { Request, Response } from 'express'
 import { HTTP_STATUSES, REFRESH_TIME } from '../core/settings'
 import { ResultStatus } from '../core/result/result.types'
 import { LoginInputModel, LoginSuccessViewModel, MeViewModel } from './auth.types'
-import { authService } from './auth.service'
+import { AuthService } from './auth.service'
 import { jwtService } from './adapters/jwt.service'
-import { usersRepository } from '../users/users.repository'
+import { UsersRepository } from '../users/users.repository'
 import { mapperMeView } from './mappers/mapper-me.view'
 import { RegConfirmCode, RegEmailResending } from './auth.types'
 import { UserInput } from '../users/users.types'
@@ -12,9 +12,14 @@ import { resultCodeToHttpException } from '../core/result/result-code-to-http-ex
 import { randomUUID } from 'crypto'
 import { securityRepository } from '../security/security.repository'
 
-export const authController = {
+export class AuthController {
+   constructor(
+      protected usersRepository: UsersRepository,
+      protected authService: AuthService,
+   ) {}
+
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
-      const result = await authService.checkCredentials(req.body)
+      const result = await this.authService.checkCredentials(req.body)
 
       if (result.status === ResultStatus.Unauthorized || !result.data || !result.data._id) {
          res.sendStatus(resultCodeToHttpException(result.status))
@@ -54,7 +59,7 @@ export const authController = {
       res.status(resultCodeToHttpException(result.status)).send({
          accessToken,
       })
-   },
+   }
 
    async refreshToken(req: Request, res: Response<LoginSuccessViewModel>) {
       if (!req.userId || !req.deviceId) {
@@ -92,7 +97,7 @@ export const authController = {
       res.status(HTTP_STATUSES.OK_200).send({
          accessToken: newAccessToken,
       })
-   },
+   }
 
    async logout(req: Request, res: Response) {
       if (!req.deviceId) {
@@ -113,10 +118,10 @@ export const authController = {
       })
 
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-   },
+   }
 
    async registration(req: Request<{}, {}, UserInput>, res: Response) {
-      const result = await authService.registration(req.body)
+      const result = await this.authService.registration(req.body)
 
       if (result.status === ResultStatus.BadRequest) {
          res.status(resultCodeToHttpException(result.status)).send({
@@ -127,10 +132,10 @@ export const authController = {
       }
 
       res.sendStatus(resultCodeToHttpException(result.status))
-   },
+   }
 
    async registrationConfirmation(req: Request<{}, {}, RegConfirmCode>, res: Response) {
-      const result = await authService.registrationConfirmation(req.body)
+      const result = await this.authService.registrationConfirmation(req.body)
 
       if (result.status === ResultStatus.BadRequest) {
          res.status(resultCodeToHttpException(result.status)).send({
@@ -141,10 +146,10 @@ export const authController = {
       }
 
       res.sendStatus(resultCodeToHttpException(result.status))
-   },
+   }
 
    async registrationEmailResending(req: Request<{}, {}, RegEmailResending>, res: Response) {
-      const result = await authService.registrationEmailResending(req.body)
+      const result = await this.authService.registrationEmailResending(req.body)
 
       if (result.status === ResultStatus.BadRequest) {
          res.status(resultCodeToHttpException(result.status)).send({
@@ -155,7 +160,7 @@ export const authController = {
       }
 
       res.sendStatus(resultCodeToHttpException(result.status))
-   },
+   }
 
    async me(req: Request, res: Response<MeViewModel>) {
       if (!req.userId) {
@@ -163,7 +168,7 @@ export const authController = {
          return
       }
 
-      const user = await usersRepository.findById(req.userId)
+      const user = await this.usersRepository.findById(req.userId)
 
       if (!user) {
          res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
@@ -171,5 +176,5 @@ export const authController = {
       }
 
       res.status(HTTP_STATUSES.OK_200).send(mapperMeView(user))
-   },
+   }
 }

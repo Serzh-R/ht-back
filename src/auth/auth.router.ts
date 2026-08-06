@@ -9,7 +9,14 @@ import { errorsResultMiddleware } from '../core/middlewares/validation/errorsRes
 import { jwtAccessAuthMiddleware } from './middlewares/jwt-access-auth.middleware'
 import { jwtRefreshAuthMiddleware } from './middlewares/jwt-refresh-auth.middleware'
 import { rateLimitMiddleware } from '../rate-limit/rate-limit.middleware'
-import { authController } from '../composition-root'
+import { AuthController } from './auth.controller'
+import { UsersRepository } from '../users/users.repository'
+import { AuthService } from './auth.service'
+
+const usersRepository = new UsersRepository()
+const authService = new AuthService(usersRepository)
+
+const authController = new AuthController(usersRepository, authService)
 
 export const authRouter = Router({})
 

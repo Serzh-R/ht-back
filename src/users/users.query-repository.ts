@@ -4,7 +4,7 @@ import { UserDb } from './users.types'
 import { UsersQuery, UsersQueryOutput } from '../core/types/query.types'
 import { mapperUserView } from './mappers/mapper-user.view'
 
-export const usersQueryRepository = {
+export class UsersQueryRepository {
    async findAll(query: UsersQuery): Promise<UsersQueryOutput> {
       const filter: Filter<UserDb> = {}
 
@@ -50,5 +50,5 @@ export const usersQueryRepository = {
          totalCount,
          items: users.map(mapperUserView),
       }
-   },
+   }
 }

@@ -1,15 +1,17 @@
 import { BlogInput, BlogView } from './blogs.types'
-import { blogsRepository } from './blogs.repository'
 import { postsRepository } from '../posts/posts.repository'
 import { BlogPostInput, PostView } from '../posts/posts.types'
+import { BlogsRepository } from './blogs.repository'
 
-export const blogsService = {
+export class BlogsService {
+   constructor(protected blogsRepository: BlogsRepository) {}
+
    async createBlog(input: BlogInput): Promise<BlogView> {
-      return blogsRepository.create(input)
-   },
+      return this.blogsRepository.create(input)
+   }
 
    async updateBlog(id: string, input: BlogInput): Promise<boolean> {
-      const isUpdated = await blogsRepository.update(id, input)
+      const isUpdated = await this.blogsRepository.update(id, input)
 
       if (!isUpdated) {
          return false
@@ -18,10 +20,10 @@ export const blogsService = {
       await postsRepository.updateBlogNameForPosts(id, input.name)
 
       return true
-   },
+   }
 
    async createPostByBlogId(blogId: string, input: BlogPostInput): Promise<PostView | null> {
-      const blog = await blogsRepository.findById(blogId)
+      const blog = await this.blogsRepository.findById(blogId)
 
       if (!blog) {
          return null
@@ -36,10 +38,10 @@ export const blogsService = {
          },
          blog.name,
       )
-   },
+   }
 
    async deleteBlogById(id: string): Promise<boolean> {
-      const isDeleted = await blogsRepository.delete(id)
+      const isDeleted = await this.blogsRepository.delete(id)
 
       if (!isDeleted) {
          return false
@@ -48,5 +50,5 @@ export const blogsService = {
       await postsRepository.deletePostsByBlogId(id)
 
       return true
-   },
+   }
 }

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
-import { usersQueryRepository } from './users.query-repository'
+import { UsersQueryRepository } from './users.query-repository'
 import { UsersService } from './users.service'
 import { ResultStatus } from '../core/result/result.types'
 import { UserInput, UserView } from './users.types'
@@ -9,7 +9,10 @@ import { UsersQueryInput } from '../core/types/query.types'
 import { normalizeUsersQuery } from '../core/helpers/query-normalizers'
 
 export class UsersController {
-   constructor(protected usersService: UsersService) {}
+   constructor(
+      protected usersService: UsersService,
+      protected usersQueryRepository: UsersQueryRepository,
+   ) {}
 
    async getUsers(
       req: Request<{}, Paginator<UserView>, {}, UsersQueryInput>,
@@ -17,7 +20,7 @@ export class UsersController {
    ) {
       const query = normalizeUsersQuery(req.query)
 
-      const users = await usersQueryRepository.findAll(query)
+      const users = await this.usersQueryRepository.findAll(query)
 
       res.status(HTTP_STATUSES.OK_200).json(users)
    }

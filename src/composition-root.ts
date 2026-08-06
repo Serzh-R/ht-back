@@ -1,11 +1,12 @@
-import { UsersRepository } from './users/users.repository'
-import { UsersService } from './users/users.service'
-import { UsersController } from './users/users.controller'
-import { AuthController } from './auth/auth.controller'
-import { AuthService } from './auth/auth.service'
+import { BlogsRepository } from './blogs/blogs.repository'
+import { BlogsQueryRepository } from './blogs/blogs.query-repository'
+import { BlogsService } from './blogs/blogs.service'
+import { BlogsController } from './blogs/blogs.controller'
 
-export const usersRepository = new UsersRepository()
-const usersService = new UsersService(usersRepository)
-export const usersController = new UsersController(usersService)
-const authService = new AuthService(usersRepository)
-export const authController = new AuthController(usersRepository, authService)
+const blogsRepository = new BlogsRepository()
+
+const blogsQueryRepository = new BlogsQueryRepository()
+
+const blogsService = new BlogsService(blogsRepository)
+
+export const blogsController = new BlogsController(blogsService, blogsQueryRepository)

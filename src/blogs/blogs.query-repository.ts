@@ -4,7 +4,7 @@ import { blogCollection } from '../db/mongo.db'
 import { BlogsQuery, BlogsQueryOutput } from '../core/types/query.types'
 import { mapperBlogView } from './mappers/mapper-blog.view'
 
-export const blogsQueryRepository = {
+export class BlogsQueryRepository {
    async findAll(query: BlogsQuery): Promise<BlogsQueryOutput> {
       const filter: Filter<BlogDb> = {}
 
@@ -30,7 +30,7 @@ export const blogsQueryRepository = {
          totalCount,
          items: blogs.map(mapperBlogView),
       }
-   },
+   }
 
    async findById(id: string): Promise<BlogView | null> {
       if (!ObjectId.isValid(id)) {
@@ -44,5 +44,5 @@ export const blogsQueryRepository = {
       }
 
       return mapperBlogView(blog)
-   },
+   }
 }

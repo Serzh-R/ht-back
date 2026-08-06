@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { blogsController } from './blogs.controller'
 import {
    blogFieldsValidator,
    blogIdParamValidator,
@@ -8,20 +7,21 @@ import {
 } from '../core/middlewares/validation/fieldValidators'
 import { authMiddleware } from '../auth/middlewares/auth.middleware'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
+import { blogsController } from '../composition-root'
 
 export const blogsRouter = Router({})
 
-blogsRouter.get('/', blogsController.getBlogs)
+blogsRouter.get('/', blogsController.getBlogs.bind(blogsController))
 
 blogsRouter.post(
    '/',
    authMiddleware,
    blogFieldsValidator,
    errorsResultMiddleware,
-   blogsController.createBlog,
+   blogsController.createBlog.bind(blogsController),
 )
 
-blogsRouter.get('/:blogId/posts', blogsController.getPostsByBlogId)
+blogsRouter.get('/:blogId/posts', blogsController.getPostsByBlogId.bind(blogsController))
 
 blogsRouter.post(
    '/:blogId/posts',
@@ -29,10 +29,15 @@ blogsRouter.post(
    blogIdParamValidator,
    blogPostFieldsValidator,
    errorsResultMiddleware,
-   blogsController.createPostByBlogId,
+   blogsController.createPostByBlogId.bind(blogsController),
 )
 
-blogsRouter.get('/:id', idParamValidator, errorsResultMiddleware, blogsController.getBlogById)
+blogsRouter.get(
+   '/:id',
+   idParamValidator,
+   errorsResultMiddleware,
+   blogsController.getBlogById.bind(blogsController),
+)
 
 blogsRouter.put(
    '/:id',
@@ -40,7 +45,7 @@ blogsRouter.put(
    idParamValidator,
    blogFieldsValidator,
    errorsResultMiddleware,
-   blogsController.updateBlog,
+   blogsController.updateBlog.bind(blogsController),
 )
 
 blogsRouter.delete(
@@ -48,5 +53,5 @@ blogsRouter.delete(
    authMiddleware,
    idParamValidator,
    errorsResultMiddleware,
-   blogsController.deleteBlogById,
+   blogsController.deleteBlogById.bind(blogsController),
 )

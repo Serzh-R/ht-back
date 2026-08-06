@@ -3,7 +3,7 @@ import { blogCollection } from '../db/mongo.db'
 import { mapperBlogView } from './mappers/mapper-blog.view'
 import { ObjectId } from 'mongodb'
 
-export const blogsRepository = {
+export class BlogsRepository {
    async findById(id: string): Promise<BlogView | null> {
       if (!ObjectId.isValid(id)) {
          return null
@@ -16,7 +16,7 @@ export const blogsRepository = {
       }
 
       return mapperBlogView(blog)
-   },
+   }
 
    async create(input: BlogInput): Promise<BlogView> {
       const newBlog: BlogDb = {
@@ -38,7 +38,7 @@ export const blogsRepository = {
       }
 
       return mapperBlogView(createdBlog)
-   },
+   }
 
    async update(id: string, input: BlogInput): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
@@ -57,7 +57,7 @@ export const blogsRepository = {
       )
 
       return result.matchedCount === 1
-   },
+   }
 
    async delete(id: string): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
@@ -69,5 +69,5 @@ export const blogsRepository = {
       })
 
       return result.deletedCount === 1
-   },
+   }
 }

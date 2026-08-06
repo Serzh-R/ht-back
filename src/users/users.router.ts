@@ -5,7 +5,16 @@ import {
    userFieldsValidator,
 } from '../core/middlewares/validation/fieldValidators'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
-import { usersController } from '../composition-root'
+import { UsersController } from './users.controller'
+import { UsersRepository } from './users.repository'
+import { UsersService } from './users.service'
+import { UsersQueryRepository } from './users.query-repository'
+
+const usersRepository = new UsersRepository()
+const usersService = new UsersService(usersRepository)
+const usersQueryRepository = new UsersQueryRepository()
+
+const usersController = new UsersController(usersService, usersQueryRepository)
 
 export const usersRouter = Router({})
 

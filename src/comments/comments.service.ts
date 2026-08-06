@@ -2,7 +2,6 @@ import { CommentInput, CommentView } from './comments.types'
 import { commentsRepository } from './comments.repository'
 import { Result, ResultStatus } from '../core/result/result.types'
 import { postsQueryRepository } from '../posts/posts.query-repository'
-import { usersRepository } from '../composition-root'
 
 export const commentsService = {
    async createComment(

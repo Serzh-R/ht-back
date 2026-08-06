@@ -2,7 +2,9 @@ import { NextFunction, Request, Response } from 'express'
 import { HTTP_STATUSES } from '../../core/settings'
 import { jwtService } from '../adapters/jwt.service'
 import { securityRepository } from '../../security/security.repository'
-import { usersRepository } from '../../composition-root'
+import { UsersRepository } from '../../users/users.repository'
+
+const usersRepository = new UsersRepository()
 
 export const jwtRefreshAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
    const refreshToken = req.cookies.refreshToken

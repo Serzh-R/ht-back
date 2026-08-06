@@ -1,7 +1,13 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES, REFRESH_TIME } from '../core/settings'
 import { ResultStatus } from '../core/result/result.types'
-import { LoginInputModel, LoginSuccessViewModel, MeViewModel } from './auth.types'
+import {
+   LoginInputModel,
+   LoginSuccessViewModel,
+   MeViewModel,
+   NewPasswordRecoveryInputModel,
+   PasswordRecoveryInputModel,
+} from './auth.types'
 import { AuthService } from './auth.service'
 import { UsersRepository } from '../users/users.repository'
 import { mapperMeView } from './mappers/mapper-me.view'
@@ -152,6 +158,26 @@ export class AuthController {
 
    async registrationEmailResending(req: Request<{}, {}, RegEmailResending>, res: Response) {
       const result = await this.authService.registrationEmailResending(req.body)
+
+      if (result.status === ResultStatus.BadRequest) {
+         res.status(resultCodeToHttpException(result.status)).send({
+            errorsMessages: result.extensions,
+         })
+
+         return
+      }
+
+      res.sendStatus(resultCodeToHttpException(result.status))
+   }
+
+   async passwordRecovery(req: Request<{}, {}, PasswordRecoveryInputModel>, res: Response) {
+      const result = await this.authService.passwordRecovery(req.body)
+
+      res.sendStatus(resultCodeToHttpException(result.status))
+   }
+
+   async newPassword(req: Request<{}, {}, NewPasswordRecoveryInputModel>, res: Response) {
+      const result = await this.authService.newPassword(req.body)
 
       if (result.status === ResultStatus.BadRequest) {
          res.status(resultCodeToHttpException(result.status)).send({

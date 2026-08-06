@@ -63,6 +63,60 @@ export class UsersRepository {
       return result.matchedCount === 1
    }
 
+   async findByRecoveryCode(recoveryCode: string): Promise<UserDb | null> {
+      return userCollection.findOne({
+         'passwordRecovery.recoveryCode': recoveryCode,
+      } as any)
+   }
+
+   async updatePasswordRecoveryInfo(
+      userId: string,
+      recoveryCode: string,
+      expirationDate: Date,
+   ): Promise<boolean> {
+      if (!ObjectId.isValid(userId)) {
+         return false
+      }
+
+      const result = await userCollection.updateOne(
+         {
+            _id: new ObjectId(userId),
+         },
+         {
+            $set: {
+               passwordRecovery: {
+                  recoveryCode,
+                  expirationDate,
+               },
+            } as any,
+         },
+      )
+
+      return result.matchedCount === 1
+   }
+
+   async updatePasswordHash(userId: string, passwordHash: string): Promise<boolean> {
+      if (!ObjectId.isValid(userId)) {
+         return false
+      }
+
+      const result = await userCollection.updateOne(
+         {
+            _id: new ObjectId(userId),
+         },
+         {
+            $set: {
+               passwordHash,
+            },
+            $unset: {
+               passwordRecovery: '',
+            },
+         } as any,
+      )
+
+      return result.matchedCount === 1
+   }
+
    async create(newUser: UserDb): Promise<UserView> {
       const result = await userCollection.insertOne(newUser)
 

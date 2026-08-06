@@ -1,12 +1,17 @@
 import { Result, ResultStatus } from '../core/result/result.types'
 import { UsersRepository } from '../users/users.repository'
-import { LoginInputModel } from './auth.types'
+import {
+   LoginInputModel,
+   NewPasswordRecoveryInputModel,
+   PasswordRecoveryInputModel,
+} from './auth.types'
 import { UserInput, UserDb } from '../users/users.types'
 import { EmailManager } from '../email/email.manager'
 import { createEmailConfirmation } from './helpers/create-email-confirmation'
 import { RegConfirmCode } from './auth.types'
 import { RegEmailResending } from './auth.types'
 import { BcryptService } from './adapters/bcrypt.service'
+import { createPasswordRecovery } from './helpers/create-password-recovery'
 
 export class AuthService {
    constructor(
@@ -199,6 +204,95 @@ export class AuthService {
       user.emailConfirmation = newConfirmation
 
       await this.emailManager.sendEmailConfirmationMessage(user)
+
+      return {
+         status: ResultStatus.NoContent,
+         extensions: [],
+         data: null,
+      }
+   }
+
+   async passwordRecovery(input: PasswordRecoveryInputModel): Promise<Result> {
+      const user = await this.usersRepository.findByEmail(input.email)
+
+      // Даже если email не существует, возвращаем 204
+      if (!user || !user._id) {
+         return {
+            status: ResultStatus.NoContent,
+            extensions: [],
+            data: null,
+         }
+      }
+
+      const passwordRecovery = createPasswordRecovery()
+
+      await this.usersRepository.updatePasswordRecoveryInfo(
+         user._id.toString(),
+         passwordRecovery.recoveryCode,
+         passwordRecovery.expirationDate,
+      )
+
+      this.emailManager
+         .sendPasswordRecoveryMessage(user.email, passwordRecovery.recoveryCode)
+         .catch((error) => {
+            console.error(`Failed to send password recovery email to ${user.email}`, error)
+         })
+
+      return {
+         status: ResultStatus.NoContent,
+         extensions: [],
+         data: null,
+      }
+   }
+
+   async newPassword(input: NewPasswordRecoveryInputModel): Promise<Result> {
+      const user = await this.usersRepository.findByRecoveryCode(input.recoveryCode)
+
+      if (!user || !user._id || !user.passwordRecovery) {
+         return {
+            status: ResultStatus.BadRequest,
+            extensions: [
+               {
+                  field: 'recoveryCode',
+                  message: 'Recovery code is incorrect',
+               },
+            ],
+            data: null,
+         }
+      }
+
+      if (user.passwordRecovery.expirationDate < new Date()) {
+         return {
+            status: ResultStatus.BadRequest,
+            extensions: [
+               {
+                  field: 'recoveryCode',
+                  message: 'Recovery code is expired',
+               },
+            ],
+            data: null,
+         }
+      }
+
+      const passwordHash = await this.bcryptService.generateHash(input.newPassword)
+
+      const isPasswordUpdated = await this.usersRepository.updatePasswordHash(
+         user._id.toString(),
+         passwordHash,
+      )
+
+      if (!isPasswordUpdated) {
+         return {
+            status: ResultStatus.BadRequest,
+            extensions: [
+               {
+                  field: 'recoveryCode',
+                  message: 'Recovery code is incorrect',
+               },
+            ],
+            data: null,
+         }
+      }
 
       return {
          status: ResultStatus.NoContent,

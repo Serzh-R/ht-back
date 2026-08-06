@@ -20,3 +20,12 @@ export type RegConfirmCode = {
 export type RegEmailResending = {
    email: string
 }
+
+export type PasswordRecoveryInputModel = {
+   email: string
+}
+
+export type NewPasswordRecoveryInputModel = {
+   newPassword: string
+   recoveryCode: string
+}

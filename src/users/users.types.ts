@@ -19,6 +19,11 @@ export type EmailConfirmationInfo = {
    isConfirmed: boolean
 }
 
+export type PasswordRecoveryInfo = {
+   recoveryCode: string
+   expirationDate: Date
+}
+
 export type UserDb = {
    _id?: ObjectId
 
@@ -28,4 +33,5 @@ export type UserDb = {
    createdAt: Date
 
    emailConfirmation: EmailConfirmationInfo
+   passwordRecovery?: PasswordRecoveryInfo
 }

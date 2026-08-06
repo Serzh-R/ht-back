@@ -4,6 +4,8 @@ import {
    regConfirmationValidator,
    regEmailResendingValidator,
    userFieldsValidator,
+   newPasswordValidator,
+   passwordRecoveryValidator,
 } from '../core/middlewares/validation/fieldValidators'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
 import { jwtAccessAuthMiddleware } from './middlewares/jwt-access-auth.middleware'
@@ -78,6 +80,22 @@ authRouter.post(
    regEmailResendingValidator,
    errorsResultMiddleware,
    authController.registrationEmailResending.bind(authController),
+)
+
+authRouter.post(
+   '/password-recovery',
+   rateLimitMiddleware.checkRateLimit.bind(rateLimitMiddleware),
+   passwordRecoveryValidator,
+   errorsResultMiddleware,
+   authController.passwordRecovery.bind(authController),
+)
+
+authRouter.post(
+   '/new-password',
+   rateLimitMiddleware.checkRateLimit.bind(rateLimitMiddleware),
+   newPasswordValidator,
+   errorsResultMiddleware,
+   authController.newPassword.bind(authController),
 )
 
 authRouter.get('/me', jwtAccessAuthMiddleware, authController.me.bind(authController))

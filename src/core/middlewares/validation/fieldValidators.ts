@@ -196,3 +196,31 @@ export const regEmailResendingValidator = [
 ]
 
 /*************************************************************************/
+
+export const passwordRecoveryValidator = [
+   body('email')
+      .trim()
+      .isString()
+      .withMessage('email must be a string')
+      .matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
+      .withMessage('email has invalid format'),
+]
+
+export const newPasswordValidator = [
+   body('newPassword')
+      .trim()
+      .isString()
+      .withMessage('newPassword must be a string')
+      .isLength({
+         min: 6,
+         max: 20,
+      })
+      .withMessage('newPassword length must be from 6 to 20'),
+
+   body('recoveryCode')
+      .trim()
+      .isString()
+      .withMessage('recoveryCode must be a string')
+      .notEmpty()
+      .withMessage('recoveryCode is required'),
+]

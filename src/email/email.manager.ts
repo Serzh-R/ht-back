@@ -1,14 +1,16 @@
-import { emailAdapter } from './email.adapter'
 import { UserDb } from '../users/users.types'
+import { EmailAdapter } from './email.adapter'
 
-export const emailManager = {
+export class EmailManager {
+   constructor(protected emailAdapter: EmailAdapter) {}
+
    async sendEmailConfirmationMessage(user: UserDb) {
       const subject = 'Подтверждение регистрации'
       const message = `<h1>Добро пожаловать!</h1>
       <p>Для завершения регистрации перейдите по ссылке ниже:</p>
       <a href="http://localhost:3004/confirm?code=${user.emailConfirmation.confirmationCode}">Подтвердить email</a>`
-      await emailAdapter.sendEmail(user.email, subject, message)
-   },
+      await this.emailAdapter.sendEmail(user.email, subject, message)
+   }
 }
 
 /*async sendEmailPasswordRecovery({

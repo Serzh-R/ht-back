@@ -1,29 +1,33 @@
 import { NextFunction, Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
-import { rateLimitRepository } from './rate-limit.repository'
+import { RateLimitRepository } from './rate-limit.repository'
 
 const REQUEST_LIMIT = 5
 const TIME_WINDOW_IN_SECONDS = 10
 
-export const rateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-   const ip = req.ip ?? 'Unknown IP'
-   const url = req.originalUrl
-   const currentDate = new Date()
+export class RateLimitMiddleware {
+   constructor(protected rateLimitRepository: RateLimitRepository) {}
 
-   await rateLimitRepository.addRequest({
-      ip,
-      url,
-      date: currentDate,
-   })
+   async checkRateLimit(req: Request, res: Response, next: NextFunction) {
+      const ip = req.ip ?? 'Unknown IP'
+      const url = req.originalUrl
+      const currentDate = new Date()
 
-   const fromDate = new Date(currentDate.getTime() - TIME_WINDOW_IN_SECONDS * 1000)
+      await this.rateLimitRepository.addRequest({
+         ip,
+         url,
+         date: currentDate,
+      })
 
-   const requestsCount = await rateLimitRepository.countRequests(ip, url, fromDate)
+      const fromDate = new Date(currentDate.getTime() - TIME_WINDOW_IN_SECONDS * 1000)
 
-   if (requestsCount > REQUEST_LIMIT) {
-      res.sendStatus(HTTP_STATUSES.TooManyRequests_429)
-      return
+      const requestsCount = await this.rateLimitRepository.countRequests(ip, url, fromDate)
+
+      if (requestsCount > REQUEST_LIMIT) {
+         res.sendStatus(HTTP_STATUSES.TooManyRequests_429)
+         return
+      }
+
+      next()
    }
-
-   next()
 }

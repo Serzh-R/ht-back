@@ -1,19 +1,21 @@
 import { Result, ResultStatus } from '../core/result/result.types'
-import { securityRepository } from './security.repository'
+import { SecurityRepository } from './security.repository'
 
-export const securityService = {
+export class SecurityService {
+   constructor(protected securityRepository: SecurityRepository) {}
+
    async deleteOtherSessions(userId: string, currentDeviceId: string): Promise<Result> {
-      await securityRepository.deleteOtherSessions(userId, currentDeviceId)
+      await this.securityRepository.deleteOtherSessions(userId, currentDeviceId)
 
       return {
          status: ResultStatus.NoContent,
          extensions: [],
          data: null,
       }
-   },
+   }
 
    async deleteSessionByDeviceId(deviceId: string, userId: string): Promise<Result> {
-      const session = await securityRepository.findSessionByDeviceId(deviceId)
+      const session = await this.securityRepository.findSessionByDeviceId(deviceId)
 
       if (!session) {
          return {
@@ -31,7 +33,7 @@ export const securityService = {
          }
       }
 
-      const isDeleted = await securityRepository.deleteSession(deviceId)
+      const isDeleted = await this.securityRepository.deleteSession(deviceId)
 
       if (!isDeleted) {
          return {
@@ -46,5 +48,5 @@ export const securityService = {
          extensions: [],
          data: null,
       }
-   },
+   }
 }

@@ -3,19 +3,21 @@ import { HTTP_STATUSES, REFRESH_TIME } from '../core/settings'
 import { ResultStatus } from '../core/result/result.types'
 import { LoginInputModel, LoginSuccessViewModel, MeViewModel } from './auth.types'
 import { AuthService } from './auth.service'
-import { jwtService } from './adapters/jwt.service'
 import { UsersRepository } from '../users/users.repository'
 import { mapperMeView } from './mappers/mapper-me.view'
 import { RegConfirmCode, RegEmailResending } from './auth.types'
 import { UserInput } from '../users/users.types'
 import { resultCodeToHttpException } from '../core/result/result-code-to-http-exception'
 import { randomUUID } from 'crypto'
-import { securityRepository } from '../security/security.repository'
+import { SecurityRepository } from '../security/security.repository'
+import { JwtService } from './adapters/jwt.service'
 
 export class AuthController {
    constructor(
       protected usersRepository: UsersRepository,
       protected authService: AuthService,
+      protected securityRepository: SecurityRepository,
+      protected jwtService: JwtService,
    ) {}
 
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {
@@ -31,17 +33,17 @@ export class AuthController {
       const ip = req.ip ?? 'Unknown IP'
       const title = req.get('user-agent') ?? 'Unknown device'
 
-      const accessToken = await jwtService.createAccessToken(userId)
-      const refreshToken = await jwtService.createRefreshToken(userId, deviceId)
+      const accessToken = await this.jwtService.createAccessToken(userId)
+      const refreshToken = await this.jwtService.createRefreshToken(userId, deviceId)
 
-      const refreshTokenPayload = await jwtService.getRefreshTokenPayload(refreshToken)
+      const refreshTokenPayload = await this.jwtService.getRefreshTokenPayload(refreshToken)
 
       if (!refreshTokenPayload) {
          res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
          return
       }
 
-      await securityRepository.createSession({
+      await this.securityRepository.createSession({
          userId,
          deviceId,
          ip,
@@ -67,17 +69,17 @@ export class AuthController {
          return
       }
 
-      const newAccessToken = await jwtService.createAccessToken(req.userId)
-      const newRefreshToken = await jwtService.createRefreshToken(req.userId, req.deviceId)
+      const newAccessToken = await this.jwtService.createAccessToken(req.userId)
+      const newRefreshToken = await this.jwtService.createRefreshToken(req.userId, req.deviceId)
 
-      const newRefreshTokenPayload = await jwtService.getRefreshTokenPayload(newRefreshToken)
+      const newRefreshTokenPayload = await this.jwtService.getRefreshTokenPayload(newRefreshToken)
 
       if (!newRefreshTokenPayload) {
          res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
          return
       }
 
-      const isSessionUpdated = await securityRepository.updateSession(
+      const isSessionUpdated = await this.securityRepository.updateSession(
          req.deviceId,
          new Date(newRefreshTokenPayload.iat * 1000),
          new Date(newRefreshTokenPayload.exp * 1000),
@@ -105,7 +107,7 @@ export class AuthController {
          return
       }
 
-      const isSessionDeleted = await securityRepository.deleteSession(req.deviceId)
+      const isSessionDeleted = await this.securityRepository.deleteSession(req.deviceId)
 
       if (!isSessionDeleted) {
          res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)

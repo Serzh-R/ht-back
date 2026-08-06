@@ -1,15 +1,19 @@
 import { Result, ResultStatus } from '../core/result/result.types'
 import { UsersRepository } from '../users/users.repository'
 import { LoginInputModel } from './auth.types'
-import { bcryptService } from './adapters/bcrypt.service'
 import { UserInput, UserDb } from '../users/users.types'
-import { emailManager } from '../email/email.manager'
+import { EmailManager } from '../email/email.manager'
 import { createEmailConfirmation } from './helpers/create-email-confirmation'
 import { RegConfirmCode } from './auth.types'
 import { RegEmailResending } from './auth.types'
+import { BcryptService } from './adapters/bcrypt.service'
 
 export class AuthService {
-   constructor(protected usersRepository: UsersRepository) {}
+   constructor(
+      protected usersRepository: UsersRepository,
+      protected bcryptService: BcryptService,
+      protected emailManager: EmailManager,
+   ) {}
 
    async checkCredentials(input: LoginInputModel): Promise<Result<UserDb>> {
       const user = await this.usersRepository.findByLoginOrEmail(input.loginOrEmail)
@@ -22,7 +26,10 @@ export class AuthService {
          }
       }
 
-      const isPasswordCorrect = await bcryptService.checkPassword(input.password, user.passwordHash)
+      const isPasswordCorrect = await this.bcryptService.checkPassword(
+         input.password,
+         user.passwordHash,
+      )
 
       if (!isPasswordCorrect) {
          return {
@@ -78,7 +85,7 @@ export class AuthService {
          }
       }
 
-      const passwordHash = await bcryptService.generateHash(input.password)
+      const passwordHash = await this.bcryptService.generateHash(input.password)
 
       const newUser: UserDb = {
          login: input.login,
@@ -90,7 +97,7 @@ export class AuthService {
 
       await this.usersRepository.create(newUser)
 
-      emailManager.sendEmailConfirmationMessage(newUser).catch((e) => {
+      this.emailManager.sendEmailConfirmationMessage(newUser).catch((e) => {
          console.error(`Failed to send confirmation email to ${newUser.email}`, e)
       })
 
@@ -191,7 +198,7 @@ export class AuthService {
 
       user.emailConfirmation = newConfirmation
 
-      await emailManager.sendEmailConfirmationMessage(user)
+      await this.emailManager.sendEmailConfirmationMessage(user)
 
       return {
          status: ResultStatus.NoContent,

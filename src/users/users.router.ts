@@ -9,10 +9,13 @@ import { UsersController } from './users.controller'
 import { UsersRepository } from './users.repository'
 import { UsersService } from './users.service'
 import { UsersQueryRepository } from './users.query-repository'
+import { BcryptService } from '../auth/adapters/bcrypt.service'
 
+const bcryptService = new BcryptService()
 const usersRepository = new UsersRepository()
-const usersService = new UsersService(usersRepository)
 const usersQueryRepository = new UsersQueryRepository()
+
+const usersService = new UsersService(usersRepository, bcryptService)
 
 const usersController = new UsersController(usersService, usersQueryRepository)
 

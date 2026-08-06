@@ -1,10 +1,13 @@
 import { UserDb, UserInput, UserView } from './users.types'
 import { UsersRepository } from './users.repository'
-import { bcryptService } from '../auth/adapters/bcrypt.service'
 import { Result, ResultStatus } from '../core/result/result.types'
+import { BcryptService } from '../auth/adapters/bcrypt.service'
 
 export class UsersService {
-   constructor(protected usersRepository: UsersRepository) {}
+   constructor(
+      protected usersRepository: UsersRepository,
+      protected bcryptService: BcryptService,
+   ) {}
 
    async createUser(input: UserInput): Promise<Result<UserView>> {
       const userByLogin = await this.usersRepository.findByLogin(input.login)
@@ -37,7 +40,7 @@ export class UsersService {
          }
       }
 
-      const passwordHash = await bcryptService.generateHash(input.password)
+      const passwordHash = await this.bcryptService.generateHash(input.password)
 
       const newUser: UserDb = {
          login: input.login,

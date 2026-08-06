@@ -8,13 +8,13 @@ type RefreshTokenPayload = JwtPayload & {
    exp: number
 }
 
-export const jwtService = {
+export class JwtService {
    async createAccessToken(userId: string): Promise<string> {
       const token = jwt.sign({ userId }, ACCESS_SECRET, {
          expiresIn: Number(ACCESS_TIME),
       })
       return token
-   },
+   }
 
    async createRefreshToken(userId: string, deviceId: string): Promise<string> {
       const token = jwt.sign({ userId, deviceId }, REFRESH_SECRET, {
@@ -22,7 +22,7 @@ export const jwtService = {
       })
 
       return token
-   },
+   }
 
    async getUserIdByAccessToken(accessToken: string): Promise<string | null> {
       try {
@@ -41,7 +41,7 @@ export const jwtService = {
       } catch {
          return null
       }
-   },
+   }
 
    async getRefreshTokenPayload(refreshToken: string): Promise<RefreshTokenPayload | null> {
       try {
@@ -64,7 +64,7 @@ export const jwtService = {
       } catch {
          return null
       }
-   },
+   }
 
    /*async decodeToken(token: string): Promise<any> {
      try {

@@ -4,7 +4,7 @@ import { postCollection } from '../db/mongo.db'
 import { mapperPostView } from './mappers/mapper-post.view'
 import { Filter, ObjectId } from 'mongodb'
 
-export const postsQueryRepository = {
+export class PostsQueryRepository {
    async findAll(query: PostsQuery): Promise<PostsQueryOutput> {
       const skip = (query.pageNumber - 1) * query.pageSize
 
@@ -24,7 +24,7 @@ export const postsQueryRepository = {
          totalCount,
          items: posts.map(mapperPostView),
       }
-   },
+   }
 
    async findById(id: string): Promise<PostView | null> {
       if (!ObjectId.isValid(id)) {
@@ -38,7 +38,7 @@ export const postsQueryRepository = {
       }
 
       return mapperPostView(post)
-   },
+   }
 
    async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<PostsQueryOutput> {
       const filter: Filter<PostDb> = { blogId }
@@ -61,5 +61,5 @@ export const postsQueryRepository = {
          totalCount,
          items: posts.map(mapperPostView),
       }
-   },
+   }
 }

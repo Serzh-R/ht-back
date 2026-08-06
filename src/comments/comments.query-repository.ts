@@ -4,7 +4,7 @@ import { CommentsQuery, CommentsQueryOutput } from '../core/types/query.types'
 import { CommentDb, CommentView } from './comments.types'
 import { mapperCommentView } from './mappers/mapper-comment.view'
 
-export const commentsQueryRepository = {
+export class CommentsQueryRepository {
    async findById(id: string): Promise<CommentView | null> {
       if (!ObjectId.isValid(id)) {
          return null
@@ -17,7 +17,7 @@ export const commentsQueryRepository = {
       }
 
       return mapperCommentView(comment)
-   },
+   }
 
    async findCommentsByPostId(postId: string, query: CommentsQuery): Promise<CommentsQueryOutput> {
       const filter: Filter<CommentDb> = { postId }
@@ -40,5 +40,5 @@ export const commentsQueryRepository = {
          totalCount,
          items: comments.map(mapperCommentView),
       }
-   },
+   }
 }

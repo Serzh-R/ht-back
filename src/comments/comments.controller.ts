@@ -1,13 +1,18 @@
 import { Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import { CommentInput, CommentView } from './comments.types'
-import { commentsQueryRepository } from './comments.query-repository'
-import { commentsService } from './comments.service'
 import { ResultStatus } from '../core/result/result.types'
+import { CommentsService } from './comments.service'
+import { CommentsQueryRepository } from './comments.query-repository'
 
-export const commentsController = {
+export class CommentsController {
+   constructor(
+      protected commentsService: CommentsService,
+      protected commentsQueryRepository: CommentsQueryRepository,
+   ) {}
+
    async getCommentById(req: Request<{ id: string }>, res: Response<CommentView>) {
-      const comment = await commentsQueryRepository.findById(req.params.id)
+      const comment = await this.commentsQueryRepository.findById(req.params.id)
 
       if (!comment) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -15,7 +20,7 @@ export const commentsController = {
       }
 
       res.status(HTTP_STATUSES.OK_200).json(comment)
-   },
+   }
 
    async updateComment(req: Request<{ commentId: string }, {}, CommentInput>, res: Response) {
       if (!req.userId) {
@@ -23,7 +28,11 @@ export const commentsController = {
          return
       }
 
-      const result = await commentsService.updateComment(req.params.commentId, req.body, req.userId)
+      const result = await this.commentsService.updateComment(
+         req.params.commentId,
+         req.body,
+         req.userId,
+      )
 
       if (result.status === ResultStatus.NotFound) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -36,7 +45,7 @@ export const commentsController = {
       }
 
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-   },
+   }
 
    async deleteComment(req: Request<{ commentId: string }>, res: Response) {
       if (!req.userId) {
@@ -44,7 +53,7 @@ export const commentsController = {
          return
       }
 
-      const result = await commentsService.deleteComment(req.params.commentId, req.userId)
+      const result = await this.commentsService.deleteComment(req.params.commentId, req.userId)
 
       if (result.status === ResultStatus.NotFound) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -57,5 +66,5 @@ export const commentsController = {
       }
 
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-   },
+   }
 }

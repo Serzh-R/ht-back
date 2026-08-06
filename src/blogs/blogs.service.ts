@@ -1,10 +1,13 @@
 import { BlogInput, BlogView } from './blogs.types'
-import { postsRepository } from '../posts/posts.repository'
 import { BlogPostInput, PostView } from '../posts/posts.types'
 import { BlogsRepository } from './blogs.repository'
+import { PostsRepository } from '../posts/posts.repository'
 
 export class BlogsService {
-   constructor(protected blogsRepository: BlogsRepository) {}
+   constructor(
+      protected blogsRepository: BlogsRepository,
+      protected postsRepository: PostsRepository,
+   ) {}
 
    async createBlog(input: BlogInput): Promise<BlogView> {
       return this.blogsRepository.create(input)
@@ -17,7 +20,7 @@ export class BlogsService {
          return false
       }
 
-      await postsRepository.updateBlogNameForPosts(id, input.name)
+      await this.postsRepository.updateBlogNameForPosts(id, input.name)
 
       return true
    }
@@ -29,7 +32,7 @@ export class BlogsService {
          return null
       }
 
-      return postsRepository.create(
+      return this.postsRepository.create(
          {
             title: input.title,
             shortDescription: input.shortDescription,
@@ -47,7 +50,7 @@ export class BlogsService {
          return false
       }
 
-      await postsRepository.deletePostsByBlogId(id)
+      await this.postsRepository.deletePostsByBlogId(id)
 
       return true
    }

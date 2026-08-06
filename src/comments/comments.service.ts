@@ -1,15 +1,22 @@
 import { CommentInput, CommentView } from './comments.types'
-import { commentsRepository } from './comments.repository'
 import { Result, ResultStatus } from '../core/result/result.types'
-import { postsQueryRepository } from '../posts/posts.query-repository'
+import { CommentsRepository } from './comments.repository'
+import { PostsQueryRepository } from '../posts/posts.query-repository'
+import { UsersRepository } from '../users/users.repository'
 
-export const commentsService = {
+export class CommentsService {
+   constructor(
+      protected commentsRepository: CommentsRepository,
+      protected postsQueryRepository: PostsQueryRepository,
+      protected usersRepository: UsersRepository,
+   ) {}
+
    async createComment(
       input: CommentInput,
       postId: string,
       userId: string,
    ): Promise<Result<CommentView>> {
-      const post = await postsQueryRepository.findById(postId)
+      const post = await this.postsQueryRepository.findById(postId)
 
       if (!post) {
          return {
@@ -19,7 +26,7 @@ export const commentsService = {
          }
       }
 
-      const user = await usersRepository.findById(userId)
+      const user = await this.usersRepository.findById(userId)
 
       if (!user) {
          return {
@@ -29,7 +36,7 @@ export const commentsService = {
          }
       }
 
-      const createdComment = await commentsRepository.create(input, postId, {
+      const createdComment = await this.commentsRepository.create(input, postId, {
          userId,
          userLogin: user.login,
       })
@@ -39,24 +46,10 @@ export const commentsService = {
          extensions: [],
          data: createdComment,
       }
-   },
-
-   /*async createComment(
-      input: CommentInput,
-      postId: string,
-      commentatorInfo: CommentatorInfo,
-   ): Promise<Result<CommentView>> {
-      const createdComment = await commentsRepository.create(input, postId, commentatorInfo)
-
-      return {
-         status: ResultStatus.Created,
-         extensions: [],
-         data: createdComment,
-      }
-   },*/
+   }
 
    async updateComment(commentId: string, input: CommentInput, userId: string): Promise<Result> {
-      const comment = await commentsRepository.findById(commentId)
+      const comment = await this.commentsRepository.findById(commentId)
 
       if (!comment) {
          return {
@@ -74,7 +67,7 @@ export const commentsService = {
          }
       }
 
-      const isUpdated = await commentsRepository.update(commentId, input.content)
+      const isUpdated = await this.commentsRepository.update(commentId, input.content)
 
       if (!isUpdated) {
          return {
@@ -89,10 +82,10 @@ export const commentsService = {
          extensions: [],
          data: null,
       }
-   },
+   }
 
    async deleteComment(commentId: string, userId: string): Promise<Result> {
-      const comment = await commentsRepository.findById(commentId)
+      const comment = await this.commentsRepository.findById(commentId)
 
       if (!comment) {
          return {
@@ -110,7 +103,7 @@ export const commentsService = {
          }
       }
 
-      const isDeleted = await commentsRepository.delete(commentId)
+      const isDeleted = await this.commentsRepository.delete(commentId)
 
       if (!isDeleted) {
          return {
@@ -125,5 +118,19 @@ export const commentsService = {
          extensions: [],
          data: null,
       }
-   },
+   }
 }
+
+/*async createComment(
+      input: CommentInput,
+      postId: string,
+      commentatorInfo: CommentatorInfo,
+   ): Promise<Result<CommentView>> {
+      const createdComment = await commentsRepository.create(input, postId, commentatorInfo)
+
+      return {
+         status: ResultStatus.Created,
+         extensions: [],
+         data: createdComment,
+      }
+   },*/

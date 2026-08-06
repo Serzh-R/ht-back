@@ -5,14 +5,15 @@ import { BlogsQueryInput, PostsByBlogQueryInput } from '../core/types/query.type
 import { Paginator } from '../core/types/paginator.types'
 import { normalizeBlogsQuery, normalizePostsQuery } from '../core/helpers/query-normalizers'
 import { BlogPostInput, PostView } from '../posts/posts.types'
-import { postsQueryRepository } from '../posts/posts.query-repository'
 import { BlogsService } from './blogs.service'
 import { BlogsQueryRepository } from './blogs.query-repository'
+import { PostsQueryRepository } from '../posts/posts.query-repository'
 
 export class BlogsController {
    constructor(
       protected blogsService: BlogsService,
       protected blogsQueryRepository: BlogsQueryRepository,
+      protected postsQueryRepository: PostsQueryRepository,
    ) {}
 
    async getBlogs(
@@ -52,7 +53,7 @@ export class BlogsController {
 
       const query = normalizePostsQuery(req.query)
 
-      const posts = await postsQueryRepository.findPostsByBlogId(blogId, query)
+      const posts = await this.postsQueryRepository.findPostsByBlogId(blogId, query)
 
       res.status(HTTP_STATUSES.OK_200).send(posts)
    }

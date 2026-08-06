@@ -3,14 +3,14 @@ import { commentCollection } from '../db/mongo.db'
 import { CommentDb, CommentInput, CommentatorInfo, CommentView } from './comments.types'
 import { mapperCommentView } from './mappers/mapper-comment.view'
 
-export const commentsRepository = {
+export class CommentsRepository {
    async findById(id: string): Promise<WithId<CommentDb> | null> {
       if (!ObjectId.isValid(id)) {
          return null
       }
 
       return commentCollection.findOne({ _id: new ObjectId(id) })
-   },
+   }
 
    async create(
       input: CommentInput,
@@ -35,7 +35,7 @@ export const commentsRepository = {
       }
 
       return mapperCommentView(createdComment)
-   },
+   }
 
    async update(id: string, content: string): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
@@ -52,7 +52,7 @@ export const commentsRepository = {
       )
 
       return result.matchedCount === 1
-   },
+   }
 
    async delete(id: string): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
@@ -64,5 +64,5 @@ export const commentsRepository = {
       })
 
       return result.deletedCount === 1
-   },
+   }
 }

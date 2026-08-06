@@ -1,7 +1,9 @@
 import request from 'supertest'
 import { Express } from 'express'
 import { SETTINGS } from '../../src/core/settings'
-import { usersRepository } from '../../src/composition-root'
+import { UsersRepository } from '../../src/users/users.repository'
+
+const usersRepository = new UsersRepository()
 
 export async function confirmTestUserEmail(app: Express, email: string) {
    const user = await usersRepository.findByEmail(email)

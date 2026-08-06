@@ -9,7 +9,9 @@ import { emailManager } from '../../src/email/email.manager'
 import { registerTestUser } from '../helpers/register-test-user'
 import { correctUserData } from '../helpers/test-data'
 import { confirmTestUserEmail } from '../helpers/confirm-test-user-email'
-import { usersRepository } from '../../src/composition-root'
+import { UsersRepository } from '../../src/users/users.repository'
+
+const usersRepository = new UsersRepository()
 
 const app = createApp()
 

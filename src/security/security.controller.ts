@@ -4,11 +4,14 @@ import { ResultStatus } from '../core/result/result.types'
 import { DeviceViewModel } from './security.types'
 import { SecurityService } from './security.service'
 import { SecurityQueryRepository } from './security.query-repository'
+import { inject, injectable } from 'inversify'
+import { SecurityRepository } from './security.repository'
 
+@injectable()
 export class SecurityController {
    constructor(
-      protected securityService: SecurityService,
-      protected securityQueryRepository: SecurityQueryRepository,
+      @inject(SecurityService) private securityService: SecurityService,
+      @inject(SecurityQueryRepository) private securityQueryRepository: SecurityQueryRepository,
    ) {}
 
    async getDevices(req: Request, res: Response<DeviceViewModel[]>) {

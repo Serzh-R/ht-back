@@ -2,7 +2,9 @@ import { PostDb, PostInput, PostView } from './posts.types'
 import { postCollection } from '../db/mongo.db'
 import { mapperPostView } from './mappers/mapper-post.view'
 import { ObjectId } from 'mongodb'
+import { injectable } from 'inversify'
 
+@injectable()
 export class PostsRepository {
    async create(input: PostInput, blogName: string): Promise<PostView> {
       const newPost: PostDb = {

@@ -8,12 +8,15 @@ import { BlogPostInput, PostView } from '../posts/posts.types'
 import { BlogsService } from './blogs.service'
 import { BlogsQueryRepository } from './blogs.query-repository'
 import { PostsQueryRepository } from '../posts/posts.query-repository'
+import { inject, injectable } from 'inversify'
+import { BlogsRepository } from './blogs.repository'
 
+@injectable()
 export class BlogsController {
    constructor(
-      protected blogsService: BlogsService,
-      protected blogsQueryRepository: BlogsQueryRepository,
-      protected postsQueryRepository: PostsQueryRepository,
+      @inject(BlogsService) private blogsService: BlogsService,
+      @inject(BlogsQueryRepository) private blogsQueryRepository: BlogsQueryRepository,
+      @inject(PostsQueryRepository) private postsQueryRepository: PostsQueryRepository,
    ) {}
 
    async getBlogs(

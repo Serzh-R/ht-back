@@ -1,12 +1,15 @@
 import { NextFunction, Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import { RateLimitRepository } from './rate-limit.repository'
+import { inject, injectable } from 'inversify'
+import { PostsService } from '../posts/posts.service'
 
 const REQUEST_LIMIT = 5
 const TIME_WINDOW_IN_SECONDS = 10
 
+@injectable()
 export class RateLimitMiddleware {
-   constructor(protected rateLimitRepository: RateLimitRepository) {}
+   constructor(@inject(RateLimitRepository) private rateLimitRepository: RateLimitRepository) {}
 
    async checkRateLimit(req: Request, res: Response, next: NextFunction) {
       const ip = req.ip ?? 'Unknown IP'

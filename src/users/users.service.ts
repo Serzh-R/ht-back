@@ -2,11 +2,13 @@ import { UserDb, UserInput, UserView } from './users.types'
 import { UsersRepository } from './users.repository'
 import { Result, ResultStatus } from '../core/result/result.types'
 import { BcryptService } from '../auth/adapters/bcrypt.service'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class UsersService {
    constructor(
-      protected usersRepository: UsersRepository,
-      protected bcryptService: BcryptService,
+      @inject(UsersRepository) private usersRepository: UsersRepository,
+      @inject(BcryptService) private bcryptService: BcryptService,
    ) {}
 
    async createUser(input: UserInput): Promise<Result<UserView>> {

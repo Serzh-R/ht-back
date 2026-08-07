@@ -12,12 +12,14 @@ import { RegConfirmCode } from './auth.types'
 import { RegEmailResending } from './auth.types'
 import { BcryptService } from './adapters/bcrypt.service'
 import { createPasswordRecovery } from './helpers/create-password-recovery'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class AuthService {
    constructor(
-      protected usersRepository: UsersRepository,
-      protected bcryptService: BcryptService,
-      protected emailManager: EmailManager,
+      @inject(UsersRepository) private usersRepository: UsersRepository,
+      @inject(BcryptService) private bcryptService: BcryptService,
+      @inject(EmailManager) private emailManager: EmailManager,
    ) {}
 
    async checkCredentials(input: LoginInputModel): Promise<Result<UserDb>> {

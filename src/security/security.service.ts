@@ -1,8 +1,10 @@
 import { Result, ResultStatus } from '../core/result/result.types'
 import { SecurityRepository } from './security.repository'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class SecurityService {
-   constructor(protected securityRepository: SecurityRepository) {}
+   constructor(@inject(SecurityRepository) private securityRepository: SecurityRepository) {}
 
    async deleteOtherSessions(userId: string, currentDeviceId: string): Promise<Result> {
       await this.securityRepository.deleteOtherSessions(userId, currentDeviceId)

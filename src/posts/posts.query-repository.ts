@@ -3,7 +3,9 @@ import { PostDb, PostView } from './posts.types'
 import { postCollection } from '../db/mongo.db'
 import { mapperPostView } from './mappers/mapper-post.view'
 import { Filter, ObjectId } from 'mongodb'
+import { injectable } from 'inversify'
 
+@injectable()
 export class PostsQueryRepository {
    async findAll(query: PostsQuery): Promise<PostsQueryOutput> {
       const skip = (query.pageNumber - 1) * query.pageSize

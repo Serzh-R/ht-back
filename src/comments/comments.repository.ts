@@ -2,7 +2,9 @@ import { ObjectId, WithId } from 'mongodb'
 import { commentCollection } from '../db/mongo.db'
 import { CommentDb, CommentInput, CommentatorInfo, CommentView } from './comments.types'
 import { mapperCommentView } from './mappers/mapper-comment.view'
+import { injectable } from 'inversify'
 
+@injectable()
 export class CommentsRepository {
    async findById(id: string): Promise<WithId<CommentDb> | null> {
       if (!ObjectId.isValid(id)) {

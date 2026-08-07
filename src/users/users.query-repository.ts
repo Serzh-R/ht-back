@@ -3,7 +3,9 @@ import { userCollection } from '../db/mongo.db'
 import { UserDb } from './users.types'
 import { UsersQuery, UsersQueryOutput } from '../core/types/query.types'
 import { mapperUserView } from './mappers/mapper-user.view'
+import { injectable } from 'inversify'
 
+@injectable()
 export class UsersQueryRepository {
    async findAll(query: UsersQuery): Promise<UsersQueryOutput> {
       const filter: Filter<UserDb> = {}

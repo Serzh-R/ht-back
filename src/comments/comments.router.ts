@@ -2,25 +2,10 @@ import { Router } from 'express'
 import { jwtAccessAuthMiddleware } from '../auth/middlewares/jwt-access-auth.middleware'
 import { commentFieldsValidator } from '../core/middlewares/validation/fieldValidators'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
-import { CommentsRepository } from './comments.repository'
-import { CommentsQueryRepository } from './comments.query-repository'
-import { PostsQueryRepository } from '../posts/posts.query-repository'
-import { UsersRepository } from '../users/users.repository'
-import { CommentsService } from './comments.service'
 import { CommentsController } from './comments.controller'
+import { container } from '../composition-root'
 
-const commentsRepository = new CommentsRepository()
-const commentsQueryRepository = new CommentsQueryRepository()
-const postsQueryRepository = new PostsQueryRepository()
-const usersRepository = new UsersRepository()
-
-const commentsService = new CommentsService(
-   commentsRepository,
-   postsQueryRepository,
-   usersRepository,
-)
-
-const commentsController = new CommentsController(commentsService, commentsQueryRepository)
+const commentsController = container.get(CommentsController)
 
 export const commentsRouter = Router()
 

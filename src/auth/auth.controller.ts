@@ -17,13 +17,15 @@ import { resultCodeToHttpException } from '../core/result/result-code-to-http-ex
 import { randomUUID } from 'crypto'
 import { SecurityRepository } from '../security/security.repository'
 import { JwtService } from './adapters/jwt.service'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class AuthController {
    constructor(
-      protected usersRepository: UsersRepository,
-      protected authService: AuthService,
-      protected securityRepository: SecurityRepository,
-      protected jwtService: JwtService,
+      @inject(UsersRepository) private usersRepository: UsersRepository,
+      @inject(AuthService) private authService: AuthService,
+      @inject(SecurityRepository) private securityRepository: SecurityRepository,
+      @inject(JwtService) private jwtService: JwtService,
    ) {}
 
    async login(req: Request<{}, {}, LoginInputModel>, res: Response<LoginSuccessViewModel>) {

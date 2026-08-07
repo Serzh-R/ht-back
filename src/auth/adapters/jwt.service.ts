@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { ACCESS_SECRET, ACCESS_TIME, REFRESH_SECRET, REFRESH_TIME } from '../../core/settings'
+import { injectable } from 'inversify'
 
 type RefreshTokenPayload = JwtPayload & {
    userId: string
@@ -8,6 +9,7 @@ type RefreshTokenPayload = JwtPayload & {
    exp: number
 }
 
+@injectable()
 export class JwtService {
    async createAccessToken(userId: string): Promise<string> {
       const token = jwt.sign({ userId }, ACCESS_SECRET, {

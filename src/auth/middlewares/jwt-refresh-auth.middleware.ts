@@ -3,10 +3,11 @@ import { HTTP_STATUSES } from '../../core/settings'
 import { JwtService } from '../adapters/jwt.service'
 import { UsersRepository } from '../../users/users.repository'
 import { SecurityRepository } from '../../security/security.repository'
+import { container } from '../../composition-root'
 
-const jwtService = new JwtService()
-const usersRepository = new UsersRepository()
-const securityRepository = new SecurityRepository()
+const jwtService = container.get(JwtService)
+const usersRepository = container.get(UsersRepository)
+const securityRepository = container.get(SecurityRepository)
 
 export const jwtRefreshAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
    const refreshToken = req.cookies.refreshToken

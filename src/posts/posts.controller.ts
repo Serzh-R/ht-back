@@ -11,13 +11,16 @@ import { PostsService } from './posts.service'
 import { PostsQueryRepository } from './posts.query-repository'
 import { CommentsService } from '../comments/comments.service'
 import { CommentsQueryRepository } from '../comments/comments.query-repository'
+import { inject, injectable } from 'inversify'
+import { BlogsRepository } from '../blogs/blogs.repository'
 
+@injectable()
 export class PostsController {
    constructor(
-      protected postsService: PostsService,
-      protected postsQueryRepository: PostsQueryRepository,
-      protected commentsService: CommentsService,
-      protected commentsQueryRepository: CommentsQueryRepository,
+      @inject(PostsService) private postsService: PostsService,
+      @inject(PostsQueryRepository) private postsQueryRepository: PostsQueryRepository,
+      @inject(CommentsService) private commentsService: CommentsService,
+      @inject(CommentsQueryRepository) private commentsQueryRepository: CommentsQueryRepository,
    ) {}
 
    async getPosts(

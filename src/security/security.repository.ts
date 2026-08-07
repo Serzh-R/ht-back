@@ -1,6 +1,8 @@
 import { deviceSessionCollection } from '../db/mongo.db'
 import { DeviceSessionDb } from './security.types'
+import { injectable } from 'inversify'
 
+@injectable()
 export class SecurityRepository {
    async createSession(session: DeviceSessionDb): Promise<void> {
       await deviceSessionCollection.insertOne(session)

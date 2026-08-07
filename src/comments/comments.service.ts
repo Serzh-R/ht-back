@@ -3,12 +3,14 @@ import { Result, ResultStatus } from '../core/result/result.types'
 import { CommentsRepository } from './comments.repository'
 import { PostsQueryRepository } from '../posts/posts.query-repository'
 import { UsersRepository } from '../users/users.repository'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class CommentsService {
    constructor(
-      protected commentsRepository: CommentsRepository,
-      protected postsQueryRepository: PostsQueryRepository,
-      protected usersRepository: UsersRepository,
+      @inject(CommentsRepository) private commentsRepository: CommentsRepository,
+      @inject(PostsQueryRepository) private postsQueryRepository: PostsQueryRepository,
+      @inject(UsersRepository) private usersRepository: UsersRepository,
    ) {}
 
    async createComment(

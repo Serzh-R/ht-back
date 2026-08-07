@@ -7,11 +7,13 @@ import { UserInput, UserView } from './users.types'
 import { Paginator } from '../core/types/paginator.types'
 import { UsersQueryInput } from '../core/types/query.types'
 import { normalizeUsersQuery } from '../core/helpers/query-normalizers'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class UsersController {
    constructor(
-      protected usersService: UsersService,
-      protected usersQueryRepository: UsersQueryRepository,
+      @inject(UsersService) private usersService: UsersService,
+      @inject(UsersQueryRepository) private usersQueryRepository: UsersQueryRepository,
    ) {}
 
    async getUsers(

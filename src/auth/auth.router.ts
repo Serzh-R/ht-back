@@ -11,34 +11,11 @@ import { errorsResultMiddleware } from '../core/middlewares/validation/errorsRes
 import { jwtAccessAuthMiddleware } from './middlewares/jwt-access-auth.middleware'
 import { jwtRefreshAuthMiddleware } from './middlewares/jwt-refresh-auth.middleware'
 import { AuthController } from './auth.controller'
-import { UsersRepository } from '../users/users.repository'
-import { AuthService } from './auth.service'
-import { SecurityRepository } from '../security/security.repository'
-import { RateLimitRepository } from '../rate-limit/rate-limit.repository'
 import { RateLimitMiddleware } from '../rate-limit/rate-limit.middleware'
-import { BcryptService } from './adapters/bcrypt.service'
-import { JwtService } from './adapters/jwt.service'
-import { EmailAdapter } from '../email/email.adapter'
-import { EmailManager } from '../email/email.manager'
+import { container } from '../composition-root'
 
-const usersRepository = new UsersRepository()
-const securityRepository = new SecurityRepository()
-const rateLimitRepository = new RateLimitRepository()
-const bcryptService = new BcryptService()
-const jwtService = new JwtService()
-
-const emailAdapter = new EmailAdapter()
-const emailManager = new EmailManager(emailAdapter)
-
-const rateLimitMiddleware = new RateLimitMiddleware(rateLimitRepository)
-const authService = new AuthService(usersRepository, bcryptService, emailManager)
-
-const authController = new AuthController(
-   usersRepository,
-   authService,
-   securityRepository,
-   jwtService,
-)
+const authController = container.get(AuthController)
+const rateLimitMiddleware = container.get(RateLimitMiddleware)
 
 export const authRouter = Router({})
 

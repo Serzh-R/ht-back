@@ -1,8 +1,10 @@
 import { UserDb } from '../users/users.types'
 import { EmailAdapter } from './email.adapter'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class EmailManager {
-   constructor(protected emailAdapter: EmailAdapter) {}
+   constructor(@inject(EmailAdapter) private emailAdapter: EmailAdapter) {}
 
    async sendEmailConfirmationMessage(user: UserDb) {
       const subject = 'Подтверждение регистрации'

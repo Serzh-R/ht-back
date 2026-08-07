@@ -1,7 +1,8 @@
 {
    // Visit https://aka.ms/tsconfig to read more about this file
    "compilerOptions": {
-      "target": "es2016",
+      //"target": "es2016",
+      "target": "ES2022",
       "module": "commonjs",
       "rootDir": ".",
       "outDir": "./dist",
@@ -12,7 +13,9 @@
       "forceConsistentCasingInFileNames": true,
       "strict": true,
       "skipLibCheck": true,
-      "types": ["node", "jest"]
+      "types": ["node", "jest"],
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true
 
       // File Layout
       // Environment Settings

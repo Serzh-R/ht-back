@@ -3,7 +3,9 @@ import { BlogDb, BlogView } from './blogs.types'
 import { blogCollection } from '../db/mongo.db'
 import { BlogsQuery, BlogsQueryOutput } from '../core/types/query.types'
 import { mapperBlogView } from './mappers/mapper-blog.view'
+import { injectable } from 'inversify'
 
+@injectable()
 export class BlogsQueryRepository {
    async findAll(query: BlogsQuery): Promise<BlogsQueryOutput> {
       const filter: Filter<BlogDb> = {}

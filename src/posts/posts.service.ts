@@ -1,11 +1,13 @@
 import { PostInput, PostView } from './posts.types'
 import { BlogsRepository } from '../blogs/blogs.repository'
 import { PostsRepository } from './posts.repository'
+import { inject, injectable } from 'inversify'
 
+@injectable()
 export class PostsService {
    constructor(
-      protected blogsRepository: BlogsRepository,
-      protected postsRepository: PostsRepository,
+      @inject(BlogsRepository) private blogsRepository: BlogsRepository,
+      @inject(PostsRepository) private postsRepository: PostsRepository,
    ) {}
 
    async createPost(input: PostInput): Promise<PostView | null> {

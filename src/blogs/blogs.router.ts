@@ -7,7 +7,10 @@ import {
 } from '../core/middlewares/validation/fieldValidators'
 import { authMiddleware } from '../auth/middlewares/auth.middleware'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
-import { blogsController } from '../composition-root'
+import { container } from '../composition-root'
+import { BlogsController } from './blogs.controller'
+
+const blogsController = container.get(BlogsController)
 
 export const blogsRouter = Router({})
 

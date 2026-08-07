@@ -2,7 +2,9 @@ import { userCollection } from '../db/mongo.db'
 import { ObjectId } from 'mongodb'
 import { UserDb, UserView } from './users.types'
 import { mapperUserView } from './mappers/mapper-user.view'
+import { injectable } from 'inversify'
 
+@injectable()
 export class UsersRepository {
    async findByLogin(login: string): Promise<UserDb | null> {
       return userCollection.findOne({ login })

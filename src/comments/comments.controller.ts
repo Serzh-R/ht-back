@@ -4,11 +4,14 @@ import { CommentInput, CommentView } from './comments.types'
 import { ResultStatus } from '../core/result/result.types'
 import { CommentsService } from './comments.service'
 import { CommentsQueryRepository } from './comments.query-repository'
+import { inject, injectable } from 'inversify'
+import { CommentsRepository } from './comments.repository'
 
+@injectable()
 export class CommentsController {
    constructor(
-      protected commentsService: CommentsService,
-      protected commentsQueryRepository: CommentsQueryRepository,
+      @inject(CommentsService) private commentsService: CommentsService,
+      @inject(CommentsQueryRepository) private commentsQueryRepository: CommentsQueryRepository,
    ) {}
 
    async getCommentById(req: Request<{ id: string }>, res: Response<CommentView>) {

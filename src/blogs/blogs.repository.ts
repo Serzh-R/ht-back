@@ -2,7 +2,9 @@ import { BlogDb, BlogInput, BlogView } from './blogs.types'
 import { blogCollection } from '../db/mongo.db'
 import { mapperBlogView } from './mappers/mapper-blog.view'
 import { ObjectId } from 'mongodb'
+import { injectable } from 'inversify'
 
+@injectable()
 export class BlogsRepository {
    async findById(id: string): Promise<BlogView | null> {
       if (!ObjectId.isValid(id)) {

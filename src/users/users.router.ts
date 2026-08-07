@@ -6,18 +6,9 @@ import {
 } from '../core/middlewares/validation/fieldValidators'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
 import { UsersController } from './users.controller'
-import { UsersRepository } from './users.repository'
-import { UsersService } from './users.service'
-import { UsersQueryRepository } from './users.query-repository'
-import { BcryptService } from '../auth/adapters/bcrypt.service'
+import { container } from '../composition-root'
 
-const bcryptService = new BcryptService()
-const usersRepository = new UsersRepository()
-const usersQueryRepository = new UsersQueryRepository()
-
-const usersService = new UsersService(usersRepository, bcryptService)
-
-const usersController = new UsersController(usersService, usersQueryRepository)
+const usersController = container.get(UsersController)
 
 export const usersRouter = Router({})
 

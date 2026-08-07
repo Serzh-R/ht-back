@@ -3,7 +3,9 @@ import { commentCollection } from '../db/mongo.db'
 import { CommentsQuery, CommentsQueryOutput } from '../core/types/query.types'
 import { CommentDb, CommentView } from './comments.types'
 import { mapperCommentView } from './mappers/mapper-comment.view'
+import { injectable } from 'inversify'
 
+@injectable()
 export class CommentsQueryRepository {
    async findById(id: string): Promise<CommentView | null> {
       if (!ObjectId.isValid(id)) {

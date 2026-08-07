@@ -1,7 +1,8 @@
 import { body, param } from 'express-validator'
 import { BlogsRepository } from '../../../blogs/blogs.repository'
+import { container } from '../../../composition-root'
 
-const blogsRepository = new BlogsRepository()
+const blogsRepository = container.get(BlogsRepository)
 
 export const idParamValidator = param('id')
    .isString()

@@ -26,6 +26,12 @@ describe('Auth API', () => {
    })
 
    beforeEach(async () => {
+      jest
+         .spyOn(EmailManager.prototype, 'sendEmailConfirmationMessage')
+         .mockResolvedValue(undefined)
+
+      jest.spyOn(EmailManager.prototype, 'sendPasswordRecoveryMessage').mockResolvedValue(undefined)
+
       await clearDb(app)
    })
 
@@ -312,9 +318,7 @@ describe('Auth API', () => {
    })
 
    it('should register user and confirm email; POST /auth/registration and POST /auth/registration-confirmation', async () => {
-      const sendEmailMock = jest
-         .spyOn(EmailManager.prototype, 'sendEmailConfirmationMessage')
-         .mockResolvedValue(undefined)
+      const sendEmailMock = jest.mocked(EmailManager.prototype.sendEmailConfirmationMessage)
 
       const registrationResponse = await registerTestUser(app, correctUserData)
 
@@ -453,9 +457,7 @@ describe('Auth API', () => {
    })
 
    it('should resend confirmation email for registered but not confirmed user; POST /auth/registration-email-resending', async () => {
-      const sendEmailMock = jest
-         .spyOn(EmailManager.prototype, 'sendEmailConfirmationMessage')
-         .mockResolvedValue(undefined)
+      const sendEmailMock = jest.mocked(EmailManager.prototype.sendEmailConfirmationMessage)
 
       await registerTestUser(app, correctUserData)
 
@@ -485,9 +487,7 @@ describe('Auth API', () => {
    })
 
    it('should not resend confirmation email if user is already confirmed; POST /auth/registration-email-resending', async () => {
-      const sendEmailMock = jest
-         .spyOn(EmailManager.prototype, 'sendEmailConfirmationMessage')
-         .mockResolvedValue(undefined)
+      const sendEmailMock = jest.mocked(EmailManager.prototype.sendEmailConfirmationMessage)
 
       await registerTestUser(app, correctUserData)
 
@@ -516,9 +516,7 @@ describe('Auth API', () => {
    })
 
    it('should not resend confirmation email for non-existing user; POST /auth/registration-email-resending', async () => {
-      const sendEmailMock = jest
-         .spyOn(EmailManager.prototype, 'sendEmailConfirmationMessage')
-         .mockResolvedValue(undefined)
+      const sendEmailMock = jest.mocked(EmailManager.prototype.sendEmailConfirmationMessage)
 
       const response = await request(app)
          .post(`${SETTINGS.PATH.AUTH}/registration-email-resending`)

@@ -685,4 +685,252 @@ describe('Auth API', () => {
          userId: user.id,
       })
    })
+
+   it('should create password recovery code for registered user; POST /auth/password-recovery', async () => {
+      const sendPasswordRecoveryMock = jest.mocked(
+         EmailManager.prototype.sendPasswordRecoveryMessage,
+      )
+
+      await registerTestUser(app, correctUserData)
+
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/password-recovery`).send({
+         email: correctUserData.email,
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.NO_CONTENT_204)
+
+      expect(sendPasswordRecoveryMock).toHaveBeenCalledTimes(1)
+
+      expect(sendPasswordRecoveryMock).toHaveBeenCalledWith(
+         correctUserData.email,
+         expect.any(String),
+      )
+
+      const user = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(user).not.toBeNull()
+      expect(user!.passwordRecovery).toBeDefined()
+
+      expect(user!.passwordRecovery!.recoveryCode).toEqual(expect.any(String))
+
+      expect(user!.passwordRecovery!.expirationDate).toBeInstanceOf(Date)
+   })
+
+   it('should return 204 if email is not registered; POST /auth/password-recovery', async () => {
+      const sendPasswordRecoveryMock = jest.mocked(
+         EmailManager.prototype.sendPasswordRecoveryMessage,
+      )
+
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/password-recovery`).send({
+         email: 'not-existing-user@mail.com',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.NO_CONTENT_204)
+
+      expect(sendPasswordRecoveryMock).not.toHaveBeenCalled()
+   })
+
+   it('should set new password by valid recovery code; POST /auth/new-password', async () => {
+      await registerTestUser(app, correctUserData)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
+         .send({
+            email: correctUserData.email,
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const userBeforePasswordChange = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(userBeforePasswordChange).not.toBeNull()
+      expect(userBeforePasswordChange!.passwordRecovery).toBeDefined()
+
+      const recoveryCode = userBeforePasswordChange!.passwordRecovery!.recoveryCode
+
+      const newPassword = 'newPassword123'
+
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
+         newPassword,
+         recoveryCode,
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.NO_CONTENT_204)
+
+      const userAfterPasswordChange = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(userAfterPasswordChange).not.toBeNull()
+
+      expect(userAfterPasswordChange!.passwordHash).not.toBe(userBeforePasswordChange!.passwordHash)
+
+      expect(userAfterPasswordChange!.passwordRecovery).toBeUndefined()
+   })
+
+   it('should login with new password after password recovery', async () => {
+      await registerTestUser(app, correctUserData)
+
+      await confirmTestUserEmail(app, correctUserData.email)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
+         .send({
+            email: correctUserData.email,
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const user = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(user).not.toBeNull()
+      expect(user!.passwordRecovery).toBeDefined()
+
+      const recoveryCode = user!.passwordRecovery!.recoveryCode
+
+      const newPassword = 'newPassword123'
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/new-password`)
+         .send({
+            newPassword,
+            recoveryCode,
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/login`)
+         .send({
+            loginOrEmail: correctUserData.login,
+            password: newPassword,
+         })
+         .expect(HTTP_STATUSES.OK_200)
+   })
+
+   it('should not set new password with incorrect recovery code; POST /auth/new-password', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
+         newPassword: 'newPassword123',
+         recoveryCode: 'incorrect-recovery-code',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'recoveryCode',
+            },
+         ],
+      })
+   })
+
+   it('should not use recovery code twice; POST /auth/new-password', async () => {
+      await registerTestUser(app, correctUserData)
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
+         .send({
+            email: correctUserData.email,
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const user = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(user).not.toBeNull()
+      expect(user!.passwordRecovery).toBeDefined()
+
+      const recoveryCode = user!.passwordRecovery!.recoveryCode
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/new-password`)
+         .send({
+            newPassword: 'newPassword123',
+            recoveryCode,
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const secondResponse = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
+         newPassword: 'anotherPassword123',
+         recoveryCode,
+      })
+
+      expect(secondResponse.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(secondResponse.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'recoveryCode',
+            },
+         ],
+      })
+   })
+
+   it('should not set new password with expired recovery code; POST /auth/new-password', async () => {
+      await registerTestUser(app, correctUserData)
+
+      const user = await usersRepository.findByEmail(correctUserData.email)
+
+      expect(user).not.toBeNull()
+      expect(user!._id).toBeDefined()
+
+      const expiredRecoveryCode = 'expired-recovery-code'
+
+      await usersRepository.updatePasswordRecoveryInfo(
+         user!._id!.toString(),
+         expiredRecoveryCode,
+         new Date(Date.now() - 1000),
+      )
+
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
+         newPassword: 'newPassword123',
+         recoveryCode: expiredRecoveryCode,
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'recoveryCode',
+            },
+         ],
+      })
+   })
+
+   it('should return 429 after more than 5 requests; POST /auth/password-recovery', async () => {
+      for (let i = 0; i < 5; i++) {
+         await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
+            .send({
+               email: 'not-existing-user@mail.com',
+            })
+            .expect(HTTP_STATUSES.NO_CONTENT_204)
+      }
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/password-recovery`)
+         .send({
+            email: 'not-existing-user@mail.com',
+         })
+         .expect(HTTP_STATUSES.TOO_MANY_REQUESTS_429)
+   })
+
+   it('should return 429 after more than 5 requests; POST /auth/new-password', async () => {
+      for (let i = 0; i < 5; i++) {
+         await request(app)
+            .post(`${SETTINGS.PATH.AUTH}/new-password`)
+            .send({
+               newPassword: 'newPassword123',
+               recoveryCode: 'incorrect-recovery-code',
+            })
+            .expect(HTTP_STATUSES.BAD_REQUEST_400)
+      }
+
+      await request(app)
+         .post(`${SETTINGS.PATH.AUTH}/new-password`)
+         .send({
+            newPassword: 'newPassword123',
+            recoveryCode: 'incorrect-recovery-code',
+         })
+         .expect(HTTP_STATUSES.TOO_MANY_REQUESTS_429)
+   })
 })

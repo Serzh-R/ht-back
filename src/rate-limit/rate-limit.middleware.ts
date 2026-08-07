@@ -27,7 +27,7 @@ export class RateLimitMiddleware {
       const requestsCount = await this.rateLimitRepository.countRequests(ip, url, fromDate)
 
       if (requestsCount > REQUEST_LIMIT) {
-         res.sendStatus(HTTP_STATUSES.TooManyRequests_429)
+         res.sendStatus(HTTP_STATUSES.TOO_MANY_REQUESTS_429)
          return
       }
 

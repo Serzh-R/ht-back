@@ -37,7 +37,7 @@ export const HTTP_STATUSES = {
    FORBIDDEN_403: 403,
    NOT_FOUND_404: 404,
    ConfirmCodeExpired_410: 410,
-   TooManyRequests_429: 429,
+   TOO_MANY_REQUESTS_429: 429,
 
    SERVER_ERROR_500: 500,
 }

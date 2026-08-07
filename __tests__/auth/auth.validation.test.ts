@@ -258,6 +258,94 @@ describe('Auth validation', () => {
          .expect(HTTP_STATUSES.UNAUTHORIZED_401)
    })
 
+   it('should not recover password with invalid email; POST /auth/password-recovery', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/password-recovery`).send({
+         email: '222^gmail.com',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+         ],
+      })
+   })
+
+   it('should not recover password with empty email; POST /auth/password-recovery', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/password-recovery`).send({
+         email: '',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'email',
+            },
+         ],
+      })
+   })
+
+   it('should not set too short new password; POST /auth/new-password', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
+         newPassword: '12345',
+         recoveryCode: 'some-recovery-code',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'newPassword',
+            },
+         ],
+      })
+   })
+
+   it('should not set too long new password; POST /auth/new-password', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
+         newPassword: '123456789012345678901',
+         recoveryCode: 'some-recovery-code',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'newPassword',
+            },
+         ],
+      })
+   })
+
+   it('should not set new password with empty recovery code; POST /auth/new-password', async () => {
+      const response = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
+         newPassword: 'newPassword123',
+         recoveryCode: '',
+      })
+
+      expect(response.status).toBe(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: expect.any(String),
+               field: 'recoveryCode',
+            },
+         ],
+      })
+   })
+
    it('should return 401 without Bearer token; GET /auth/me', async () => {
       await request(app).get(`${SETTINGS.PATH.AUTH}/me`).expect(HTTP_STATUSES.UNAUTHORIZED_401)
    })

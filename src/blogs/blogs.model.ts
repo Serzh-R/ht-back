@@ -10,8 +10,8 @@ const blogSchema = new Schema<Omit<BlogDb, '_id'>>(
       name: { type: String, required: true },
       description: { type: String, required: true },
       websiteUrl: { type: String, required: true },
-      createdAt: { type: Date, required: true, default: Date.now },
-      isMembership: { type: Boolean, required: true, default: false },
+      createdAt: { type: Date, required: true },
+      isMembership: { type: Boolean, required: true },
    },
    {
       collection: 'blogs',

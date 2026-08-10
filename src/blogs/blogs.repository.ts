@@ -3,6 +3,7 @@ import { blogCollection } from '../db/mongo.db'
 import { mapperBlogView } from './mappers/mapper-blog.view'
 import { ObjectId } from 'mongodb'
 import { injectable } from 'inversify'
+import { BlogDocument } from './blogs.model'
 
 @injectable()
 export class BlogsRepository {
@@ -20,7 +21,11 @@ export class BlogsRepository {
       return mapperBlogView(blog)
    }
 
-   async create(input: BlogInput): Promise<BlogView> {
+   async save(blog: BlogDocument): Promise<void> {
+      await blog.save()
+   }
+
+   /*async create(input: BlogInput): Promise<BlogView> {
       const newBlog: BlogDb = {
          name: input.name,
          description: input.description,
@@ -40,7 +45,7 @@ export class BlogsRepository {
       }
 
       return mapperBlogView(createdBlog)
-   }
+   }*/
 
    async update(id: string, input: BlogInput): Promise<boolean> {
       if (!ObjectId.isValid(id)) {

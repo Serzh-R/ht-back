@@ -27,11 +27,25 @@ export class BlogsService {
       return mapperBlogView(blog)
    }
 
-   /*async createBlog(input: BlogInput): Promise<BlogView> {
-      return this.blogsRepository.create(input)
-   }*/
-
    async updateBlog(id: string, input: BlogInput): Promise<boolean> {
+      const blog = await this.blogsRepository.findById(id)
+
+      if (!blog) {
+         return false
+      }
+
+      blog.name = input.name
+      blog.description = input.description
+      blog.websiteUrl = input.websiteUrl
+
+      await this.blogsRepository.save(blog)
+
+      await this.postsRepository.updateBlogNameForPosts(id, input.name)
+
+      return true
+   }
+
+   /*async updateBlog(id: string, input: BlogInput): Promise<boolean> {
       const isUpdated = await this.blogsRepository.update(id, input)
 
       if (!isUpdated) {
@@ -41,7 +55,7 @@ export class BlogsService {
       await this.postsRepository.updateBlogNameForPosts(id, input.name)
 
       return true
-   }
+   }*/
 
    async createPostByBlogId(blogId: string, input: BlogPostInput): Promise<PostView | null> {
       const blog = await this.blogsRepository.findById(blogId)
@@ -62,6 +76,20 @@ export class BlogsService {
    }
 
    async deleteBlogById(id: string): Promise<boolean> {
+      const blog = await this.blogsRepository.findById(id)
+
+      if (!blog) {
+         return false
+      }
+
+      await this.blogsRepository.delete(blog)
+
+      await this.postsRepository.deletePostsByBlogId(id)
+
+      return true
+   }
+
+   /*async deleteBlogById(id: string): Promise<boolean> {
       const isDeleted = await this.blogsRepository.delete(id)
 
       if (!isDeleted) {
@@ -71,5 +99,5 @@ export class BlogsService {
       await this.postsRepository.deletePostsByBlogId(id)
 
       return true
-   }
+   }*/
 }

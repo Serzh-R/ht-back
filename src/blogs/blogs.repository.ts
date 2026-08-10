@@ -1,13 +1,18 @@
-import { BlogDb, BlogInput, BlogView } from './blogs.types'
-import { blogCollection } from '../db/mongo.db'
-import { mapperBlogView } from './mappers/mapper-blog.view'
-import { ObjectId } from 'mongodb'
 import { injectable } from 'inversify'
-import { BlogDocument } from './blogs.model'
+import { Types } from 'mongoose'
+import { BlogDocument, BlogModel } from './blogs.model'
 
 @injectable()
 export class BlogsRepository {
-   async findById(id: string): Promise<BlogView | null> {
+   async findById(id: string): Promise<BlogDocument | null> {
+      if (!Types.ObjectId.isValid(id)) {
+         return null
+      }
+
+      return BlogModel.findById(id)
+   }
+
+   /*async findById(id: string): Promise<BlogView | null> {
       if (!ObjectId.isValid(id)) {
          return null
       }
@@ -19,35 +24,13 @@ export class BlogsRepository {
       }
 
       return mapperBlogView(blog)
-   }
+   }*/
 
    async save(blog: BlogDocument): Promise<void> {
       await blog.save()
    }
 
-   /*async create(input: BlogInput): Promise<BlogView> {
-      const newBlog: BlogDb = {
-         name: input.name,
-         description: input.description,
-         websiteUrl: input.websiteUrl,
-         createdAt: new Date(),
-         isMembership: false,
-      }
-
-      const result = await blogCollection.insertOne(newBlog)
-
-      const createdBlog = await blogCollection.findOne({
-         _id: result.insertedId,
-      })
-
-      if (!createdBlog) {
-         throw new Error('Blog was not created')
-      }
-
-      return mapperBlogView(createdBlog)
-   }*/
-
-   async update(id: string, input: BlogInput): Promise<boolean> {
+   /*async update(id: string, input: BlogInput): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
          return false
       }
@@ -64,9 +47,13 @@ export class BlogsRepository {
       )
 
       return result.matchedCount === 1
+   }*/
+
+   async delete(blog: BlogDocument): Promise<void> {
+      await blog.deleteOne()
    }
 
-   async delete(id: string): Promise<boolean> {
+   /*async delete(id: string): Promise<boolean> {
       if (!ObjectId.isValid(id)) {
          return false
       }
@@ -76,5 +63,5 @@ export class BlogsRepository {
       })
 
       return result.deletedCount === 1
-   }
+   }*/
 }

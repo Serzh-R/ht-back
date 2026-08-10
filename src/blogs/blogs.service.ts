@@ -45,18 +45,6 @@ export class BlogsService {
       return true
    }
 
-   /*async updateBlog(id: string, input: BlogInput): Promise<boolean> {
-      const isUpdated = await this.blogsRepository.update(id, input)
-
-      if (!isUpdated) {
-         return false
-      }
-
-      await this.postsRepository.updateBlogNameForPosts(id, input.name)
-
-      return true
-   }*/
-
    async createPostByBlogId(blogId: string, input: BlogPostInput): Promise<PostView | null> {
       const blog = await this.blogsRepository.findById(blogId)
 
@@ -88,16 +76,4 @@ export class BlogsService {
 
       return true
    }
-
-   /*async deleteBlogById(id: string): Promise<boolean> {
-      const isDeleted = await this.blogsRepository.delete(id)
-
-      if (!isDeleted) {
-         return false
-      }
-
-      await this.postsRepository.deletePostsByBlogId(id)
-
-      return true
-   }*/
 }

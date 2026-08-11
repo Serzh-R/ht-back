@@ -1,22 +1,20 @@
 import mongoose from 'mongoose'
 import { Collection } from 'mongodb'
 import { SETTINGS } from '../core/settings'
-import { BlogDb } from '../blogs/blogs.types'
-import { PostDb } from '../posts/posts.types'
 import { UserDb } from '../users/users.types'
 import { CommentDb } from '../comments/comments.types'
 import { DeviceSessionDb } from '../security/security.types'
 import { ApiRequestDb } from '../rate-limit/rate-limit.types'
 
-const BLOG_COLLECTION_NAME = 'blogs'
-const POST_COLLECTION_NAME = 'posts'
+//const BLOG_COLLECTION_NAME = 'blogs'
+//const POST_COLLECTION_NAME = 'posts'
 const USER_COLLECTION_NAME = 'users'
 const COMMENT_COLLECTION_NAME = 'comments'
 const DEVICE_SESSION_COLLECTION_NAME = 'device-sessions'
 const API_REQUEST_COLLECTION_NAME = 'api-requests'
 
-export let blogCollection: Collection<BlogDb>
-export let postCollection: Collection<PostDb>
+//export let blogCollection: Collection<BlogDb>
+//export let postCollection: Collection<PostDb>
 export let userCollection: Collection<UserDb>
 export let commentCollection: Collection<CommentDb>
 export let deviceSessionCollection: Collection<DeviceSessionDb>
@@ -34,8 +32,8 @@ export async function runDb(url: string): Promise<boolean> {
          throw new Error('Database connection is not initialized')
       }
 
-      blogCollection = db.collection<BlogDb>(BLOG_COLLECTION_NAME)
-      postCollection = db.collection<PostDb>(POST_COLLECTION_NAME)
+      //blogCollection = db.collection<BlogDb>(BLOG_COLLECTION_NAME)
+      //postCollection = db.collection<PostDb>(POST_COLLECTION_NAME)
       userCollection = db.collection<UserDb>(USER_COLLECTION_NAME)
       commentCollection = db.collection<CommentDb>(COMMENT_COLLECTION_NAME)
       deviceSessionCollection = db.collection<DeviceSessionDb>(DEVICE_SESSION_COLLECTION_NAME)

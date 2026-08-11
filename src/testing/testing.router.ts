@@ -2,18 +2,18 @@ import { Request, Response, Router } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import {
    apiRequestCollection,
-   blogCollection,
    commentCollection,
    deviceSessionCollection,
-   postCollection,
    userCollection,
 } from '../db/mongo.db'
+import { BlogModel } from '../blogs/blogs.model'
+import { PostModel } from '../posts/posts.model'
 
 export const testingRouter = Router({})
 
 testingRouter.delete('/', async (req: Request, res: Response) => {
-   await blogCollection.deleteMany({})
-   await postCollection.deleteMany({})
+   await BlogModel.deleteMany({})
+   await PostModel.deleteMany({})
    await userCollection.deleteMany({})
    await commentCollection.deleteMany({})
    await deviceSessionCollection.deleteMany({})

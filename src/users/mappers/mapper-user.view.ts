@@ -1,7 +1,7 @@
-import { UserDb, UserView } from '../users.types'
-import { WithId } from 'mongodb'
+import { UserView } from '../users.types'
+import { UserDocument } from '../users.model'
 
-export function mapperUserView(user: WithId<UserDb>): UserView {
+export function mapperUserView(user: UserDocument): UserView {
    return {
       id: user._id.toString(),
       login: user.login,

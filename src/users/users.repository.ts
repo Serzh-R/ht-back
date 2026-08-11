@@ -1,46 +1,46 @@
-import { userCollection } from '../db/mongo.db'
-import { ObjectId } from 'mongodb'
 import { UserDb, UserView } from './users.types'
 import { mapperUserView } from './mappers/mapper-user.view'
 import { injectable } from 'inversify'
+import { UserDocument, UserModel } from './users.model'
+import { Types } from 'mongoose'
 
 @injectable()
 export class UsersRepository {
-   async findByLogin(login: string): Promise<UserDb | null> {
-      return userCollection.findOne({ login })
+   async findByLogin(login: string): Promise<UserDocument | null> {
+      return UserModel.findOne({ login })
    }
 
-   async findByEmail(email: string): Promise<UserDb | null> {
-      return userCollection.findOne({ email })
+   async findByEmail(email: string): Promise<UserDocument | null> {
+      return UserModel.findOne({ email })
    }
 
-   async findByLoginOrEmail(loginOrEmail: string): Promise<UserDb | null> {
-      return userCollection.findOne({
+   async findByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
+      return UserModel.findOne({
          $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
       })
    }
 
-   async findById(id: string) {
-      if (!ObjectId.isValid(id)) {
+   async findById(id: string): Promise<UserDocument | null> {
+      if (!Types.ObjectId.isValid(id)) {
          return null
       }
 
-      return userCollection.findOne({ _id: new ObjectId(id) })
+      return UserModel.findById(id)
    }
 
-   async findByConfirmationCode(code: string): Promise<UserDb | null> {
-      return userCollection.findOne({
+   async findByConfirmationCode(code: string): Promise<UserDocument | null> {
+      return UserModel.findOne({
          'emailConfirmation.confirmationCode': code,
-      } as any)
+      })
    }
 
    async confirmEmail(userId: string): Promise<boolean> {
-      const result = await userCollection.updateOne(
-         { _id: new ObjectId(userId) },
+      const result = await UserModel.updateOne(
+         { _id: userId },
          {
             $set: {
                'emailConfirmation.isConfirmed': true,
-            } as any,
+            },
          },
       )
 
@@ -52,23 +52,23 @@ export class UsersRepository {
       confirmationCode: string,
       expirationDate: Date,
    ): Promise<boolean> {
-      const result = await userCollection.updateOne(
-         { _id: new ObjectId(userId) },
+      const result = await UserModel.updateOne(
+         { _id: userId },
          {
             $set: {
                'emailConfirmation.confirmationCode': confirmationCode,
                'emailConfirmation.expirationDate': expirationDate,
-            } as any,
+            },
          },
       )
 
       return result.matchedCount === 1
    }
 
-   async findByRecoveryCode(recoveryCode: string): Promise<UserDb | null> {
-      return userCollection.findOne({
+   async findByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
+      return UserModel.findOne({
          'passwordRecovery.recoveryCode': recoveryCode,
-      } as any)
+      })
    }
 
    async updatePasswordRecoveryInfo(
@@ -76,13 +76,13 @@ export class UsersRepository {
       recoveryCode: string,
       expirationDate: Date,
    ): Promise<boolean> {
-      if (!ObjectId.isValid(userId)) {
+      if (!Types.ObjectId.isValid(userId)) {
          return false
       }
 
-      const result = await userCollection.updateOne(
+      const result = await UserModel.updateOne(
          {
-            _id: new ObjectId(userId),
+            _id: userId,
          },
          {
             $set: {
@@ -90,7 +90,7 @@ export class UsersRepository {
                   recoveryCode,
                   expirationDate,
                },
-            } as any,
+            },
          },
       )
 
@@ -98,13 +98,13 @@ export class UsersRepository {
    }
 
    async updatePasswordHash(userId: string, passwordHash: string): Promise<boolean> {
-      if (!ObjectId.isValid(userId)) {
+      if (!Types.ObjectId.isValid(userId)) {
          return false
       }
 
-      const result = await userCollection.updateOne(
+      const result = await UserModel.updateOne(
          {
-            _id: new ObjectId(userId),
+            _id: userId,
          },
          {
             $set: {
@@ -113,33 +113,25 @@ export class UsersRepository {
             $unset: {
                passwordRecovery: '',
             },
-         } as any,
+         },
       )
 
       return result.matchedCount === 1
    }
 
    async create(newUser: UserDb): Promise<UserView> {
-      const result = await userCollection.insertOne(newUser)
-
-      const createdUser = await userCollection.findOne({
-         _id: result.insertedId,
-      })
-
-      if (!createdUser) {
-         throw new Error('User was not created')
-      }
+      const createdUser = await UserModel.create(newUser)
 
       return mapperUserView(createdUser)
    }
 
    async deleteById(id: string): Promise<boolean> {
-      if (!ObjectId.isValid(id)) {
+      if (!Types.ObjectId.isValid(id)) {
          return false
       }
 
-      const result = await userCollection.deleteOne({
-         _id: new ObjectId(id),
+      const result = await UserModel.deleteOne({
+         _id: id,
       })
 
       return result.deletedCount === 1

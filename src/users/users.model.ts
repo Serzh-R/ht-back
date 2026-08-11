@@ -22,14 +22,20 @@ const passwordRecoverySchema = new Schema<PasswordRecoveryInfo>(
    },
 )
 
-const userSchema = new Schema<UserDb>({
-   login: { type: String, required: true },
-   email: { type: String, required: true },
-   passwordHash: { type: String, required: true },
-   createdAt: { type: Date, required: true },
-   emailConfirmation: { type: emailConfirmationSchema, required: true },
-   passwordRecovery: { type: passwordRecoverySchema, required: false },
-})
+const userSchema = new Schema<UserDb>(
+   {
+      login: { type: String, required: true },
+      email: { type: String, required: true },
+      passwordHash: { type: String, required: true },
+      createdAt: { type: Date, required: true },
+      emailConfirmation: { type: emailConfirmationSchema, required: true },
+      passwordRecovery: { type: passwordRecoverySchema, required: false },
+   },
+   {
+      collection: 'users',
+      versionKey: false,
+   },
+)
 
 export type UserDocument = HydratedDocument<UserDb>
 

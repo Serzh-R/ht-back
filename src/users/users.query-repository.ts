@@ -1,16 +1,16 @@
-import { Filter } from 'mongodb'
-import { userCollection } from '../db/mongo.db'
-import { UserDb } from './users.types'
 import { UsersQuery, UsersQueryOutput } from '../core/types/query.types'
 import { mapperUserView } from './mappers/mapper-user.view'
+import { UserModel } from './users.model'
+import { UserDb } from './users.types'
 import { injectable } from 'inversify'
+import { QueryFilter } from 'mongoose'
 
 @injectable()
 export class UsersQueryRepository {
    async findAll(query: UsersQuery): Promise<UsersQueryOutput> {
-      const filter: Filter<UserDb> = {}
+      const filter: QueryFilter<UserDb> = {}
 
-      const searchConditions: Filter<UserDb>[] = []
+      const searchConditions: QueryFilter<UserDb>[] = []
 
       if (query.searchLoginTerm) {
          searchConditions.push({
@@ -36,14 +36,14 @@ export class UsersQueryRepository {
 
       const skip = (query.pageNumber - 1) * query.pageSize
 
-      const totalCount = await userCollection.countDocuments(filter)
+      const totalCount = await UserModel.countDocuments(filter)
 
-      const users = await userCollection
-         .find(filter)
-         .sort({ [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1 })
+      const users = await UserModel.find(filter)
+         .sort({
+            [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1,
+         })
          .skip(skip)
          .limit(query.pageSize)
-         .toArray()
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),

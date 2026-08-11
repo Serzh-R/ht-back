@@ -1,29 +1,34 @@
-import { Filter, ObjectId } from 'mongodb'
-import { BlogDb, BlogView } from './blogs.types'
-import { blogCollection } from '../db/mongo.db'
+import { BlogView } from './blogs.types'
 import { BlogsQuery, BlogsQueryOutput } from '../core/types/query.types'
+import { BlogModel } from './blogs.model'
 import { mapperBlogView } from './mappers/mapper-blog.view'
+import { Types } from 'mongoose'
 import { injectable } from 'inversify'
 
 @injectable()
 export class BlogsQueryRepository {
    async findAll(query: BlogsQuery): Promise<BlogsQueryOutput> {
-      const filter: Filter<BlogDb> = {}
+      let filter = {}
 
       if (query.searchNameTerm) {
-         filter.name = { $regex: query.searchNameTerm, $options: 'i' }
+         filter = {
+            name: {
+               $regex: query.searchNameTerm,
+               $options: 'i',
+            },
+         }
       }
 
       const skip = (query.pageNumber - 1) * query.pageSize
 
-      const totalCount = await blogCollection.countDocuments(filter)
+      const totalCount = await BlogModel.countDocuments(filter)
 
-      const blogs = await blogCollection
-         .find(filter)
-         .sort({ [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1 })
+      const blogs = await BlogModel.find(filter)
+         .sort({
+            [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1,
+         })
          .skip(skip)
          .limit(query.pageSize)
-         .toArray()
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),
@@ -35,11 +40,11 @@ export class BlogsQueryRepository {
    }
 
    async findById(id: string): Promise<BlogView | null> {
-      if (!ObjectId.isValid(id)) {
+      if (!Types.ObjectId.isValid(id)) {
          return null
       }
 
-      const blog = await blogCollection.findOne({ _id: new ObjectId(id) })
+      const blog = await BlogModel.findById(id)
 
       if (!blog) {
          return null

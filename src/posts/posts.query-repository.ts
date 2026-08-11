@@ -1,23 +1,21 @@
 import { PostsQuery, PostsQueryOutput } from '../core/types/query.types'
-import { PostDb, PostView } from './posts.types'
-import { postCollection } from '../db/mongo.db'
+import { PostView } from './posts.types'
 import { mapperPostView } from './mappers/mapper-post.view'
-import { Filter, ObjectId } from 'mongodb'
 import { injectable } from 'inversify'
+import { PostModel } from './posts.model'
+import { Types } from 'mongoose'
 
 @injectable()
 export class PostsQueryRepository {
    async findAll(query: PostsQuery): Promise<PostsQueryOutput> {
       const skip = (query.pageNumber - 1) * query.pageSize
 
-      const totalCount = await postCollection.countDocuments({})
+      const totalCount = await PostModel.countDocuments({})
 
-      const posts = await postCollection
-         .find({})
+      const posts = await PostModel.find({})
          .sort({ [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1 })
          .skip(skip)
          .limit(query.pageSize)
-         .toArray()
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),
@@ -29,11 +27,11 @@ export class PostsQueryRepository {
    }
 
    async findById(id: string): Promise<PostView | null> {
-      if (!ObjectId.isValid(id)) {
+      if (!Types.ObjectId.isValid(id)) {
          return null
       }
 
-      const post = await postCollection.findOne({ _id: new ObjectId(id) })
+      const post = await PostModel.findById(id)
 
       if (!post) {
          return null
@@ -43,18 +41,16 @@ export class PostsQueryRepository {
    }
 
    async findPostsByBlogId(blogId: string, query: PostsQuery): Promise<PostsQueryOutput> {
-      const filter: Filter<PostDb> = { blogId }
+      const filter = { blogId }
 
       const skip = (query.pageNumber - 1) * query.pageSize
 
-      const totalCount = await postCollection.countDocuments(filter)
+      const totalCount = await PostModel.countDocuments(filter)
 
-      const posts = await postCollection
-         .find(filter)
+      const posts = await PostModel.find(filter)
          .sort({ [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1 })
          .skip(skip)
          .limit(query.pageSize)
-         .toArray()
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),

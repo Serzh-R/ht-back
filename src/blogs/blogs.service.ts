@@ -5,6 +5,8 @@ import { PostsRepository } from '../posts/posts.repository'
 import { inject, injectable } from 'inversify'
 import { BlogModel } from './blogs.model'
 import { mapperBlogView } from './mappers/mapper-blog.view'
+import {PostModel} from '../posts/posts.model'
+import {mapperPostView} from '../posts/mappers/mapper-post.view'
 
 @injectable()
 export class BlogsService {
@@ -45,22 +47,28 @@ export class BlogsService {
       return true
    }
 
-   async createPostByBlogId(blogId: string, input: BlogPostInput): Promise<PostView | null> {
+   async createPostByBlogId(
+       blogId: string,
+       input: BlogPostInput,
+   ): Promise<PostView | null> {
       const blog = await this.blogsRepository.findById(blogId)
 
       if (!blog) {
          return null
       }
 
-      return this.postsRepository.create(
-         {
-            title: input.title,
-            shortDescription: input.shortDescription,
-            content: input.content,
-            blogId: blog.id,
-         },
-         blog.name,
-      )
+      const post = new PostModel()
+
+      post.title = input.title
+      post.shortDescription = input.shortDescription
+      post.content = input.content
+      post.blogId = blog._id.toString()
+      post.blogName = blog.name
+      post.createdAt = new Date()
+
+      await this.postsRepository.save(post)
+
+      return mapperPostView(post)
    }
 
    async deleteBlogById(id: string): Promise<boolean> {

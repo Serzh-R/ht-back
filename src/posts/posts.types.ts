@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongodb'
-
 export type PostInput = {
    title: string
    shortDescription: string
@@ -14,7 +12,6 @@ export type BlogPostInput = {
 }
 
 export type PostDb = {
-   _id?: ObjectId
    title: string
    shortDescription: string
    content: string

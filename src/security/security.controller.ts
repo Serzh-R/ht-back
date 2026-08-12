@@ -5,7 +5,6 @@ import { DeviceViewModel } from './security.types'
 import { SecurityService } from './security.service'
 import { SecurityQueryRepository } from './security.query-repository'
 import { inject, injectable } from 'inversify'
-import { SecurityRepository } from './security.repository'
 
 @injectable()
 export class SecurityController {

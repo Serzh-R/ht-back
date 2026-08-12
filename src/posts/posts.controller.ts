@@ -12,7 +12,6 @@ import { PostsQueryRepository } from './posts.query-repository'
 import { CommentsService } from '../comments/comments.service'
 import { CommentsQueryRepository } from '../comments/comments.query-repository'
 import { inject, injectable } from 'inversify'
-import { BlogsRepository } from '../blogs/blogs.repository'
 
 @injectable()
 export class PostsController {

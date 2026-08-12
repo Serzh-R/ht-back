@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { HTTP_STATUSES } from '../core/settings'
 import { RateLimitRepository } from './rate-limit.repository'
 import { inject, injectable } from 'inversify'
-import { PostsService } from '../posts/posts.service'
 
 const REQUEST_LIMIT = 5
 const TIME_WINDOW_IN_SECONDS = 10

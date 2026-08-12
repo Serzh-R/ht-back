@@ -9,7 +9,6 @@ import { BlogsService } from './blogs.service'
 import { BlogsQueryRepository } from './blogs.query-repository'
 import { PostsQueryRepository } from '../posts/posts.query-repository'
 import { inject, injectable } from 'inversify'
-import { BlogsRepository } from './blogs.repository'
 
 @injectable()
 export class BlogsController {

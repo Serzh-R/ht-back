@@ -5,7 +5,6 @@ import { ResultStatus } from '../core/result/result.types'
 import { CommentsService } from './comments.service'
 import { CommentsQueryRepository } from './comments.query-repository'
 import { inject, injectable } from 'inversify'
-import { CommentsRepository } from './comments.repository'
 
 @injectable()
 export class CommentsController {

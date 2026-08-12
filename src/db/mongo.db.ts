@@ -1,11 +1,5 @@
 import mongoose from 'mongoose'
-import { Collection } from 'mongodb'
 import { SETTINGS } from '../core/settings'
-import { ApiRequestDb } from '../rate-limit/rate-limit.types'
-
-const API_REQUEST_COLLECTION_NAME = 'api-requests'
-
-export let apiRequestCollection: Collection<ApiRequestDb>
 
 export async function runDb(url: string): Promise<boolean> {
    try {
@@ -19,18 +13,7 @@ export async function runDb(url: string): Promise<boolean> {
          throw new Error('Database connection is not initialized')
       }
 
-      apiRequestCollection = db.collection<ApiRequestDb>(API_REQUEST_COLLECTION_NAME)
-
       await db.command({ ping: 1 })
-
-      await apiRequestCollection.createIndex(
-         {
-            date: 1,
-         },
-         {
-            expireAfterSeconds: 10,
-         },
-      )
 
       console.log('✅ Connected to the database')
       return true
@@ -42,7 +25,6 @@ export async function runDb(url: string): Promise<boolean> {
    }
 }
 
-// для тестов
 export async function stopDb() {
    if (mongoose.connection.readyState === 0) {
       throw new Error('❌ No active connection')

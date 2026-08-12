@@ -4,6 +4,8 @@ import { CommentsRepository } from './comments.repository'
 import { PostsQueryRepository } from '../posts/posts.query-repository'
 import { UsersRepository } from '../users/users.repository'
 import { inject, injectable } from 'inversify'
+import { CommentModel } from './comments.model'
+import { mapperCommentView } from './mappers/mapper-comment.view'
 
 @injectable()
 export class CommentsService {
@@ -38,15 +40,22 @@ export class CommentsService {
          }
       }
 
-      const createdComment = await this.commentsRepository.create(input, postId, {
+      const comment = new CommentModel()
+
+      comment.content = input.content
+      comment.commentatorInfo = {
          userId,
          userLogin: user.login,
-      })
+      }
+      comment.postId = postId
+      comment.createdAt = new Date()
+
+      await this.commentsRepository.save(comment)
 
       return {
          status: ResultStatus.Created,
          extensions: [],
-         data: createdComment,
+         data: mapperCommentView(comment),
       }
    }
 
@@ -69,15 +78,9 @@ export class CommentsService {
          }
       }
 
-      const isUpdated = await this.commentsRepository.update(commentId, input.content)
+      comment.content = input.content
 
-      if (!isUpdated) {
-         return {
-            status: ResultStatus.NotFound,
-            extensions: [],
-            data: null,
-         }
-      }
+      await this.commentsRepository.save(comment)
 
       return {
          status: ResultStatus.NoContent,
@@ -105,15 +108,7 @@ export class CommentsService {
          }
       }
 
-      const isDeleted = await this.commentsRepository.delete(commentId)
-
-      if (!isDeleted) {
-         return {
-            status: ResultStatus.NotFound,
-            extensions: [],
-            data: null,
-         }
-      }
+      await this.commentsRepository.delete(comment)
 
       return {
          status: ResultStatus.NoContent,
@@ -122,17 +117,3 @@ export class CommentsService {
       }
    }
 }
-
-/*async createComment(
-      input: CommentInput,
-      postId: string,
-      commentatorInfo: CommentatorInfo,
-   ): Promise<Result<CommentView>> {
-      const createdComment = await commentsRepository.create(input, postId, commentatorInfo)
-
-      return {
-         status: ResultStatus.Created,
-         extensions: [],
-         data: createdComment,
-      }
-   },*/

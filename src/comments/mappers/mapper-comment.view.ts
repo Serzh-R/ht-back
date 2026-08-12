@@ -1,7 +1,7 @@
-import { WithId } from 'mongodb'
-import { CommentDb, CommentView } from '../comments.types'
+import { CommentView } from '../comments.types'
+import { CommentDocument } from '../comments.model'
 
-export const mapperCommentView = (comment: WithId<CommentDb>): CommentView => {
+export const mapperCommentView = (comment: CommentDocument): CommentView => {
    return {
       id: comment._id.toString(),
       content: comment.content,

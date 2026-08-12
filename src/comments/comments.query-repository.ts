@@ -1,18 +1,18 @@
-import { Filter, ObjectId } from 'mongodb'
-import { commentCollection } from '../db/mongo.db'
 import { CommentsQuery, CommentsQueryOutput } from '../core/types/query.types'
-import { CommentDb, CommentView } from './comments.types'
+import { CommentView } from './comments.types'
 import { mapperCommentView } from './mappers/mapper-comment.view'
 import { injectable } from 'inversify'
+import { Types } from 'mongoose'
+import { CommentModel } from './comments.model'
 
 @injectable()
 export class CommentsQueryRepository {
    async findById(id: string): Promise<CommentView | null> {
-      if (!ObjectId.isValid(id)) {
+      if (!Types.ObjectId.isValid(id)) {
          return null
       }
 
-      const comment = await commentCollection.findOne({ _id: new ObjectId(id) })
+      const comment = await CommentModel.findById(id)
 
       if (!comment) {
          return null
@@ -22,18 +22,18 @@ export class CommentsQueryRepository {
    }
 
    async findCommentsByPostId(postId: string, query: CommentsQuery): Promise<CommentsQueryOutput> {
-      const filter: Filter<CommentDb> = { postId }
+      const filter = { postId }
 
       const skip = (query.pageNumber - 1) * query.pageSize
 
-      const totalCount = await commentCollection.countDocuments(filter)
+      const totalCount = await CommentModel.countDocuments(filter)
 
-      const comments = await commentCollection
-         .find(filter)
-         .sort({ [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1 })
+      const comments = await CommentModel.find(filter)
+         .sort({
+            [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1,
+         })
          .skip(skip)
          .limit(query.pageSize)
-         .toArray()
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),

@@ -1,15 +1,15 @@
-import { deviceSessionCollection } from '../db/mongo.db'
 import { DeviceSessionDb } from './security.types'
 import { injectable } from 'inversify'
+import { DeviceSessionDocument, DeviceSessionModel } from './security.model'
 
 @injectable()
 export class SecurityRepository {
    async createSession(session: DeviceSessionDb): Promise<void> {
-      await deviceSessionCollection.insertOne(session)
+      await DeviceSessionModel.create(session)
    }
 
-   async findSessionByDeviceId(deviceId: string): Promise<DeviceSessionDb | null> {
-      return deviceSessionCollection.findOne({
+   async findSessionByDeviceId(deviceId: string): Promise<DeviceSessionDocument | null> {
+      return DeviceSessionModel.findOne({
          deviceId,
       })
    }
@@ -19,7 +19,7 @@ export class SecurityRepository {
       lastActiveDate: Date,
       expirationDate: Date,
    ): Promise<boolean> {
-      const result = await deviceSessionCollection.updateOne(
+      const result = await DeviceSessionModel.updateOne(
          {
             deviceId,
          },
@@ -35,7 +35,7 @@ export class SecurityRepository {
    }
 
    async deleteSession(deviceId: string): Promise<boolean> {
-      const result = await deviceSessionCollection.deleteOne({
+      const result = await DeviceSessionModel.deleteOne({
          deviceId,
       })
 
@@ -43,7 +43,7 @@ export class SecurityRepository {
    }
 
    async deleteOtherSessions(userId: string, currentDeviceId: string): Promise<void> {
-      await deviceSessionCollection.deleteMany({
+      await DeviceSessionModel.deleteMany({
          userId,
          deviceId: {
             $ne: currentDeviceId,

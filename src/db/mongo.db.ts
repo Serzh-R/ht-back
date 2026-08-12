@@ -1,13 +1,10 @@
 import mongoose from 'mongoose'
 import { Collection } from 'mongodb'
 import { SETTINGS } from '../core/settings'
-import { DeviceSessionDb } from '../security/security.types'
 import { ApiRequestDb } from '../rate-limit/rate-limit.types'
 
-const DEVICE_SESSION_COLLECTION_NAME = 'device-sessions'
 const API_REQUEST_COLLECTION_NAME = 'api-requests'
 
-export let deviceSessionCollection: Collection<DeviceSessionDb>
 export let apiRequestCollection: Collection<ApiRequestDb>
 
 export async function runDb(url: string): Promise<boolean> {
@@ -22,19 +19,9 @@ export async function runDb(url: string): Promise<boolean> {
          throw new Error('Database connection is not initialized')
       }
 
-      deviceSessionCollection = db.collection<DeviceSessionDb>(DEVICE_SESSION_COLLECTION_NAME)
       apiRequestCollection = db.collection<ApiRequestDb>(API_REQUEST_COLLECTION_NAME)
 
       await db.command({ ping: 1 })
-
-      await deviceSessionCollection.createIndex(
-         {
-            expirationDate: 1,
-         },
-         {
-            expireAfterSeconds: 0,
-         },
-      )
 
       await apiRequestCollection.createIndex(
          {

@@ -1,16 +1,14 @@
-import { deviceSessionCollection } from '../db/mongo.db'
 import { DeviceViewModel } from './security.types'
 import { mapperDeviceView } from './mappers/mapper-device.view'
 import { injectable } from 'inversify'
+import { DeviceSessionModel } from './security.model'
 
 @injectable()
 export class SecurityQueryRepository {
    async findAllByUserId(userId: string): Promise<DeviceViewModel[]> {
-      const sessions = await deviceSessionCollection
-         .find({
-            userId,
-         })
-         .toArray()
+      const sessions = await DeviceSessionModel.find({
+         userId,
+      })
 
       return sessions.map(mapperDeviceView)
    }

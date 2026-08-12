@@ -1,6 +1,7 @@
-import { DeviceSessionDb, DeviceViewModel } from '../security.types'
+import { DeviceViewModel } from '../security.types'
+import { DeviceSessionDocument } from '../security.model'
 
-export const mapperDeviceView = (session: DeviceSessionDb): DeviceViewModel => {
+export const mapperDeviceView = (session: DeviceSessionDocument): DeviceViewModel => {
    return {
       ip: session.ip,
       title: session.title,

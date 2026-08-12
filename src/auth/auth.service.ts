@@ -13,6 +13,7 @@ import { RegEmailResending } from './auth.types'
 import { BcryptService } from './adapters/bcrypt.service'
 import { createPasswordRecovery } from './helpers/create-password-recovery'
 import { inject, injectable } from 'inversify'
+import { UserDocument } from '../users/users.model'
 
 @injectable()
 export class AuthService {
@@ -22,7 +23,7 @@ export class AuthService {
       @inject(EmailManager) private emailManager: EmailManager,
    ) {}
 
-   async checkCredentials(input: LoginInputModel): Promise<Result<UserDb>> {
+   async checkCredentials(input: LoginInputModel): Promise<Result<UserDocument>> {
       const user = await this.usersRepository.findByLoginOrEmail(input.loginOrEmail)
 
       if (!user) {

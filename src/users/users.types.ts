@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongodb'
-
 export type UserInput = {
    login: string
    password: string
@@ -25,8 +23,6 @@ export type PasswordRecoveryInfo = {
 }
 
 export type UserDb = {
-   _id?: ObjectId
-
    login: string
    email: string
    passwordHash: string

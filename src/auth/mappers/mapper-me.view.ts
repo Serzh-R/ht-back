@@ -1,8 +1,7 @@
-import { UserDb } from '../../users/users.types'
 import { MeViewModel } from '../auth.types'
-import { WithId } from 'mongodb'
+import { UserDocument } from '../../users/users.model'
 
-export const mapperMeView = (user: WithId<UserDb>): MeViewModel => {
+export const mapperMeView = (user: UserDocument): MeViewModel => {
    return {
       email: user.email,
       login: user.login,

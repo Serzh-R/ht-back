@@ -44,8 +44,8 @@ export const HTTP_STATUSES = {
 
 export const BCRYPT_SALT_ROUNDS = 12
 
-export const ACCESS_TIME = process.env.JWT_ACCESS_TIME || '10'
+export const ACCESS_TIME = process.env.JWT_ACCESS_TIME || '3600'
 export const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'your_secret_key'
 
-export const REFRESH_TIME = process.env.JWT_REFRESH_TIME || '20'
+export const REFRESH_TIME = process.env.JWT_REFRESH_TIME || '36000'
 export const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your_refresh_secret_key'

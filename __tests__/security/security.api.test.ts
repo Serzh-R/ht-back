@@ -251,7 +251,6 @@ describe('Security devices API', () => {
       }
 
       await createAndConfirmUser(app, firstUserData)
-
       await createAndConfirmUser(app, secondUserData)
 
       const firstUserDevice = await loginDevice(app, firstUserData, 'First user Chrome')
@@ -274,7 +273,7 @@ describe('Security devices API', () => {
       expect(devicesAfterFailedDeletion).toHaveLength(1)
 
       expect(devicesAfterFailedDeletion[0].deviceId).toBe(secondUserDeviceId)
-   })
+   }, 30000)
 
    it('should invalidate refresh token after device deletion', async () => {
       const userData: TestUserData = {

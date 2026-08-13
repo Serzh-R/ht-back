@@ -1,6 +1,7 @@
 import { body, param } from 'express-validator'
 import { BlogsRepository } from '../../../blogs/blogs.repository'
 import { container } from '../../../composition-root'
+import { LikeStatus } from '../../../likes/likes.types'
 
 const blogsRepository = container.get(BlogsRepository)
 
@@ -224,4 +225,14 @@ export const newPasswordValidator = [
       .withMessage('recoveryCode must be a string')
       .notEmpty()
       .withMessage('recoveryCode is required'),
+]
+
+/*************************************************************************/
+
+export const likeStatusValidator = [
+   body('likeStatus')
+      .isString()
+      .withMessage('likeStatus must be a string')
+      .isIn(Object.values(LikeStatus))
+      .withMessage('likeStatus must be None, Like or Dislike'),
 ]

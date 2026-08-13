@@ -96,6 +96,7 @@ export class PostsController {
       const comments = await this.commentsQueryRepository.findCommentsByPostId(
          req.params.postId,
          query,
+         req.userId ?? null,
       )
 
       res.status(HTTP_STATUSES.OK_200).json(comments)

@@ -1,3 +1,5 @@
+import { LikesInfoView } from '../likes/likes.types'
+
 export type CommentInput = {
    content: string
 }
@@ -19,4 +21,5 @@ export type CommentView = {
    content: string
    commentatorInfo: CommentatorInfo
    createdAt: string
+   likesInfo: LikesInfoView
 }

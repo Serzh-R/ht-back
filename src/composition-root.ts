@@ -39,6 +39,10 @@ import { EmailManager } from './email/email.manager'
 import { RateLimitRepository } from './rate-limit/rate-limit.repository'
 import { RateLimitMiddleware } from './rate-limit/rate-limit.middleware'
 
+import { LikesRepository } from './likes/likes.repository'
+import { LikesService } from './likes/likes.service'
+import { LikesQueryRepository } from './likes/likes.query-repository'
+
 export const container = new Container()
 
 container.bind(UsersRepository).toSelf()
@@ -77,3 +81,7 @@ container.bind(EmailManager).toSelf()
 
 container.bind(RateLimitRepository).toSelf()
 container.bind(RateLimitMiddleware).toSelf()
+
+container.bind(LikesRepository).toSelf()
+container.bind(LikesQueryRepository).toSelf()
+container.bind(LikesService).toSelf()

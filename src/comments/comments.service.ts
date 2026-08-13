@@ -6,6 +6,8 @@ import { UsersRepository } from '../users/users.repository'
 import { inject, injectable } from 'inversify'
 import { CommentModel } from './comments.model'
 import { mapperCommentView } from './mappers/mapper-comment.view'
+import { LikeStatus } from '../likes/likes.types'
+import { LikesRepository } from '../likes/likes.repository'
 
 @injectable()
 export class CommentsService {
@@ -13,6 +15,7 @@ export class CommentsService {
       @inject(CommentsRepository) private commentsRepository: CommentsRepository,
       @inject(PostsQueryRepository) private postsQueryRepository: PostsQueryRepository,
       @inject(UsersRepository) private usersRepository: UsersRepository,
+      @inject(LikesRepository) private likesRepository: LikesRepository,
    ) {}
 
    async createComment(
@@ -55,7 +58,11 @@ export class CommentsService {
       return {
          status: ResultStatus.Created,
          extensions: [],
-         data: mapperCommentView(comment),
+         data: mapperCommentView(comment, {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+         }),
       }
    }
 
@@ -109,6 +116,8 @@ export class CommentsService {
       }
 
       await this.commentsRepository.delete(comment)
+
+      await this.likesRepository.deleteByParentId(commentId)
 
       return {
          status: ResultStatus.NoContent,

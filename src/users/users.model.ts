@@ -3,7 +3,7 @@ import { EmailConfirmationInfo, PasswordRecoveryInfo, UserDb } from './users.typ
 
 const emailConfirmationSchema = new Schema<EmailConfirmationInfo>(
    {
-      confirmationCode: { type: String, required: true },
+      confirmationCode: { type: String, required: false },
       expirationDate: { type: Date, required: true },
       isConfirmed: { type: Boolean, required: true },
    },

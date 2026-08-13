@@ -9,6 +9,7 @@ import { errorsResultMiddleware } from '../core/middlewares/validation/errorsRes
 import { jwtAccessAuthMiddleware } from '../auth/middlewares/jwt-access-auth.middleware'
 import { PostsController } from './posts.controller'
 import { container } from '../composition-root'
+import { jwtAccessAuthOptionalMiddleware } from '../auth/middlewares/jwt-access-auth-optional.middleware'
 
 const postsController = container.get(PostsController)
 
@@ -24,7 +25,11 @@ postsRouter.post(
    postsController.createCommentByPostId.bind(postsController),
 )
 
-postsRouter.get('/:postId/comments', postsController.getCommentsByPostId.bind(postsController))
+postsRouter.get(
+   '/:postId/comments',
+   jwtAccessAuthOptionalMiddleware,
+   postsController.getCommentsByPostId.bind(postsController),
+)
 
 postsRouter.get(
    '/:id',

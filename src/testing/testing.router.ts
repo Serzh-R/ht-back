@@ -6,6 +6,7 @@ import { UserModel } from '../users/users.model'
 import { CommentModel } from '../comments/comments.model'
 import { DeviceSessionModel } from '../security/security.model'
 import { ApiRequestModel } from '../rate-limit/rate-limit.model'
+import { LikeModel } from '../likes/likes.model'
 
 export const testingRouter = Router({})
 
@@ -16,6 +17,7 @@ testingRouter.delete('/', async (req: Request, res: Response) => {
    await CommentModel.deleteMany({})
    await DeviceSessionModel.deleteMany({})
    await ApiRequestModel.deleteMany({})
+   await LikeModel.deleteMany({})
 
    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

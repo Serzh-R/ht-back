@@ -5,16 +5,19 @@ import { ResultStatus } from '../core/result/result.types'
 import { CommentsService } from './comments.service'
 import { CommentsQueryRepository } from './comments.query-repository'
 import { inject, injectable } from 'inversify'
+import { LikesService } from '../likes/likes.service'
+import { LikeInput } from '../likes/likes.types'
 
 @injectable()
 export class CommentsController {
    constructor(
       @inject(CommentsService) private commentsService: CommentsService,
       @inject(CommentsQueryRepository) private commentsQueryRepository: CommentsQueryRepository,
+      @inject(LikesService) private likesService: LikesService,
    ) {}
 
    async getCommentById(req: Request<{ id: string }>, res: Response<CommentView>) {
-      const comment = await this.commentsQueryRepository.findById(req.params.id)
+      const comment = await this.commentsQueryRepository.findById(req.params.id, req.userId ?? null)
 
       if (!comment) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -43,6 +46,26 @@ export class CommentsController {
 
       if (result.status === ResultStatus.Forbidden) {
          res.sendStatus(HTTP_STATUSES.FORBIDDEN_403)
+         return
+      }
+
+      res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+   }
+
+   async updateLikeStatus(req: Request<{ commentId: string }, {}, LikeInput>, res: Response) {
+      if (!req.userId) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const result = await this.likesService.updateLikeStatus(
+         req.params.commentId,
+         req.userId,
+         req.body,
+      )
+
+      if (result.status === ResultStatus.NotFound) {
+         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
          return
       }
 

@@ -9,6 +9,7 @@ import { createTestBlog } from '../helpers/create-test-blog'
 import { createTestPost } from '../helpers/create-test-post'
 import { loginTestUser } from '../helpers/login-test-user'
 import { createTestComment } from '../helpers/create-test-comment'
+import { LikeModel } from '../../src/likes/likes.model'
 
 const app = createApp()
 
@@ -49,6 +50,11 @@ describe('Comments API', () => {
             userLogin: user.login,
          },
          createdAt: expect.any(String),
+         likesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: 'None',
+         },
       })
    })
 
@@ -292,6 +298,11 @@ describe('Comments API', () => {
             userLogin: user.login,
          },
          createdAt: expect.any(String),
+         likesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: 'None',
+         },
       })
 
       expect(response.body.extraField).toBeUndefined()
@@ -325,5 +336,162 @@ describe('Comments API', () => {
       })
 
       expect(response.body.extraField).toBeUndefined()
+   })
+
+   it('should make like, dislike and reset operations; PUT /comments/:commentId/like-status', async () => {
+      const firstUser = await createTestUser(app)
+      const firstUserToken = await loginTestUser(app, firstUser.login, 'qwerty123')
+
+      const secondUser = await createTestUser(app, {
+         login: 'secondUser',
+         email: 'second-user@mail.com',
+         password: 'qwerty123',
+      })
+
+      const secondUserToken = await loginTestUser(app, secondUser.login, 'qwerty123')
+
+      const blog = await createTestBlog(app)
+      const post = await createTestPost(app, blog.id)
+
+      const comment = await createTestComment(app, post.id, firstUserToken)
+
+      // Первый пользователь ставит лайк
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', firstUserToken)
+         .send({
+            likeStatus: 'Like',
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      // Без токена видны счётчики, но персональный статус — None
+      const publicResponse = await request(app)
+         .get(`${SETTINGS.PATH.COMMENTS}/${comment.id}`)
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(publicResponse.body.likesInfo).toEqual({
+         likesCount: 1,
+         dislikesCount: 0,
+         myStatus: 'None',
+      })
+
+      // С токеном первый пользователь видит свой Like
+      const firstUserResponse = await request(app)
+         .get(`${SETTINGS.PATH.COMMENTS}/${comment.id}`)
+         .set('Authorization', firstUserToken)
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(firstUserResponse.body.likesInfo).toEqual({
+         likesCount: 1,
+         dislikesCount: 0,
+         myStatus: 'Like',
+      })
+
+      // Повторный Like не создаёт вторую реакцию
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', firstUserToken)
+         .send({
+            likeStatus: 'Like',
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      // Второй пользователь ставит Dislike
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', secondUserToken)
+         .send({
+            likeStatus: 'Dislike',
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const secondUserResponse = await request(app)
+         .get(`${SETTINGS.PATH.COMMENTS}/${comment.id}`)
+         .set('Authorization', secondUserToken)
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(secondUserResponse.body.likesInfo).toEqual({
+         likesCount: 1,
+         dislikesCount: 1,
+         myStatus: 'Dislike',
+      })
+
+      // Первый пользователь меняет Like на Dislike
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', firstUserToken)
+         .send({
+            likeStatus: 'Dislike',
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const changedStatusResponse = await request(app)
+         .get(`${SETTINGS.PATH.COMMENTS}/${comment.id}`)
+         .set('Authorization', firstUserToken)
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(changedStatusResponse.body.likesInfo).toEqual({
+         likesCount: 0,
+         dislikesCount: 2,
+         myStatus: 'Dislike',
+      })
+
+      // Первый пользователь удаляет свою реакцию
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', firstUserToken)
+         .send({
+            likeStatus: 'None',
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      const resetResponse = await request(app)
+         .get(`${SETTINGS.PATH.COMMENTS}/${comment.id}`)
+         .set('Authorization', firstUserToken)
+         .expect(HTTP_STATUSES.OK_200)
+
+      expect(resetResponse.body.likesInfo).toEqual({
+         likesCount: 0,
+         dislikesCount: 1,
+         myStatus: 'None',
+      })
+   }, 60000)
+
+   it('should delete comment likes when comment is deleted; DELETE /comments/:commentId', async () => {
+      const user = await createTestUser(app)
+      const bearerToken = await loginTestUser(app, user.login, 'qwerty123')
+
+      const blog = await createTestBlog(app)
+      const post = await createTestPost(app, blog.id)
+      const comment = await createTestComment(app, post.id, bearerToken)
+
+      // Создаём реакцию
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', bearerToken)
+         .send({
+            likeStatus: 'Like',
+         })
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      // Проверяем, что реакция сохранилась
+      const likesBeforeDeleting = await LikeModel.countDocuments({
+         parentId: comment.id,
+      })
+
+      expect(likesBeforeDeleting).toBe(1)
+
+      // Удаляем комментарий
+      await request(app)
+         .delete(`${SETTINGS.PATH.COMMENTS}/${comment.id}`)
+         .set('Authorization', bearerToken)
+         .expect(HTTP_STATUSES.NO_CONTENT_204)
+
+      // Проверяем, что связанные реакции тоже удалены
+      const likesAfterDeleting = await LikeModel.countDocuments({
+         parentId: comment.id,
+      })
+
+      expect(likesAfterDeleting).toBe(0)
    })
 })

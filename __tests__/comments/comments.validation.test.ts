@@ -352,4 +352,112 @@ describe('Comments validation', () => {
          })
          .expect(HTTP_STATUSES.BAD_REQUEST_400)
    })
+
+   it('should not update like status without Bearer token; PUT /comments/:commentId/like-status', async () => {
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/666666666666666666666666/like-status`)
+         .send({
+            likeStatus: 'Like',
+         })
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should not update like status with incorrect Bearer token; PUT /comments/:commentId/like-status', async () => {
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/666666666666666666666666/like-status`)
+         .set('Authorization', 'Bearer incorrect-token')
+         .send({
+            likeStatus: 'Like',
+         })
+         .expect(HTTP_STATUSES.UNAUTHORIZED_401)
+   })
+
+   it('should not update like status if comment does not exist; PUT /comments/:commentId/like-status', async () => {
+      const user = await createTestUser(app)
+      const bearerToken = await loginTestUser(app, user.login, 'qwerty123')
+
+      await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/666666666666666666666666/like-status`)
+         .set('Authorization', bearerToken)
+         .send({
+            likeStatus: 'Like',
+         })
+         .expect(HTTP_STATUSES.NOT_FOUND_404)
+   })
+
+   it('should not update like status with incorrect value; PUT /comments/:commentId/like-status', async () => {
+      const user = await createTestUser(app)
+      const bearerToken = await loginTestUser(app, user.login, 'qwerty123')
+
+      const blog = await createTestBlog(app)
+      const post = await createTestPost(app, blog.id)
+      const comment = await createTestComment(app, post.id, bearerToken)
+
+      const response = await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', bearerToken)
+         .send({
+            likeStatus: 'IncorrectStatus',
+         })
+         .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: 'likeStatus must be None, Like or Dislike',
+               field: 'likeStatus',
+            },
+         ],
+      })
+   })
+
+   it('should not update like status without likeStatus field; PUT /comments/:commentId/like-status', async () => {
+      const user = await createTestUser(app)
+      const bearerToken = await loginTestUser(app, user.login, 'qwerty123')
+
+      const blog = await createTestBlog(app)
+      const post = await createTestPost(app, blog.id)
+      const comment = await createTestComment(app, post.id, bearerToken)
+
+      const response = await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', bearerToken)
+         .send({})
+         .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: 'likeStatus must be a string',
+               field: 'likeStatus',
+            },
+         ],
+      })
+   })
+
+   it('should not update like status if likeStatus is not string; PUT /comments/:commentId/like-status', async () => {
+      const user = await createTestUser(app)
+      const bearerToken = await loginTestUser(app, user.login, 'qwerty123')
+
+      const blog = await createTestBlog(app)
+      const post = await createTestPost(app, blog.id)
+      const comment = await createTestComment(app, post.id, bearerToken)
+
+      const response = await request(app)
+         .put(`${SETTINGS.PATH.COMMENTS}/${comment.id}/like-status`)
+         .set('Authorization', bearerToken)
+         .send({
+            likeStatus: 123,
+         })
+         .expect(HTTP_STATUSES.BAD_REQUEST_400)
+
+      expect(response.body).toEqual({
+         errorsMessages: [
+            {
+               message: 'likeStatus must be a string',
+               field: 'likeStatus',
+            },
+         ],
+      })
+   })
 })

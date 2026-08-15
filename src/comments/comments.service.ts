@@ -52,6 +52,8 @@ export class CommentsService {
       }
       comment.postId = postId
       comment.createdAt = new Date()
+      comment.likesCount = 0
+      comment.dislikesCount = 0
 
       await this.commentsRepository.save(comment)
 

@@ -14,6 +14,8 @@ export type CommentDb = {
    commentatorInfo: CommentatorInfo
    postId: string
    createdAt: Date
+   likesCount: number
+   dislikesCount: number
 }
 
 export type CommentView = {

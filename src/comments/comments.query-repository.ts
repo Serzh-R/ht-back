@@ -26,11 +26,15 @@ export class CommentsQueryRepository {
 
       const commentId = comment._id.toString()
 
-      const likesInfoMap = await this.likesQueryRepository.findLikesInfo([commentId], userId)
+      const myStatusesMap = await this.likesQueryRepository.findMyStatuses([commentId], userId)
 
-      const likesInfo = likesInfoMap.get(commentId)!
+      const myStatus = myStatusesMap.get(commentId)!
 
-      return mapperCommentView(comment, likesInfo)
+      return mapperCommentView(comment, {
+         likesCount: comment.likesCount,
+         dislikesCount: comment.dislikesCount,
+         myStatus,
+      })
    }
 
    async findCommentsByPostId(
@@ -53,7 +57,7 @@ export class CommentsQueryRepository {
 
       const commentIds = comments.map((comment) => comment._id.toString())
 
-      const likesInfoMap = await this.likesQueryRepository.findLikesInfo(commentIds, userId)
+      const myStatusesMap = await this.likesQueryRepository.findMyStatuses(commentIds, userId)
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),
@@ -62,9 +66,13 @@ export class CommentsQueryRepository {
          totalCount,
          items: comments.map((comment) => {
             const commentId = comment._id.toString()
-            const likesInfo = likesInfoMap.get(commentId)!
+            const myStatus = myStatusesMap.get(commentId)!
 
-            return mapperCommentView(comment, likesInfo)
+            return mapperCommentView(comment, {
+               likesCount: comment.likesCount,
+               dislikesCount: comment.dislikesCount,
+               myStatus,
+            })
          }),
       }
    }

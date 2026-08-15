@@ -17,6 +17,8 @@ const commentSchema = new Schema<CommentDb>(
       commentatorInfo: { type: commentatorInfoSchema, required: true },
       postId: { type: String, required: true },
       createdAt: { type: Date, required: true },
+      likesCount: { type: Number, required: true, default: 0 },
+      dislikesCount: { type: Number, required: true, default: 0 },
    },
    {
       collection: 'comments',

@@ -218,7 +218,6 @@ export class AuthService {
    async passwordRecovery(input: PasswordRecoveryInputModel): Promise<Result> {
       const user = await this.usersRepository.findByEmail(input.email)
 
-      // Даже если email не существует, возвращаем 204
       if (!user || !user._id) {
          return {
             status: ResultStatus.NoContent,

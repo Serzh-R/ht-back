@@ -124,34 +124,3 @@ export class PostsController {
       res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
    }
 }
-
-/*async createCommentByPostId(
-      req: Request<{ postId: string }, {}, CommentInput>,
-      res: Response<CommentView>,
-   ) {
-      if (!req.userId) {
-         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
-         return
-      }
-
-      const post = await postsQueryRepository.findById(req.params.postId)
-
-      if (!post) {
-         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-         return
-      }
-
-      const user = await usersRepository.findById(req.userId)
-
-      if (!user) {
-         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
-         return
-      }
-
-      const result = await commentsService.createComment(req.body, req.params.postId, {
-         userId: req.userId,
-         userLogin: user.login,
-      })
-
-      res.status(HTTP_STATUSES.CREATED_201).json(result.data!)
-   },*/

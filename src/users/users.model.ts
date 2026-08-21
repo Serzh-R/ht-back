@@ -1,5 +1,5 @@
-import { HydratedDocument, model, Schema } from 'mongoose'
-import { EmailConfirmationInfo, PasswordRecoveryInfo, UserDb } from './users.types'
+import { HydratedDocument, Model, model, Schema } from 'mongoose'
+import { EmailConfirmationInfo, PasswordRecoveryInfo, UserDb, UserInput } from './users.types'
 
 const emailConfirmationSchema = new Schema<EmailConfirmationInfo>(
    {
@@ -22,6 +22,22 @@ const passwordRecoverySchema = new Schema<PasswordRecoveryInfo>(
    },
 )
 
+interface UserMethods {
+   confirmEmail(): void
+
+   updateEmailConfirmation(emailConfirmation: EmailConfirmationInfo): void
+
+   setPasswordRecovery(passwordRecovery: PasswordRecoveryInfo): void
+
+   updatePassword(passwordHash: string): void
+}
+
+type UserStatics = typeof UserEntity
+
+type UserModelType = Model<UserDb, {}, UserMethods> & UserStatics
+
+export type UserDocument = HydratedDocument<UserDb, UserMethods>
+
 const userSchema = new Schema<UserDb>(
    {
       login: { type: String, required: true },
@@ -37,6 +53,50 @@ const userSchema = new Schema<UserDb>(
    },
 )
 
-export type UserDocument = HydratedDocument<UserDb>
+class UserEntity {
+   private constructor(
+      public login: string,
+      public email: string,
+      public passwordHash: string,
+      public createdAt: Date,
+      public emailConfirmation: EmailConfirmationInfo,
+      public passwordRecovery?: PasswordRecoveryInfo,
+   ) {}
 
-export const UserModel = model<UserDb>('User', userSchema)
+   static createUser(
+      input: UserInput,
+      passwordHash: string,
+      emailConfirmation: EmailConfirmationInfo,
+   ): UserDocument {
+      const user = new UserModel()
+
+      user.login = input.login
+      user.email = input.email
+      user.passwordHash = passwordHash
+      user.createdAt = new Date()
+      user.emailConfirmation = emailConfirmation
+
+      return user
+   }
+
+   confirmEmail(): void {
+      this.emailConfirmation.isConfirmed = true
+   }
+
+   updateEmailConfirmation(emailConfirmation: EmailConfirmationInfo): void {
+      this.emailConfirmation = emailConfirmation
+   }
+
+   setPasswordRecovery(passwordRecovery: PasswordRecoveryInfo): void {
+      this.passwordRecovery = passwordRecovery
+   }
+
+   updatePassword(passwordHash: string): void {
+      this.passwordHash = passwordHash
+      this.passwordRecovery = undefined
+   }
+}
+
+userSchema.loadClass(UserEntity)
+
+export const UserModel = model<UserDb, UserModelType>('User', userSchema)

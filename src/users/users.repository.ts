@@ -119,6 +119,10 @@ export class UsersRepository {
       return result.matchedCount === 1
    }
 
+   async save(user: UserDocument): Promise<void> {
+      await user.save()
+   }
+
    async create(newUser: UserDb): Promise<UserView> {
       const createdUser = await UserModel.create(newUser)
 

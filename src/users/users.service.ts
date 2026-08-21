@@ -1,8 +1,10 @@
-import { UserDb, UserInput, UserView } from './users.types'
+import { UserInput, UserView } from './users.types'
 import { UsersRepository } from './users.repository'
 import { Result, ResultStatus } from '../core/result/result.types'
 import { BcryptService } from '../auth/adapters/bcrypt.service'
 import { inject, injectable } from 'inversify'
+import { UserModel } from './users.model'
+import { mapperUserView } from './mappers/mapper-user.view'
 
 @injectable()
 export class UsersService {
@@ -44,24 +46,18 @@ export class UsersService {
 
       const passwordHash = await this.bcryptService.generateHash(input.password)
 
-      const newUser: UserDb = {
-         login: input.login,
-         email: input.email,
-         passwordHash,
-         createdAt: new Date(),
-         emailConfirmation: {
-            confirmationCode: '',
-            expirationDate: new Date(),
-            isConfirmed: true,
-         },
-      }
+      const user = UserModel.createUser(input, passwordHash, {
+         confirmationCode: '',
+         expirationDate: new Date(),
+         isConfirmed: true,
+      })
 
-      const createdUser = await this.usersRepository.create(newUser)
+      await this.usersRepository.save(user)
 
       return {
          status: ResultStatus.Created,
          extensions: [],
-         data: createdUser,
+         data: mapperUserView(user),
       }
    }
 

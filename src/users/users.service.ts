@@ -62,15 +62,17 @@ export class UsersService {
    }
 
    async deleteUserById(id: string): Promise<Result> {
-      const isDeleted = await this.usersRepository.deleteById(id)
+      const user = await this.usersRepository.findById(id)
 
-      if (!isDeleted) {
+      if (!user) {
          return {
             status: ResultStatus.NotFound,
             extensions: [],
             data: null,
          }
       }
+
+      await this.usersRepository.delete(user)
 
       return {
          status: ResultStatus.NoContent,

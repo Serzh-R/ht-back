@@ -5,7 +5,7 @@ import {
    NewPasswordRecoveryInputModel,
    PasswordRecoveryInputModel,
 } from './auth.types'
-import { UserInput, UserDb } from '../users/users.types'
+import { UserInput } from '../users/users.types'
 import { EmailManager } from '../email/email.manager'
 import { createEmailConfirmation } from './helpers/create-email-confirmation'
 import { RegConfirmCode } from './auth.types'
@@ -13,7 +13,7 @@ import { RegEmailResending } from './auth.types'
 import { BcryptService } from './adapters/bcrypt.service'
 import { createPasswordRecovery } from './helpers/create-password-recovery'
 import { inject, injectable } from 'inversify'
-import { UserDocument } from '../users/users.model'
+import { UserDocument, UserModel } from '../users/users.model'
 
 @injectable()
 export class AuthService {
@@ -95,18 +95,14 @@ export class AuthService {
 
       const passwordHash = await this.bcryptService.generateHash(input.password)
 
-      const newUser: UserDb = {
-         login: input.login,
-         email: input.email,
-         passwordHash,
-         createdAt: new Date(),
-         emailConfirmation: createEmailConfirmation(),
-      }
+      const emailConfirmation = createEmailConfirmation()
 
-      await this.usersRepository.create(newUser)
+      const user = UserModel.createUser(input, passwordHash, emailConfirmation)
 
-      this.emailManager.sendEmailConfirmationMessage(newUser).catch((e) => {
-         console.error(`Failed to send confirmation email to ${newUser.email}`, e)
+      await this.usersRepository.save(user)
+
+      this.emailManager.sendEmailConfirmationMessage(user).catch((e) => {
+         console.error(`Failed to send confirmation email to ${user.email}`, e)
       })
 
       return {
@@ -158,7 +154,9 @@ export class AuthService {
          }
       }
 
-      await this.usersRepository.confirmEmail(user._id!.toString())
+      user.confirmEmail()
+
+      await this.usersRepository.save(user)
 
       return {
          status: ResultStatus.NoContent,
@@ -198,13 +196,9 @@ export class AuthService {
 
       const newConfirmation = createEmailConfirmation()
 
-      await this.usersRepository.updateConfirmationInfo(
-         user._id!.toString(),
-         newConfirmation.confirmationCode,
-         newConfirmation.expirationDate,
-      )
+      user.updateEmailConfirmation(newConfirmation)
 
-      user.emailConfirmation = newConfirmation
+      await this.usersRepository.save(user)
 
       await this.emailManager.sendEmailConfirmationMessage(user)
 
@@ -228,11 +222,9 @@ export class AuthService {
 
       const passwordRecovery = createPasswordRecovery()
 
-      await this.usersRepository.updatePasswordRecoveryInfo(
-         user._id.toString(),
-         passwordRecovery.recoveryCode,
-         passwordRecovery.expirationDate,
-      )
+      user.setPasswordRecovery(passwordRecovery)
+
+      await this.usersRepository.save(user)
 
       this.emailManager
          .sendPasswordRecoveryMessage(user.email, passwordRecovery.recoveryCode)
@@ -250,7 +242,7 @@ export class AuthService {
    async newPassword(input: NewPasswordRecoveryInputModel): Promise<Result> {
       const user = await this.usersRepository.findByRecoveryCode(input.recoveryCode)
 
-      if (!user || !user._id || !user.passwordRecovery) {
+      if (!user || !user.passwordRecovery) {
          return {
             status: ResultStatus.BadRequest,
             extensions: [
@@ -278,23 +270,9 @@ export class AuthService {
 
       const passwordHash = await this.bcryptService.generateHash(input.newPassword)
 
-      const isPasswordUpdated = await this.usersRepository.updatePasswordHash(
-         user._id.toString(),
-         passwordHash,
-      )
+      user.updatePassword(passwordHash)
 
-      if (!isPasswordUpdated) {
-         return {
-            status: ResultStatus.BadRequest,
-            extensions: [
-               {
-                  field: 'recoveryCode',
-                  message: 'Recovery code is incorrect',
-               },
-            ],
-            data: null,
-         }
-      }
+      await this.usersRepository.save(user)
 
       return {
          status: ResultStatus.NoContent,

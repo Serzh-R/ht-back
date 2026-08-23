@@ -20,3 +20,13 @@ export type LikesInfoView = {
    dislikesCount: number
    myStatus: LikeStatus
 }
+
+export type LikeDetailsView = {
+   addedAt: string
+   userId: string
+   login: string
+}
+
+export type ExtendedLikesInfoView = LikesInfoView & {
+   newestLikes: LikeDetailsView[]
+}

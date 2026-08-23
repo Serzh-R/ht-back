@@ -1,3 +1,5 @@
+import { ExtendedLikesInfoView } from '../likes/likes.types'
+
 export type PostInput = {
    title: string
    shortDescription: string
@@ -18,6 +20,8 @@ export type PostDb = {
    blogId: string
    blogName: string
    createdAt: Date
+   likesCount: number
+   dislikesCount: number
 }
 
 export type PostView = {
@@ -28,4 +32,5 @@ export type PostView = {
    blogId: string
    blogName: string
    createdAt: string
+   extendedLikesInfo: ExtendedLikesInfoView
 }

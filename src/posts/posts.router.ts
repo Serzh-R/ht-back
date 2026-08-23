@@ -3,6 +3,7 @@ import { authMiddleware } from '../auth/middlewares/auth.middleware'
 import {
    commentFieldsValidator,
    idParamValidator,
+   likeStatusValidator,
    postFieldsValidator,
 } from '../core/middlewares/validation/fieldValidators'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
@@ -15,7 +16,11 @@ const postsController = container.get(PostsController)
 
 export const postsRouter = Router({})
 
-postsRouter.get('/', postsController.getPosts.bind(postsController))
+postsRouter.get(
+   '/',
+   jwtAccessAuthOptionalMiddleware,
+   postsController.getPosts.bind(postsController),
+)
 
 postsRouter.post(
    '/:postId/comments',
@@ -31,8 +36,17 @@ postsRouter.get(
    postsController.getCommentsByPostId.bind(postsController),
 )
 
+postsRouter.put(
+   '/:postId/like-status',
+   jwtAccessAuthMiddleware,
+   likeStatusValidator,
+   errorsResultMiddleware,
+   postsController.updatePostLikeStatus.bind(postsController),
+)
+
 postsRouter.get(
    '/:id',
+   jwtAccessAuthOptionalMiddleware,
    idParamValidator,
    errorsResultMiddleware,
    postsController.getPostById.bind(postsController),

@@ -5,6 +5,7 @@ import { LikeModel } from './likes.model'
 import { LikesRepository } from './likes.repository'
 import { LikeInput, LikeStatus } from './likes.types'
 import { UsersRepository } from '../users/users.repository'
+import { PostsRepository } from '../posts/posts.repository'
 
 @injectable()
 export class LikesService {
@@ -12,6 +13,7 @@ export class LikesService {
       @inject(LikesRepository) private likesRepository: LikesRepository,
       @inject(CommentsRepository) private commentsRepository: CommentsRepository,
       @inject(UsersRepository) private usersRepository: UsersRepository,
+      @inject(PostsRepository) private postsRepository: PostsRepository,
    ) {}
 
    async updateLikeStatus(commentId: string, userId: string, input: LikeInput): Promise<Result> {
@@ -116,6 +118,113 @@ export class LikesService {
       await this.likesRepository.save(existingLike)
 
       await this.commentsRepository.save(comment)
+
+      return {
+         status: ResultStatus.NoContent,
+         extensions: [],
+         data: null,
+      }
+   }
+
+   async updatePostLikeStatus(postId: string, userId: string, input: LikeInput): Promise<Result> {
+      const post = await this.postsRepository.findById(postId)
+
+      if (!post) {
+         return {
+            status: ResultStatus.NotFound,
+            extensions: [],
+            data: null,
+         }
+      }
+
+      const existingLike = await this.likesRepository.findByAuthorIdAndParentId(userId, postId)
+
+      if (!existingLike) {
+         if (input.likeStatus === LikeStatus.None) {
+            return {
+               status: ResultStatus.NoContent,
+               extensions: [],
+               data: null,
+            }
+         }
+
+         const user = await this.usersRepository.findById(userId)
+
+         if (!user) {
+            return {
+               status: ResultStatus.Unauthorized,
+               extensions: [],
+               data: null,
+            }
+         }
+
+         const like = new LikeModel()
+
+         like.createdAt = new Date()
+         like.status = input.likeStatus
+         like.authorId = userId
+         like.authorLogin = user.login
+         like.parentId = postId
+
+         if (input.likeStatus === LikeStatus.Like) {
+            post.likesCount += 1
+         }
+
+         if (input.likeStatus === LikeStatus.Dislike) {
+            post.dislikesCount += 1
+         }
+
+         await this.likesRepository.save(like)
+         await this.postsRepository.save(post)
+
+         return {
+            status: ResultStatus.NoContent,
+            extensions: [],
+            data: null,
+         }
+      }
+
+      if (input.likeStatus === LikeStatus.None) {
+         if (existingLike.status === LikeStatus.Like) {
+            post.likesCount -= 1
+         }
+
+         if (existingLike.status === LikeStatus.Dislike) {
+            post.dislikesCount -= 1
+         }
+
+         await this.likesRepository.delete(existingLike)
+         await this.postsRepository.save(post)
+
+         return {
+            status: ResultStatus.NoContent,
+            extensions: [],
+            data: null,
+         }
+      }
+
+      if (existingLike.status === input.likeStatus) {
+         return {
+            status: ResultStatus.NoContent,
+            extensions: [],
+            data: null,
+         }
+      }
+
+      if (existingLike.status === LikeStatus.Like) {
+         post.likesCount -= 1
+         post.dislikesCount += 1
+      }
+
+      if (existingLike.status === LikeStatus.Dislike) {
+         post.dislikesCount -= 1
+         post.likesCount += 1
+      }
+
+      existingLike.status = input.likeStatus
+
+      await this.likesRepository.save(existingLike)
+      await this.postsRepository.save(post)
 
       return {
          status: ResultStatus.NoContent,

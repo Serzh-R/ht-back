@@ -55,7 +55,11 @@ export class BlogsController {
 
       const query = normalizePostsQuery(req.query)
 
-      const posts = await this.postsQueryRepository.findPostsByBlogId(blogId, query)
+      const posts = await this.postsQueryRepository.findPostsByBlogId(
+         blogId,
+         query,
+         req.userId ?? null,
+      )
 
       res.status(HTTP_STATUSES.OK_200).send(posts)
    }

@@ -9,6 +9,7 @@ import { authMiddleware } from '../auth/middlewares/auth.middleware'
 import { errorsResultMiddleware } from '../core/middlewares/validation/errorsResultMiddleware'
 import { container } from '../composition-root'
 import { BlogsController } from './blogs.controller'
+import { jwtAccessAuthOptionalMiddleware } from '../auth/middlewares/jwt-access-auth-optional.middleware'
 
 const blogsController = container.get(BlogsController)
 
@@ -24,7 +25,11 @@ blogsRouter.post(
    blogsController.createBlog.bind(blogsController),
 )
 
-blogsRouter.get('/:blogId/posts', blogsController.getPostsByBlogId.bind(blogsController))
+blogsRouter.get(
+   '/:blogId/posts',
+   jwtAccessAuthOptionalMiddleware,
+   blogsController.getPostsByBlogId.bind(blogsController),
+)
 
 blogsRouter.post(
    '/:blogId/posts',

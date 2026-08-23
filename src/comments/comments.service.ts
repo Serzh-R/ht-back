@@ -23,7 +23,7 @@ export class CommentsService {
       postId: string,
       userId: string,
    ): Promise<Result<CommentView>> {
-      const post = await this.postsQueryRepository.findById(postId)
+      const post = await this.postsQueryRepository.findById(postId, null)
 
       if (!post) {
          return {

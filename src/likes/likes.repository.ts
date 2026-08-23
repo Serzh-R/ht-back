@@ -26,4 +26,16 @@ export class LikesRepository {
          parentId,
       })
    }
+
+   async deleteByParentIds(parentIds: string[]): Promise<void> {
+      if (parentIds.length === 0) {
+         return
+      }
+
+      await LikeModel.deleteMany({
+         parentId: {
+            $in: parentIds,
+         },
+      })
+   }
 }

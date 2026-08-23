@@ -1,4 +1,5 @@
 import type { DBType } from './db.types'
+import { LikeStatus } from '../likes/likes.types'
 
 export const db: DBType = {
    blogs: [
@@ -36,6 +37,13 @@ export const db: DBType = {
          blogId: '1',
          blogName: 'Serzh',
          createdAt: new Date().toISOString(),
+
+         extendedLikesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: [],
+         },
       },
       {
          id: '2',
@@ -45,6 +53,13 @@ export const db: DBType = {
          blogId: '2',
          blogName: 'IT Blog',
          createdAt: new Date().toISOString(),
+
+         extendedLikesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: [],
+         },
       },
       {
          id: '3',
@@ -54,6 +69,13 @@ export const db: DBType = {
          blogId: '3',
          blogName: 'JS Notes',
          createdAt: new Date().toISOString(),
+
+         extendedLikesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+            newestLikes: [],
+         },
       },
    ],
    users: [

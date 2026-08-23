@@ -8,12 +8,14 @@ import { mapperBlogView } from './mappers/mapper-blog.view'
 import { PostModel } from '../posts/posts.model'
 import { mapperPostView } from '../posts/mappers/mapper-post.view'
 import { LikeStatus } from '../likes/likes.types'
+import { LikesRepository } from '../likes/likes.repository'
 
 @injectable()
 export class BlogsService {
    constructor(
       @inject(BlogsRepository) private blogsRepository: BlogsRepository,
       @inject(PostsRepository) private postsRepository: PostsRepository,
+      @inject(LikesRepository) private likesRepository: LikesRepository,
    ) {}
 
    async createBlog(input: BlogInput): Promise<BlogView> {
@@ -83,9 +85,13 @@ export class BlogsService {
          return false
       }
 
+      const postIds = await this.postsRepository.findPostIdsByBlogId(id)
+
       await this.blogsRepository.delete(blog)
 
       await this.postsRepository.deletePostsByBlogId(id)
+
+      await this.likesRepository.deleteByParentIds(postIds)
 
       return true
    }

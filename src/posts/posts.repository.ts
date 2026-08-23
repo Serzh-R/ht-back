@@ -16,6 +16,16 @@ export class PostsRepository {
       return PostModel.findById(id)
    }
 
+   async findPostIdsByBlogId(blogId: string): Promise<string[]> {
+      const posts = await PostModel.find({
+         blogId,
+      }).select({
+         _id: 1,
+      })
+
+      return posts.map((post) => post._id.toString())
+   }
+
    async updateBlogNameForPosts(blogId: string, blogName: string): Promise<void> {
       await PostModel.updateMany(
          { blogId },

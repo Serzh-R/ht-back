@@ -5,12 +5,14 @@ import { inject, injectable } from 'inversify'
 import { PostModel } from './posts.model'
 import { mapperPostView } from './mappers/mapper-post.view'
 import { LikeStatus } from '../likes/likes.types'
+import { LikesRepository } from '../likes/likes.repository'
 
 @injectable()
 export class PostsService {
    constructor(
       @inject(BlogsRepository) private blogsRepository: BlogsRepository,
       @inject(PostsRepository) private postsRepository: PostsRepository,
+      @inject(LikesRepository) private likesRepository: LikesRepository,
    ) {}
 
    async createPost(input: PostInput): Promise<PostView | null> {
@@ -73,6 +75,8 @@ export class PostsService {
       }
 
       await this.postsRepository.delete(post)
+
+      await this.likesRepository.deleteByParentId(id)
 
       return true
    }

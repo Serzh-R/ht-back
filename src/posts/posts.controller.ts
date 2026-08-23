@@ -12,6 +12,8 @@ import { PostsQueryRepository } from './posts.query-repository'
 import { CommentsService } from '../comments/comments.service'
 import { CommentsQueryRepository } from '../comments/comments.query-repository'
 import { inject, injectable } from 'inversify'
+import { LikesService } from '../likes/likes.service'
+import { LikeInput } from '../likes/likes.types'
 
 @injectable()
 export class PostsController {
@@ -20,6 +22,7 @@ export class PostsController {
       @inject(PostsQueryRepository) private postsQueryRepository: PostsQueryRepository,
       @inject(CommentsService) private commentsService: CommentsService,
       @inject(CommentsQueryRepository) private commentsQueryRepository: CommentsQueryRepository,
+      @inject(LikesService) private likesService: LikesService,
    ) {}
 
    async getPosts(
@@ -28,13 +31,13 @@ export class PostsController {
    ) {
       const query = normalizePostsQuery(req.query)
 
-      const posts = await this.postsQueryRepository.findAll(query)
+      const posts = await this.postsQueryRepository.findAll(query, req.userId ?? null)
 
       res.status(HTTP_STATUSES.OK_200).json(posts)
    }
 
    async getPostById(req: Request<{ id: string }>, res: Response<PostView>) {
-      const post = await this.postsQueryRepository.findById(req.params.id)
+      const post = await this.postsQueryRepository.findById(req.params.id, req.userId ?? null)
 
       if (!post) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -42,6 +45,31 @@ export class PostsController {
       }
 
       res.status(HTTP_STATUSES.OK_200).json(post)
+   }
+
+   async updatePostLikeStatus(req: Request<{ postId: string }, {}, LikeInput>, res: Response) {
+      if (!req.userId) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      const result = await this.likesService.updatePostLikeStatus(
+         req.params.postId,
+         req.userId,
+         req.body,
+      )
+
+      if (result.status === ResultStatus.NotFound) {
+         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+         return
+      }
+
+      if (result.status === ResultStatus.Unauthorized) {
+         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+         return
+      }
+
+      res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
    }
 
    async createPost(req: Request<{}, {}, PostInput>, res: Response) {
@@ -84,7 +112,7 @@ export class PostsController {
       req: Request<{ postId: string }, Paginator<CommentView>, {}, CommentsQueryInput>,
       res: Response<Paginator<CommentView>>,
    ) {
-      const post = await this.postsQueryRepository.findById(req.params.postId)
+      const post = await this.postsQueryRepository.findById(req.params.postId, req.userId ?? null)
 
       if (!post) {
          res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

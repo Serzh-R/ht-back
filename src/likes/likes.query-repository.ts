@@ -1,6 +1,6 @@
 import { injectable } from 'inversify'
 import { LikeModel } from './likes.model'
-import { LikeStatus } from './likes.types'
+import { LikeDetailsView, LikeStatus } from './likes.types'
 
 @injectable()
 export class LikesQueryRepository {
@@ -30,5 +30,46 @@ export class LikesQueryRepository {
       }
 
       return myStatusesMap
+   }
+
+   async findNewestLikes(parentIds: string[]): Promise<Map<string, LikeDetailsView[]>> {
+      const newestLikesMap = new Map<string, LikeDetailsView[]>()
+
+      for (const parentId of parentIds) {
+         newestLikesMap.set(parentId, [])
+      }
+
+      if (parentIds.length === 0) {
+         return newestLikesMap
+      }
+
+      const likes = await LikeModel.find({
+         parentId: {
+            $in: parentIds,
+         },
+         status: LikeStatus.Like,
+      }).sort({
+         createdAt: -1,
+      })
+
+      for (const like of likes) {
+         const newestLikes = newestLikesMap.get(like.parentId)
+
+         if (!newestLikes) {
+            continue
+         }
+
+         if (newestLikes.length >= 3) {
+            continue
+         }
+
+         newestLikes.push({
+            addedAt: like.createdAt.toISOString(),
+            userId: like.authorId,
+            login: like.authorLogin,
+         })
+      }
+
+      return newestLikesMap
    }
 }

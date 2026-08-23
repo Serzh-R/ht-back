@@ -12,6 +12,7 @@ export type LikeDb = {
    createdAt: Date
    status: LikeStatus.Like | LikeStatus.Dislike
    authorId: string
+   authorLogin: string
    parentId: string
 }
 

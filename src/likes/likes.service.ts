@@ -4,12 +4,14 @@ import { Result, ResultStatus } from '../core/result/result.types'
 import { LikeModel } from './likes.model'
 import { LikesRepository } from './likes.repository'
 import { LikeInput, LikeStatus } from './likes.types'
+import { UsersRepository } from '../users/users.repository'
 
 @injectable()
 export class LikesService {
    constructor(
       @inject(LikesRepository) private likesRepository: LikesRepository,
       @inject(CommentsRepository) private commentsRepository: CommentsRepository,
+      @inject(UsersRepository) private usersRepository: UsersRepository,
    ) {}
 
    async updateLikeStatus(commentId: string, userId: string, input: LikeInput): Promise<Result> {
@@ -34,11 +36,22 @@ export class LikesService {
             }
          }
 
+         const user = await this.usersRepository.findById(userId)
+
+         if (!user) {
+            return {
+               status: ResultStatus.Unauthorized,
+               extensions: [],
+               data: null,
+            }
+         }
+
          const like = new LikeModel()
 
          like.createdAt = new Date()
          like.status = input.likeStatus
          like.authorId = userId
+         like.authorLogin = user.login
          like.parentId = commentId
 
          if (input.likeStatus === LikeStatus.Like) {

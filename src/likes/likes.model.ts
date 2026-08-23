@@ -6,6 +6,7 @@ const likeSchema = new Schema<LikeDb>(
       createdAt: { type: Date, required: true },
       status: { type: String, enum: [LikeStatus.Like, LikeStatus.Dislike], required: true },
       authorId: { type: String, required: true },
+      authorLogin: { type: String, required: true },
       parentId: { type: String, required: true },
    },
    {

@@ -7,6 +7,7 @@ import { BlogModel } from './blogs.model'
 import { mapperBlogView } from './mappers/mapper-blog.view'
 import { PostModel } from '../posts/posts.model'
 import { mapperPostView } from '../posts/mappers/mapper-post.view'
+import { LikeStatus } from '../likes/likes.types'
 
 @injectable()
 export class BlogsService {
@@ -62,10 +63,17 @@ export class BlogsService {
       post.blogId = blog._id.toString()
       post.blogName = blog.name
       post.createdAt = new Date()
+      post.likesCount = 0
+      post.dislikesCount = 0
 
       await this.postsRepository.save(post)
 
-      return mapperPostView(post)
+      return mapperPostView(post, {
+         likesCount: post.likesCount,
+         dislikesCount: post.dislikesCount,
+         myStatus: LikeStatus.None,
+         newestLikes: [],
+      })
    }
 
    async deleteBlogById(id: string): Promise<boolean> {

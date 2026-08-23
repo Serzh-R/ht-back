@@ -13,6 +13,8 @@ const postSchema = new Schema<PostDb>(
       blogId: { type: String, required: true },
       blogName: { type: String, required: true },
       createdAt: { type: Date, required: true },
+      likesCount: { type: Number, required: true, default: 0 },
+      dislikesCount: { type: Number, required: true, default: 0 },
    },
    {
       collection: 'posts',

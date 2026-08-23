@@ -4,6 +4,7 @@ import { PostsRepository } from './posts.repository'
 import { inject, injectable } from 'inversify'
 import { PostModel } from './posts.model'
 import { mapperPostView } from './mappers/mapper-post.view'
+import { LikeStatus } from '../likes/likes.types'
 
 @injectable()
 export class PostsService {
@@ -27,10 +28,17 @@ export class PostsService {
       post.blogId = input.blogId
       post.blogName = blog.name
       post.createdAt = new Date()
+      post.likesCount = 0
+      post.dislikesCount = 0
 
       await this.postsRepository.save(post)
 
-      return mapperPostView(post)
+      return mapperPostView(post, {
+         likesCount: post.likesCount,
+         dislikesCount: post.dislikesCount,
+         myStatus: LikeStatus.None,
+         newestLikes: [],
+      })
    }
 
    async updatePost(id: string, input: PostInput): Promise<boolean> {

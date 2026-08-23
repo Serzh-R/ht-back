@@ -1,7 +1,11 @@
 import { PostView } from '../posts.types'
 import { PostDocument } from '../posts.model'
+import { ExtendedLikesInfoView } from '../../likes/likes.types'
 
-export function mapperPostView(post: PostDocument): PostView {
+export function mapperPostView(
+   post: PostDocument,
+   extendedLikesInfo: ExtendedLikesInfoView,
+): PostView {
    return {
       id: post._id.toString(),
       title: post.title,
@@ -10,5 +14,6 @@ export function mapperPostView(post: PostDocument): PostView {
       blogId: post.blogId,
       blogName: post.blogName,
       createdAt: post.createdAt.toISOString(),
+      extendedLikesInfo,
    }
 }

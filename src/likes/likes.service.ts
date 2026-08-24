@@ -222,6 +222,7 @@ export class LikesService {
       }
 
       existingLike.status = input.likeStatus
+      existingLike.createdAt = new Date()
 
       await this.likesRepository.save(existingLike)
       await this.postsRepository.save(post)

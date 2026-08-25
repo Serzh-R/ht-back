@@ -127,7 +127,7 @@ export class LikesService {
    }
 
    async updatePostLikeStatus(postId: string, userId: string, input: LikeInput): Promise<Result> {
-      const post = await this.postsRepository.findById(postId)
+      /*const post = await this.postsRepository.findById(postId)
 
       if (!post) {
          return {
@@ -137,7 +137,20 @@ export class LikesService {
          }
       }
 
-      const existingLike = await this.likesRepository.findByAuthorIdAndParentId(userId, postId)
+      const existingLike = await this.likesRepository.findByAuthorIdAndParentId(userId, postId)*/
+
+      const [post, existingLike] = await Promise.all([
+         this.postsRepository.findById(postId),
+         this.likesRepository.findByAuthorIdAndParentId(userId, postId),
+      ])
+
+      if (!post) {
+         return {
+            status: ResultStatus.NotFound,
+            extensions: [],
+            data: null,
+         }
+      }
 
       if (!existingLike) {
          if (input.likeStatus === LikeStatus.None) {
@@ -174,8 +187,10 @@ export class LikesService {
             post.dislikesCount += 1
          }
 
-         await this.likesRepository.save(like)
-         await this.postsRepository.save(post)
+         /*await this.likesRepository.save(like)
+         await this.postsRepository.save(post)*/
+
+         await Promise.all([this.likesRepository.save(like), this.postsRepository.save(post)])
 
          return {
             status: ResultStatus.NoContent,
@@ -193,8 +208,13 @@ export class LikesService {
             post.dislikesCount -= 1
          }
 
-         await this.likesRepository.delete(existingLike)
-         await this.postsRepository.save(post)
+         /*await this.likesRepository.delete(existingLike)
+         await this.postsRepository.save(post)*/
+
+         await Promise.all([
+            this.likesRepository.delete(existingLike),
+            this.postsRepository.save(post),
+         ])
 
          return {
             status: ResultStatus.NoContent,
@@ -224,8 +244,10 @@ export class LikesService {
       existingLike.status = input.likeStatus
       existingLike.createdAt = new Date()
 
-      await this.likesRepository.save(existingLike)
-      await this.postsRepository.save(post)
+      /*await this.likesRepository.save(existingLike)
+      await this.postsRepository.save(post)*/
+
+      await Promise.all([this.likesRepository.save(existingLike), this.postsRepository.save(post)])
 
       return {
          status: ResultStatus.NoContent,

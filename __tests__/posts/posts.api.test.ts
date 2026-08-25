@@ -58,6 +58,12 @@ describe('Posts API', () => {
          blogId: createdBlog.id,
          blogName: createdBlog.name,
          createdAt: expect.any(String),
+         extendedLikesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: 'None',
+            newestLikes: [],
+         },
       })
 
       const postsListResponse = await request(app)
@@ -125,6 +131,12 @@ describe('Posts API', () => {
          blogId: anotherBlog.id,
          blogName: anotherBlog.name,
          createdAt: expect.any(String),
+         extendedLikesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: 'None',
+            newestLikes: [],
+         },
       })
    })
 

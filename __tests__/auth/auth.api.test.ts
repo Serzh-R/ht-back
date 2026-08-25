@@ -873,11 +873,12 @@ describe('Auth API', () => {
 
       const expiredRecoveryCode = 'expired-recovery-code'
 
-      await usersRepository.updatePasswordRecoveryInfo(
-         user!._id!.toString(),
-         expiredRecoveryCode,
-         new Date(Date.now() - 1000),
-      )
+      user!.setPasswordRecovery({
+         recoveryCode: expiredRecoveryCode,
+         expirationDate: new Date(Date.now() - 1000),
+      })
+
+      await usersRepository.save(user!)
 
       const response = await request(app).post(`${SETTINGS.PATH.AUTH}/new-password`).send({
          newPassword: 'newPassword123',

@@ -17,20 +17,35 @@ export class PostsQueryRepository {
    async findAll(query: PostsQuery, userId: string | null): Promise<PostsQueryOutput> {
       const skip = (query.pageNumber - 1) * query.pageSize
 
-      const totalCount = await PostModel.countDocuments({})
+      /*const totalCount = await PostModel.countDocuments({})
 
       const posts = await PostModel.find({})
          .sort({
             [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1,
          })
          .skip(skip)
-         .limit(query.pageSize)
+         .limit(query.pageSize)*/
+
+      const [totalCount, posts] = await Promise.all([
+         PostModel.countDocuments({}),
+         PostModel.find({})
+            .sort({
+               [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1,
+            })
+            .skip(skip)
+            .limit(query.pageSize),
+      ])
 
       const postIds = posts.map((post) => post._id.toString())
 
-      const myStatusesMap = await this.likesQueryRepository.findMyStatuses(postIds, userId)
+      /*const myStatusesMap = await this.likesQueryRepository.findMyStatuses(postIds, userId)
 
-      const newestLikesMap = await this.likesQueryRepository.findNewestLikes(postIds)
+      const newestLikesMap = await this.likesQueryRepository.findNewestLikes(postIds)*/
+
+      const [myStatusesMap, newestLikesMap] = await Promise.all([
+         this.likesQueryRepository.findMyStatuses(postIds, userId),
+         this.likesQueryRepository.findNewestLikes(postIds),
+      ])
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),
@@ -84,20 +99,35 @@ export class PostsQueryRepository {
 
       const skip = (query.pageNumber - 1) * query.pageSize
 
-      const totalCount = await PostModel.countDocuments(filter)
+      /*const totalCount = await PostModel.countDocuments(filter)
 
       const posts = await PostModel.find(filter)
          .sort({
             [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1,
          })
          .skip(skip)
-         .limit(query.pageSize)
+         .limit(query.pageSize)*/
+
+      const [totalCount, posts] = await Promise.all([
+         PostModel.countDocuments(filter),
+         PostModel.find(filter)
+            .sort({
+               [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1,
+            })
+            .skip(skip)
+            .limit(query.pageSize),
+      ])
 
       const postIds = posts.map((post) => post._id.toString())
 
-      const myStatusesMap = await this.likesQueryRepository.findMyStatuses(postIds, userId)
+      /*const myStatusesMap = await this.likesQueryRepository.findMyStatuses(postIds, userId)
 
-      const newestLikesMap = await this.likesQueryRepository.findNewestLikes(postIds)
+      const newestLikesMap = await this.likesQueryRepository.findNewestLikes(postIds)*/
+
+      const [myStatusesMap, newestLikesMap] = await Promise.all([
+         this.likesQueryRepository.findMyStatuses(postIds, userId),
+         this.likesQueryRepository.findNewestLikes(postIds),
+      ])
 
       return {
          pagesCount: Math.ceil(totalCount / query.pageSize),
